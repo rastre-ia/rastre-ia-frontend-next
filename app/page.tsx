@@ -1,101 +1,72 @@
-import Image from "next/image";
+import React from "react";
+import Link from "next/link";
 
-export default function Home() {
+import { Button } from "@/components/ui/button";
+
+import AnimatedLogo from "@/components/AnimatedLogo";
+import ProcessFlux from "./ProcessFlux";
+import MotionHeader from "./MotionHeader";
+import FeatureCards from "./FeatureCards";
+
+const Home: React.FC = () => {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+        <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
+          <Link href="/" className="text-2xl font-bold text-primary">
+            <AnimatedLogo className="inline" />
+          </Link>
+          <div className="space-x-4">
+            <Link href="/login">
+              <Button>Entrar</Button>
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      <main className="pt-20">
+        <MotionHeader />
+
+        <section className="container mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            Como Funciona
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCards />
+          </div>
+        </section>
+
+        <ProcessFlux />
+
+        <section className="container mx-auto px-6 py-20">
+          <div className="bg-white dark:bg-gray-800 p-12 rounded-lg shadow-lg">
+            <h2 className="text-3xl font-bold mb-6">
+              Junte-se à Luta Contra o Crime
+            </h2>
+            <p className="text-lg mb-8">
+              O RastreIA é mais que uma ferramenta – é uma iniciativa da
+              comunidade contra roubos, assistindo as autoridades. Com a
+              tecnologia de IA e colaboração, tornamos as comunidades mais
+              seguras, uma denúncia de cada vez.
+            </p>
+            <Link href="/register">
+              <Button size="lg" className="w-full sm:w-auto">
+                Registrar Item Roubado
+              </Button>
+            </Link>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      <footer className="bg-gray-100 dark:bg-gray-900 py-8 mt-auto">
+        <div className="container mx-auto px-6 text-center">
+          <p>
+            &copy; {new Date().getFullYear()} RastreIA. Todos os direitos
+            reservados.
+          </p>
+        </div>
       </footer>
     </div>
   );
-}
+};
+
+export default Home;
