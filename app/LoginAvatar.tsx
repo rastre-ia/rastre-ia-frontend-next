@@ -3,17 +3,28 @@ import { FunctionComponent } from 'react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { useSession } from 'next-auth/react';
+import { useSession, SessionProvider } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 
 interface LoginAvatarProps {}
 
 const LoginAvatar: FunctionComponent<LoginAvatarProps> = () => {
-	const { data: session, status } = useSession();
+	const session = useSession();
 
-	if (status === 'authenticated') {
+	if (session.status === 'authenticated') {
 		console.log(session);
 
-		return <p>Signed in as {session?.user ? session.user.name : 'A'}</p>;
+		return (
+			<SessionProvider>
+				<Button
+					onClick={() => {
+						signOut();
+					}}
+				>
+					Sair
+				</Button>
+			</SessionProvider>
+		);
 	}
 
 	return (
