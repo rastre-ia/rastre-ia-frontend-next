@@ -49,7 +49,7 @@ const Home: React.FC = () => {
               tecnologia de IA e colaboração, tornamos as comunidades mais
               seguras, uma denúncia de cada vez.
             </p>
-            <Link href="/register">
+            <Link href="/register-item">
               <Button size="lg" className="w-full sm:w-auto">
                 Registrar Item Roubado
               </Button>

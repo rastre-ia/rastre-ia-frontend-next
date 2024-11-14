@@ -35,7 +35,7 @@ const MotionHeader: FunctionComponent<MotionHeaderProps> = () => {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="space-x-4"
       >
-        <Link href="/register">
+        <Link href="/register-item">
           <Button size="lg">Registrar Item Roubado</Button>
         </Link>
         <Link href="/new-report">
