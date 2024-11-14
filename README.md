@@ -6,18 +6,20 @@ First install all the dependencies.
 pnpm install
 ```
 
-Now you need to create a `.env` file on root, this file contains the endpoints and API keys:
+Now you need to create a `.env.local` file on root, this file contains the endpoints and API keys:
 
-```shell
-MONGO_DB_URL=
-MONGO_DB_API_KEY=
-```
+````shell
+AUTH_SECRET="MySecret" # Added by `npx auth`. Read more: https://cli.authjs.dev
+
+
+# Replace <password>
+MONGODB_URI="mongodb+srv://rastreia:<password>@rastre-ia-cluster-1.wtxmq.mongodb.net/rastreia?retryWrites=true&w=majority&appName=Rastre-ia-cluster-1"```
 
 ## To run use:
 
 ```shell
 pnpm dev
-```
+````
 
 ## To add shadcn componets:
 
