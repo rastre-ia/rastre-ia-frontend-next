@@ -1,22 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, User } from 'lucide-react';
-import { redirect, useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
+import { useSearchParams } from 'next/navigation';
 
 export default function CitizenLogin({}: {}) {
 	const [cpf, setCpf] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-	const [error, setError] = useState<string>('');
-	const router = useRouter();
+	const searchParams = useSearchParams();
+	const searchParamError = searchParams.get('error');
+	const [error, setError] = useState<string>(
+		searchParamError
+			? 'Credenciais inválidas. Por favor, tente novamente.'
+			: ''
+	);
 
-	const credentialsAction = (formData: FormData) => {
+	const credentialsAction = async (formData: FormData) => {
 		if (!isValidCPF(cpf)) {
 			setError(
 				'CPF inválido. Por favor, insira um CPF no formato XXX.XXX.XXX-XX.'
@@ -26,7 +31,7 @@ export default function CitizenLogin({}: {}) {
 		// Remove all non-numeric characters
 		const cleanedCpf = cpf.replace(/\D/g, '');
 
-		signIn('credentials', {
+		await signIn('credentials', {
 			password: password,
 			cpf: cleanedCpf,
 			redirectTo: '/my-profile',
@@ -89,9 +94,19 @@ export default function CitizenLogin({}: {}) {
 					</div>
 				</div>
 			</div>
-			<Button type="submit" className="w-full mt-6">
-				<User className="mr-2 h-4 w-4" />
-				Entrar como Cidadão
+			<Button
+				type="submit"
+				className="w-full mt-6"
+				// disabled={isSubmitting}
+			>
+				{/* {isSubmitting ? (
+					<>Carregando...</>
+				) : ( */}
+				<>
+					<User className="mr-2 h-4 w-4" />
+					Entrar como Cidadão
+				</>
+				{/* )} */}
 			</Button>
 		</form>
 	);

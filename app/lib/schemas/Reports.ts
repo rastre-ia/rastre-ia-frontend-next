@@ -30,7 +30,7 @@ export enum ReportSubmissionMethodEnum {
 }
 
 export interface ReportSchemaInterface {
-	userId: Schema.Types.ObjectId;
+	userId: Schema.Types.ObjectId | string;
 	title: string;
 	location: PointSchemaInterface;
 	description: string;
@@ -39,10 +39,10 @@ export interface ReportSchemaInterface {
 	assistanceNeeded: ReportAssistanceNeededEnum;
 	type: ReportTypeEnum;
 	submissionMethod: ReportSubmissionMethodEnum;
-	chatHistory: ChatSchemaInterface[];
+	chatHistory?: ChatSchemaInterface[];
 	embeddings: number[];
-	createdAt: Date;
-	updatedAt: Date;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 const reportsSchema = new Schema<ReportSchemaInterface>({

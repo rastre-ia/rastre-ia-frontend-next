@@ -47,7 +47,7 @@ const Home: React.FC = () => {
 							iniciativa da comunidade contra roubos, assistindo
 							as autoridades. Com a tecnologia de IA e
 							colaboração, tornamos as comunidades mais seguras,
-							uma denúncia de cada vez.
+							um relato de cada vez.
 						</p>
 						<Link href="/register-item">
 							<Button size="lg" className="w-full sm:w-auto">

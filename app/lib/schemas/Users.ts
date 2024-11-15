@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from 'mongoose';
 import pointSchema from './helpers/PointSchema';
 
-interface UsersType {
+export interface UsersType {
 	name: string;
 	email: string;
 	cpf: string;

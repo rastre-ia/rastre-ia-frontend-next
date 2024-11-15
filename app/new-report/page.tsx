@@ -38,10 +38,17 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AnimatedLogo from '@/components/AnimatedLogo';
 import {
 	ReportAssistanceNeededEnum,
+	ReportSchemaInterface,
 	ReportStatusEnum,
 	ReportSubmissionMethodEnum,
 	ReportTypeEnum,
 } from '../lib/schemas/Reports';
+import { validReportTypesTranslated } from '../_helpers/report-type-translator';
+import { useSession } from 'next-auth/react';
+import { getUserObjectIdById } from '../_helpers/db/users';
+import { createNewReport } from '../_helpers/db/reports';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 // Função mock para simular resposta de IA
 const getAIResponse = async (message: string) => {
@@ -67,13 +74,8 @@ function LocationPicker({
 }
 
 export default function ReportPage() {
-	const [messages, setMessages] = useState([
-		{
-			role: 'system',
-			content:
-				'Olá! Estou aqui para ajudar você a fazer um relato. O que você gostaria de relatar hoje? Seja um roubo, atividade suspeita ou qualquer outra coisa, estou aqui para ouvir e coletar os detalhes importantes.',
-		},
-	]);
+	const { data: session, status } = useSession();
+	const [messages, setMessages] = useState([]);
 	const [input, setInput] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [reportData, setReportData] = useState({
@@ -81,32 +83,88 @@ export default function ReportPage() {
 		location: { type: 'Point', coordinates: [0, 0] },
 		description: '',
 		images: [],
-		status: ReportStatusEnum.PENDING,
 		assistanceNeeded: ReportAssistanceNeededEnum.DONT_REQUIRE_ASSIST,
 		type: ReportTypeEnum.STRANGE_ACTIVITY,
 		submissionMethod: ReportSubmissionMethodEnum.FORMS,
 	});
+	const userId = session?.user?._id;
+	const { toast } = useToast();
+	const router = useRouter();
+
+	if (status !== 'authenticated') {
+		return <div>Access Denied</div>;
+	}
+
+	if (!userId) {
+		return <div>Loading...</div>;
+	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!input.trim()) return;
 
-		setMessages((prev) => [...prev, { role: 'user', content: input }]);
 		setInput('');
 		setIsLoading(true);
 
 		const aiResponse = await getAIResponse(input);
-		setMessages((prev) => [
-			...prev,
-			{ role: 'system', content: aiResponse },
-		]);
+		// setMessages((prev) => [
+		// 	...prev,
+		// 	{ role: 'system', content: aiResponse },
+		// ]);
 		setIsLoading(false);
 	};
 
-	const handleFormSubmit = (e: React.FormEvent) => {
+	const handleFormSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log('Formulário enviado:', reportData);
-		// Aqui você normalmente enviaria esses dados para o seu backend
+
+		setInput('');
+		setIsLoading(true);
+
+		try {
+			const userObjectId = await getUserObjectIdById(userId);
+
+			const reportBody: ReportSchemaInterface = {
+				userId: userObjectId,
+				title: reportData.title,
+				location: {
+					type: 'Point',
+					coordinates: [
+						reportData.location.coordinates[1],
+						reportData.location.coordinates[0],
+					],
+				},
+				description: reportData.description,
+				images: reportData.images,
+				status: ReportStatusEnum.NOT_APPLICABLE,
+				assistanceNeeded: reportData.assistanceNeeded,
+				type: reportData.type,
+				submissionMethod: reportData.submissionMethod,
+				chatHistory: messages,
+				embeddings: [],
+			};
+
+			const res = await createNewReport(reportBody);
+			if (res.status === 200) {
+				console.log('Report created successfully');
+				toast({
+					title: 'Success',
+					description: 'Seu relatório foi criado com sucesso',
+					variant: 'default',
+				});
+				router.push('/my-profile');
+			} else {
+				throw new Error('Error creating report');
+			}
+		} catch (error) {
+			toast({
+				title: 'Error',
+				description: 'Erro ao criar relatório',
+				variant: 'destructive',
+			});
+			console.error('Error creating report:', error);
+		}
+
+		setIsLoading(false);
 	};
 
 	const handleLocationChange = (latlng: { lat: number; lng: number }) => {
@@ -135,10 +193,10 @@ export default function ReportPage() {
 				className="max-w-2xl mx-auto"
 			>
 				<div className="flex justify-between items-center mb-6">
-					<Link href="/">
+					<Link href="/my-profile">
 						<Button variant="ghost" className="gap-2">
 							<ArrowLeft className="h-4 w-4" />
-							Voltar para o Início
+							Voltar à minha página
 						</Button>
 					</Link>
 					<h1 className="text-3xl font-bold text-primary">
@@ -170,7 +228,7 @@ export default function ReportPage() {
 							</TabsList>
 							<TabsContent value="ai-chat">
 								<ScrollArea className="h-[400px] mb-4 p-4 border rounded-md">
-									{messages.map((message, index) => (
+									{/* {messages.map((message, index) => (
 										<div
 											key={index}
 											className={`mb-4 ${
@@ -189,7 +247,7 @@ export default function ReportPage() {
 												{message.content}
 											</span>
 										</div>
-									))}
+									))} */}
 								</ScrollArea>
 								<form
 									onSubmit={handleSubmit}
@@ -246,31 +304,16 @@ export default function ReportPage() {
 												<SelectValue placeholder="Selecione o tipo de relatório" />
 											</SelectTrigger>
 											<SelectContent>
-												{Object.values(
-													ReportTypeEnum
-												).map((type) => (
-													<SelectItem
-														key={type}
-														value={type}
-													>
-														{type
-															.replace(/_/g, ' ')
-															.replace(
-																/\w\S*/g,
-																(txt) =>
-																	txt
-																		.charAt(
-																			0
-																		)
-																		.toUpperCase() +
-																	txt
-																		.substr(
-																			1
-																		)
-																		.toLowerCase()
-															)}
-													</SelectItem>
-												))}
+												{validReportTypesTranslated.map(
+													(type) => (
+														<SelectItem
+															key={type.label}
+															value={type.value}
+														>
+															{type.label}
+														</SelectItem>
+													)
+												)}
 											</SelectContent>
 										</Select>
 									</div>

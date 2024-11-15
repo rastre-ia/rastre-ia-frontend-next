@@ -1,18 +1,18 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent } from 'react';
 
 interface AnimatedLogoProps {
-  className?: string;
+	className?: string;
 }
 
 const AnimatedLogo: FunctionComponent<AnimatedLogoProps> = ({
-  className = "text-4xl font-bold",
+	className = 'text-4xl font-bold',
 }) => {
-  return (
-    <h1 className={className}>
-      Rastre
-      <span className="inline-block animate-colorCycle">IA</span>
-    </h1>
-  );
+	return (
+		<div className={className}>
+			Rastre
+			<span className="inline-block animate-colorCycle">IA</span>
+		</div>
+	);
 };
 
 export default AnimatedLogo;
