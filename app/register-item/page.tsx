@@ -44,10 +44,10 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
     },
   });
 
-  // Chamando map.locate() uma vez para obter a localização inicial
+  
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: 16 }); // Configura a localização inicial do usuário
-  }, [map]); // Executa apenas uma vez ao montar o componente
+    map.locate({ setView: true, maxZoom: 16 }); 
+  }, [map]); 
 
   const handleDrag = (event: any) => {
     const { lat, lng } = event.target.getLatLng();
