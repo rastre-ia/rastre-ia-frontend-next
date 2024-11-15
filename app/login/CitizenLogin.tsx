@@ -7,34 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, User } from 'lucide-react';
 import { redirect, useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-
-const formatCPF = (cpf: string) => {
-	// Remove all non-numeric characters
-	const cleanedCpf = cpf.replace(/\D/g, '');
-
-	// Add formatting (XXX.XXX.XXX-XX)
-	if (cleanedCpf.length <= 3) {
-		return cleanedCpf;
-	}
-	if (cleanedCpf.length <= 6) {
-		return `${cleanedCpf.slice(0, 3)}.${cleanedCpf.slice(3)}`;
-	}
-	if (cleanedCpf.length <= 9) {
-		return `${cleanedCpf.slice(0, 3)}.${cleanedCpf.slice(
-			3,
-			6
-		)}.${cleanedCpf.slice(6)}`;
-	}
-	return `${cleanedCpf.slice(0, 3)}.${cleanedCpf.slice(
-		3,
-		6
-	)}.${cleanedCpf.slice(6, 9)}-${cleanedCpf.slice(9, 11)}`;
-};
-
-const isValidCPF = (cpf: string) => {
-	const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-	return cpfRegex.test(cpf);
-};
+import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
 
 export default function CitizenLogin({}: {}) {
 	const [cpf, setCpf] = useState<string>('');
