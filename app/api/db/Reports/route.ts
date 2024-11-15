@@ -1,5 +1,4 @@
 import dbConnect from '@/app/lib/mongodb';
-import Users from '@/app/lib/schemas/Users';
 import { NextResponse, NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import Reports, { ReportSchemaInterface } from '@/app/lib/schemas/Reports';

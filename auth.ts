@@ -7,10 +7,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 		CredentialsProvider({
 			// The name to display on the sign in form (e.g. "Sign in with...")
 			name: 'CPF_Credentials',
-			// `credentials` is used to generate a form on the sign in page.
-			// You can specify which fields should be submitted, by adding keys to the `credentials` object.
-			// e.g. domain, username, password, 2FA token, etc.
-			// You can pass any HTML attribute to the <input> tag through the object.
+
 			credentials: {
 				cpf: {
 					label: 'CPF',
@@ -19,10 +16,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				},
 				password: { label: 'Senha', type: 'password' },
 			},
+
 			async authorize(credentials, req) {
 				'use server';
-				console.error('credentials', credentials);
-
 				// Add logic here to look up the user from the credentials supplied
 				if (!credentials.cpf || !credentials.password) {
 					return null;
@@ -45,6 +41,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 				if (parsedResp.success && parsedResp.user) {
 					return parsedResp.user;
+					return {
+						id: parsedResp.user._id,
+						name: parsedResp.user.name,
+						email: parsedResp.user.email,
+						cpf: parsedResp.user.cpf,
+						experience: parsedResp.user.experience,
+					};
 				} else {
 					console.log('check your credentials');
 					return null;
@@ -52,4 +55,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			},
 		}),
 	],
+
+	// Adds the _id field to the session
+	// The user variable comes from the authorize function
+	callbacks: {
+		jwt({ token, user }) {
+			if (user) {
+				//@ts-ignore
+				token._id = user._id;
+			}
+			return token;
+		},
+		session({ session, token }) {
+			//@ts-ignore
+			session.user._id = token._id as string;
+
+			return session;
+		},
+	},
 });
