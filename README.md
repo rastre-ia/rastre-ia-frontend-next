@@ -27,3 +27,19 @@ pnpm dev
 ```shell
 npx shadcn@latest add <component-name>
 ```
+
+## Users for testing purposes
+
+**Normal user**:
+
+-   CPF: 12345678900
+-   Password: 123123
+
+**Police station**:
+
+-   email: pf@toledo.br
+-   Password: 123123
+
+## Acknowledgements
+
+-   [BrasilAPI](https://brasilapi.com.br/)

@@ -107,7 +107,7 @@ export default function SignUp() {
 				description:
 					'Your account has been created. Welcome to RastreIA!',
 			});
-
+			setIsSubmitting(false);
 			signIn('credentials', {
 				password: password,
 				cpf: cleanedCpf,
@@ -120,7 +120,6 @@ export default function SignUp() {
 					'There was a problem creating your account. Please try again.',
 				variant: 'destructive',
 			});
-		} finally {
 			setIsSubmitting(false);
 		}
 	};

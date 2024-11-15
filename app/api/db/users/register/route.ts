@@ -7,8 +7,6 @@ import { cepLookup } from '@/app/_helpers/brasil-api';
 export async function POST(req: Request) {
 	const { name, email, cpf, cep, password } = await req.json();
 
-	console.error({ name, email, cpf, cep, password });
-
 	if (!name || !email || !cpf || !cep || !password) {
 		return NextResponse.json(
 			{ message: 'Missing fields' },

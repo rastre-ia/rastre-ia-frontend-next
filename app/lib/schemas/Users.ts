@@ -1,4 +1,5 @@
 import mongoose, { Model, Schema } from 'mongoose';
+import pointSchema from './helpers/PointSchema';
 
 interface UsersType {
 	name: string;
@@ -8,23 +9,12 @@ interface UsersType {
 	cep: string;
 	location: any;
 
+	experience: number;
+
 	passwordHash: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
-
-const pointSchema = new mongoose.Schema({
-	type: {
-		type: String,
-		enum: ['Point'],
-		required: true,
-	},
-	// Coordinates must be stored in [longitude, latitude] order
-	coordinates: {
-		type: [Number],
-		required: true,
-	},
-});
 
 const usersSchema = new Schema<UsersType>({
 	name: { type: String, required: true },
@@ -37,13 +27,15 @@ const usersSchema = new Schema<UsersType>({
 		index: '2dsphere',
 	},
 
+	experience: { type: Number, default: 0, min: 0 },
+
 	passwordHash: { type: String, required: true },
 
 	createdAt: { type: Date, default: () => Date.now(), immutable: true },
 	updatedAt: { type: Date, default: () => Date.now() },
 });
 
-usersSchema.pre('validate', function (next) {
+usersSchema.pre('save', function (next) {
 	this.updatedAt = new Date();
 	next();
 });
