@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import pointSchema from './helpers/PointSchema';
-import chatSchema from './helpers/ChatSchema';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
+import chatSchema, { ChatSchemaInterface } from './helpers/ChatSchema';
 
 export enum ReportAssistanceNeededEnum {
 	REQUIRE_ASSISTANCE = 'require_assistance',
@@ -29,7 +29,23 @@ export enum ReportSubmissionMethodEnum {
 	OTHER = 'other',
 }
 
-const reportsSchema = new Schema({
+export interface ReportSchemaInterface {
+	userId: Schema.Types.ObjectId;
+	title: string;
+	location: PointSchemaInterface;
+	description: string;
+	images: string[];
+	status: ReportStatusEnum;
+	assistanceNeeded: ReportAssistanceNeededEnum;
+	type: ReportTypeEnum;
+	submissionMethod: ReportSubmissionMethodEnum;
+	chatHistory: ChatSchemaInterface[];
+	embeddings: number[];
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+const reportsSchema = new Schema<ReportSchemaInterface>({
 	userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
 
 	title: { type: String, required: true },
@@ -81,4 +97,4 @@ reportsSchema.pre('save', function (next) {
 const Reports =
 	mongoose.models.Reports || mongoose.model('Reports', reportsSchema);
 
-export default Reports;
+export default Reports as mongoose.Model<ReportSchemaInterface>;
