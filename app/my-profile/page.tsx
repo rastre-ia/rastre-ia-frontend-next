@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-	Shield,
-	FileText,
-	AlertTriangle,
-	Award,
-	TrendingUp,
-	User,
-	LogOut,
-} from 'lucide-react';
+import { Shield, FileText, TrendingUp, User, LogOut } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,12 +12,12 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import AnimatedLogo from '@/components/AnimatedLogo';
 import { auth, signOut } from '@/auth';
 import BACKEND_URL from '../_helpers/backend-path';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { UsersType } from '../lib/schemas/Users';
 
 // Definição dos tipos de dados do usuário
@@ -209,7 +201,7 @@ export default async function MyProfile() {
 										variant="outline"
 									>
 										<FileText className="mr-2 h-4 w-4" />
-										Enviar uma denúncia
+										Enviar um relato
 									</Button>
 								</Link>
 							</li>

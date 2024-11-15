@@ -1,9 +1,6 @@
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import argon2 from '@node-rs/argon2';
-import { cepLookup } from '@/app/_helpers/brasil-api';
 import { auth } from '@/auth';
 
 export async function GET(

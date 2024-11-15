@@ -1,41 +1,29 @@
-'use client';
 import { FunctionComponent } from 'react';
 import Link from 'next/link';
-
 import { Button } from '@/components/ui/button';
-import { useSession, SessionProvider } from 'next-auth/react';
-import { signOut } from 'next-auth/react';
-
+import { auth } from '@/auth';
 interface LoginAvatarProps {}
 
-const LoginAvatar: FunctionComponent<LoginAvatarProps> = () => {
-	const session = useSession();
+const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
+	const session = await auth();
 
-	if (session.status === 'authenticated') {
-		console.log(session);
-
+	if (!session) {
 		return (
-			<SessionProvider>
-				<Button
-					onClick={() => {
-						signOut();
-					}}
-				>
-					Sair
-				</Button>
-			</SessionProvider>
+			<>
+				<Link href="/signup">
+					<Button variant="outline">Registre-se</Button>
+				</Link>
+				<Link href="/login">
+					<Button>Entrar</Button>
+				</Link>
+			</>
 		);
 	}
 
 	return (
-		<>
-			<Link href="/signup">
-				<Button variant={'outline'}>Registre-se</Button>
-			</Link>
-			<Link href="/login">
-				<Button>Entrar</Button>
-			</Link>
-		</>
+		<Link href={'/my-profile'}>
+			<Button>Meu perfil</Button>
+		</Link>
 	);
 };
 
