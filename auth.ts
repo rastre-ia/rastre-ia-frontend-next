@@ -3,6 +3,9 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import BACKEND_URL from './app/_helpers/backend-path';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+	pages: {
+		signIn: '/login',
+	},
 	providers: [
 		CredentialsProvider({
 			// The name to display on the sign in form (e.g. "Sign in with...")

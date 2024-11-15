@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
@@ -45,7 +44,6 @@ export default function SignUp() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [cpf, setCpf] = useState<string>('');
 
-	const router = useRouter();
 	const { toast } = useToast();
 
 	const handleSubmit = async (event: React.FormEvent) => {

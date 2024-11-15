@@ -79,8 +79,6 @@ export default async function MyProfile() {
 	});
 	const userData = (await res.json()).user as UsersType;
 
-	console.log(userData);
-
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
 			<div className="flex justify-between items-center mb-6">
