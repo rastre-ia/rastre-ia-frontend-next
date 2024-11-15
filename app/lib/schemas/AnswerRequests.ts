@@ -27,9 +27,9 @@ const answerRequestsSchema = new Schema({
 	requestRadius: {
 		type: Number,
 		required: true,
-		default: 1000,
+		default: 1000, // 1000 meters
 		min: [1, 'The request radius must be greater than 1 meter'],
-	}, // 1000 meters
+	},
 
 	priority: {
 		type: String,

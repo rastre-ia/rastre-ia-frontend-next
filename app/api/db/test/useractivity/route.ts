@@ -1,11 +1,11 @@
 import dbConnect from '@/app/lib/mongodb';
 import { NextResponse } from 'next/server';
-import argon2 from '@node-rs/argon2';
 import UserActivities, {
 	ActivityTypeEnum,
 } from '@/app/lib/schemas/UserActivities';
 import AnswerRequests from '@/app/lib/schemas/AnswerRequests';
 import Reports from '@/app/lib/schemas/Reports';
+import StolenItems from '@/app/lib/schemas/StolenItems';
 
 export async function GET() {
 	await dbConnect();
@@ -44,8 +44,7 @@ export async function POST(req: Request) {
 				report = await Reports.findById(reportId);
 				break;
 			case ActivityTypeEnum.REGISTER_STOLEN_ITEM:
-				// TODO FIX THIS
-				// stolenItem = await StolenItems.findById(stolenItemId)
+				stolenItem = await StolenItems.findById(stolenItemId);
 				break;
 			default:
 				break;
@@ -56,7 +55,7 @@ export async function POST(req: Request) {
 			activityType,
 			requestId: request?._id,
 			reportId: report?._id,
-			// stolenItemId: stolenItem?._id,
+			stolenItemId: stolenItem?._id,
 			data,
 		});
 

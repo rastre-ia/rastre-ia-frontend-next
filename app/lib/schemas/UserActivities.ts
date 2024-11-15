@@ -1,4 +1,4 @@
-import mongoose, { Model, mongo, Schema } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
 
 export enum ActivityTypeEnum {
 	ANSWER_REQUEST = 'answer_request',
