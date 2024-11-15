@@ -1,21 +1,41 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents,Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Popup,
+} from "react-leaflet";
 import { motion } from "framer-motion";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Upload, ArrowLeft, Camera, MapPin, FileText, User, Calendar } from "lucide-react";
+import {
+  Upload,
+  ArrowLeft,
+  Camera,
+  MapPin,
+  FileText,
+  User,
+  Calendar,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import Link from "next/link";
 
-import { CldUploadWidget,CldImage } from 'next-cloudinary';
+import { CldUploadWidget, CldImage } from "next-cloudinary";
 
 interface LatLng {
   lat: number;
@@ -27,10 +47,11 @@ interface LocationMarkerProps {
   setPosition: (position: LatLng) => void;
 }
 const customIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', 
-  iconSize: [25, 41], 
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconSize: [25, 41],
   iconAnchor: [12, 41],
-  popupAnchor: [1, -34], 
+  popupAnchor: [1, -34],
 });
 
 function LocationMarker({ position, setPosition }: LocationMarkerProps) {
@@ -44,10 +65,9 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
     },
   });
 
-  
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: 16 }); 
-  }, [map]); 
+    map.locate({ setView: true, maxZoom: 16 });
+  }, [map]);
 
   const handleDrag = (event: any) => {
     const { lat, lng } = event.target.getLatLng();
@@ -61,22 +81,22 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
       );
       const data = await response.json();
-      
+
       const addressComponents = [
-        data.address.road,           // Nome da rua
+        data.address.road, // Nome da rua
         data.address.neighbourhood, // Bairro
-        data.address.city,          // Cidade
-        data.address.state,         // Estado
-        data.address.postcode,      // CEP
+        data.address.city, // Cidade
+        data.address.state, // Estado
+        data.address.postcode, // CEP
       ];
 
       // Filtra valores vazios e monta o endereço
-      const filteredAddress = addressComponents.filter(Boolean).join(', ');
+      const filteredAddress = addressComponents.filter(Boolean).join(", ");
 
-      setAddress(filteredAddress); 
+      setAddress(filteredAddress);
     } catch (error) {
-      console.error('Erro ao buscar endereço:', error);
-      setAddress('Endereço não encontrado');
+      console.error("Erro ao buscar endereço:", error);
+      setAddress("Endereço não encontrado");
     }
   };
 
@@ -99,12 +119,11 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
       <Popup>
         <p>Latitude: {position.lat}</p>
         <p>Longitude: {position.lng}</p>
-        <p>Endereço: {address ? address : 'Carregando...'}</p>
+        <p>Endereço: {address ? address : "Carregando..."}</p>
       </Popup>
     </Marker>
   );
 }
-
 
 export default function RegisterItem() {
   const [position, setPosition] = useState<LatLng | null>(null);
@@ -131,24 +150,26 @@ export default function RegisterItem() {
     };
   }, []);
 
-
   const [resource, setResource] = useState();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-        if (!imageUrl) {
+    if (!imageUrl) {
       alert("Por favor, faça o upload da imagem antes de enviar.");
       return;
     }
 
     const formData = {
-      object: (event.target as HTMLFormElement).object.value, 
+      object: (event.target as HTMLFormElement).object.value,
       robberyDate: (event.target as HTMLFormElement)["robbery-date"].value,
-      imageUrl: imageUrl, 
+      imageUrl: imageUrl,
       description: (event.target as HTMLFormElement).description.value,
-      eventDescription: (event.target as HTMLFormElement)["event-description"].value,
-      robberCharacteristics: (event.target as HTMLFormElement)["robber-characteristics"].value,
-      location: position, 
+      eventDescription: (event.target as HTMLFormElement)["event-description"]
+        .value,
+      robberCharacteristics: (event.target as HTMLFormElement)[
+        "robber-characteristics"
+      ].value,
+      location: position,
     };
 
     try {
@@ -203,43 +224,54 @@ export default function RegisterItem() {
                 Qual é o objeto?
               </Label>
               <Input id="object" placeholder="ex: iPhone 12, Relógio Rolex" />
-              <Label htmlFor="robbery-date" className="flex items-center gap-2 mb-2"> 
-                <Calendar className="h-4 w-4" /> Data do roubo 
-              </Label> 
+              <Label
+                htmlFor="robbery-date"
+                className="flex items-center gap-2 mb-2"
+              >
+                <Calendar className="h-4 w-4" /> Data do roubo
+              </Label>
               <Input id="robbery-date" type="datetime-local" />
               <Label className="flex items-center gap-2 mb-2">
                 <Camera className="h-4 w-4" />
                 Foto do objeto
               </Label>
               <CldUploadWidget
-  uploadPreset="ml_default"
-  onSuccess={(result,{widget}) => {
-    setImageUrl(result.info.secure_url);
-  
-  } }
-  onQueuesEnd={(result, { widget }) => {
-    widget.close();
-  }}
->
-  {({ open }) => (
-    <Button type="button" onClick={() => open()}>
-      <Camera className="h-4 w-4 mr-2" />
-      Upload da Foto
-    </Button>
-  )}
-</CldUploadWidget>
+                uploadPreset="ml_default"
+                onSuccess={(result, { widget }) => {
+                  setImageUrl(result.info.secure_url);
+                }}
+                onQueuesEnd={(result, { widget }) => {
+                  widget.close();
+                }}
+              >
+                {({ open }) => (
+                  <Button type="button" onClick={() => open()}>
+                    <Camera className="h-4 w-4 mr-2" />
+                    Upload da Foto
+                  </Button>
+                )}
+              </CldUploadWidget>
 
-{/* Renderização da imagem após o upload */}
-{imageUrl && (
-  <img src={imageUrl} alt="Imagem do objeto" className="mt-4 w-full h-auto" />
-  
-)}
+              {/* Renderização da imagem após o upload */}
+              {imageUrl && (
+                <img
+                  src={imageUrl}
+                  alt="Imagem do objeto"
+                  className="mt-4 w-full h-auto"
+                />
+              )}
 
-              <Label htmlFor="description" className="flex items-center gap-2 mb-2">
+              <Label
+                htmlFor="description"
+                className="flex items-center gap-2 mb-2"
+              >
                 <FileText className="h-4 w-4" />
                 Descrição do objeto
               </Label>
-              <Textarea id="description" placeholder="Forneça uma descrição detalhada do item" />
+              <Textarea
+                id="description"
+                placeholder="Forneça uma descrição detalhada do item"
+              />
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -263,7 +295,6 @@ export default function RegisterItem() {
                       position={position}
                       setPosition={setPosition}
                     />
-    
                   </MapContainer>
                 </div>
               </motion.div>
@@ -319,6 +350,4 @@ export default function RegisterItem() {
       </motion.div>
     </div>
   );
-  
 }
-
