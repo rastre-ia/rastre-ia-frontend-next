@@ -7,6 +7,12 @@ export enum MessageTypeEnum {
 	OTHER = 'other',
 }
 
+export interface ChatSchemaInterface {
+	activityType: MessageTypeEnum;
+	content: string;
+	createdAt: Date;
+}
+
 const chatSchema = new Schema({
 	activityType: {
 		type: String,

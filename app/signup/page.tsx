@@ -88,7 +88,7 @@ export default function SignUp() {
 				cpf: cleanedCpf,
 			};
 
-			const resp = await fetch(BACKEND_URL + '/db/users/register', {
+			const resp = await fetch(BACKEND_URL + '/db/users', {
 				method: 'POST',
 				headers: {
 					Accept: 'application/json',

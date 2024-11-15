@@ -28,9 +28,14 @@ const LoginAvatar: FunctionComponent<LoginAvatarProps> = () => {
 	}
 
 	return (
-		<Link href="/login">
-			<Button>Entrar</Button>
-		</Link>
+		<>
+			<Link href="/signup">
+				<Button variant={'outline'}>Registre-se</Button>
+			</Link>
+			<Link href="/login">
+				<Button>Entrar</Button>
+			</Link>
+		</>
 	);
 };
 

@@ -1,5 +1,11 @@
 import { Schema } from 'mongoose';
-const pointSchema = new Schema({
+
+export interface PointSchemaInterface {
+	type: string;
+	coordinates: [number, number];
+}
+
+const pointSchema = new Schema<PointSchemaInterface>({
 	type: {
 		type: String,
 		enum: ['Point'],
