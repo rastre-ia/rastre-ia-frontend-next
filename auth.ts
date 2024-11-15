@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import BACKEND_URL from './app/_helpers/backend-path';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	providers: [
@@ -34,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 					password: credentials.password,
 				};
 
-				const resp = await fetch(backendURL + '/db/users/login', {
+				const resp = await fetch(BACKEND_URL + '/db/users/login', {
 					method: 'POST',
 					headers: {
 						Accept: 'application/json',

@@ -5,6 +5,7 @@ interface UsersType {
 	email: string;
 	cpf: string;
 
+	cep: string;
 	location: any;
 
 	passwordHash: string;
@@ -25,24 +26,22 @@ const pointSchema = new mongoose.Schema({
 	},
 });
 
-const usersSchema = new Schema<UsersType>(
-	{
-		name: { type: String, required: true },
-		email: { type: String, required: true, unique: true },
-		cpf: { type: String, required: true, unique: true },
+const usersSchema = new Schema<UsersType>({
+	name: { type: String, required: true },
+	email: { type: String, required: true, unique: true },
+	cpf: { type: String, required: true, unique: true },
 
-		location: {
-			type: pointSchema,
-			index: '2dsphere',
-		},
+	cep: { type: String, required: true },
+	location: {
+		type: pointSchema,
+		index: '2dsphere',
+	},
 
-		passwordHash: { type: String, required: true },
+	passwordHash: { type: String, required: true },
 
-		createdAt: { type: Date, default: () => Date.now(), immutable: true },
-		updatedAt: { type: Date, default: () => Date.now() },
-	}
-	// { autoIndex: true }
-);
+	createdAt: { type: Date, default: () => Date.now(), immutable: true },
+	updatedAt: { type: Date, default: () => Date.now() },
+});
 
 usersSchema.pre('validate', function (next) {
 	this.updatedAt = new Date();

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -19,6 +19,7 @@ export default function RootLayout({
 			// className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<SessionProvider>{children}</SessionProvider>
+				<Toaster />
 			</body>
 		</html>
 	);
