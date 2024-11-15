@@ -95,6 +95,6 @@ reportsSchema.pre('save', function (next) {
 });
 
 const Reports =
-	mongoose.models.Reports || mongoose.model('Reports', reportsSchema);
+	mongoose.models?.Reports || mongoose.model('Reports', reportsSchema);
 
 export default Reports as mongoose.Model<ReportSchemaInterface>;
