@@ -1,4 +1,7 @@
-import { ReportSchemaInterface } from '@/app/lib/schemas/Reports';
+import {
+	ReportSchemaInterface,
+	ReportStatusEnum,
+} from '@/app/lib/schemas/Reports';
 import BACKEND_URL from '../backend-path';
 
 export async function createNewReport(report: ReportSchemaInterface) {
@@ -11,4 +14,29 @@ export async function createNewReport(report: ReportSchemaInterface) {
 		body: JSON.stringify(report),
 	});
 	return resp;
+}
+
+export async function getReportsStatus(
+	idArray: string[] | undefined,
+	headers: Headers
+): Promise<{ id: string; status: ReportStatusEnum }[]> {
+	if (!idArray) return [];
+
+	try {
+		const params = `?ids=${idArray}`;
+
+		const resp = await fetch(BACKEND_URL + '/db/reports/status' + params, {
+			headers: headers,
+		});
+		if (!resp.ok) {
+			return [];
+		}
+
+		const parsedResp = await resp.json();
+
+		return parsedResp.statusArray;
+	} catch (error) {
+		console.error('Error getting stolen items:', error);
+	}
+	return [];
 }

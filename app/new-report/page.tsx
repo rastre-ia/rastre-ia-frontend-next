@@ -49,6 +49,7 @@ import { getUserObjectIdById } from '../_helpers/db/users';
 import { createNewReport } from '../_helpers/db/reports';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 // Função mock para simular resposta de IA
 const getAIResponse = async (message: string) => {
@@ -91,8 +92,8 @@ export default function ReportPage() {
 	const { toast } = useToast();
 	const router = useRouter();
 
-	if (status !== 'authenticated') {
-		return <div>Access Denied</div>;
+	if (status === 'unauthenticated') {
+		redirect('/login?redirect_to=/new-report');
 	}
 
 	if (!userId) {

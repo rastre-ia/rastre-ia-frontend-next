@@ -7,18 +7,20 @@ export enum ActivityTypeEnum {
 	OTHER = 'other',
 }
 
-interface UserActivitiesType {
-	userId: Schema.Types.ObjectId;
-	activityType: String;
-	requestId: Schema.Types.ObjectId;
-	reportId: Schema.Types.ObjectId;
-	stolenItemId: Schema.Types.ObjectId;
-	createdAt: Date;
-	updatedAt: Date;
-	data: String;
+export interface UserActivitiesInterface {
+	_id?: Schema.Types.ObjectId | string;
+	userId: Schema.Types.ObjectId | string;
+	activityType: ActivityTypeEnum;
+	requestId?: Schema.Types.ObjectId | string;
+	reportId?: Schema.Types.ObjectId | string;
+	stolenItemId?: Schema.Types.ObjectId | string;
+	extraData?: String;
+
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
-const userActivitiesSchema = new Schema<UserActivitiesType>({
+const userActivitiesSchema = new Schema<UserActivitiesInterface>({
 	userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
 	activityType: {
 		type: String,
@@ -29,7 +31,7 @@ const userActivitiesSchema = new Schema<UserActivitiesType>({
 	requestId: { type: Schema.Types.ObjectId, ref: 'AnswerRequests' },
 	reportId: { type: Schema.Types.ObjectId, ref: 'Reports' },
 	stolenItemId: { type: Schema.Types.ObjectId, ref: 'StolenItems' },
-	data: { type: String },
+	extraData: { type: String },
 
 	createdAt: { type: Date, default: () => Date.now(), immutable: true },
 	updatedAt: { type: Date, default: () => Date.now() },
@@ -51,7 +53,7 @@ userActivitiesSchema.pre('validate', function (next) {
 	)
 		next(new Error('stolenItemId is required'));
 
-	if (this.activityType === ActivityTypeEnum.OTHER && !this.data)
+	if (this.activityType === ActivityTypeEnum.OTHER && !this.extraData)
 		next(new Error('data is required for other activities'));
 
 	next();
@@ -64,6 +66,9 @@ userActivitiesSchema.pre('save', function (next) {
 
 const UserActivities =
 	mongoose.models.UserActivities ||
-	mongoose.model<UserActivitiesType>('UserActivities', userActivitiesSchema);
+	mongoose.model<UserActivitiesInterface>(
+		'UserActivities',
+		userActivitiesSchema
+	);
 
-export default UserActivities as Model<UserActivitiesType>;
+export default UserActivities as Model<UserActivitiesInterface>;

@@ -30,6 +30,8 @@ export enum ReportSubmissionMethodEnum {
 }
 
 export interface ReportSchemaInterface {
+	_id?: Schema.Types.ObjectId;
+
 	userId: Schema.Types.ObjectId | string;
 	title: string;
 	location: PointSchemaInterface;
@@ -97,4 +99,4 @@ reportsSchema.pre('save', function (next) {
 const Reports =
 	mongoose.models?.Reports || mongoose.model('Reports', reportsSchema);
 
-export default Reports as mongoose.Model<ReportSchemaInterface>;
+export default Reports;

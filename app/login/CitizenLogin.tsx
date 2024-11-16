@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, User } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
-import { useSearchParams } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 
 export default function CitizenLogin({}: {}) {
 	const [cpf, setCpf] = useState<string>('');
@@ -15,6 +15,8 @@ export default function CitizenLogin({}: {}) {
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const searchParams = useSearchParams();
 	const searchParamError = searchParams.get('error');
+	const searchParamRedirectTo = searchParams.get('redirect_to');
+
 	const [error, setError] = useState<string>(
 		searchParamError
 			? 'Credenciais inválidas. Por favor, tente novamente.'
@@ -31,11 +33,20 @@ export default function CitizenLogin({}: {}) {
 		// Remove all non-numeric characters
 		const cleanedCpf = cpf.replace(/\D/g, '');
 
-		await signIn('credentials', {
+		const loginResult = await signIn('credentials', {
 			password: password,
 			cpf: cleanedCpf,
 			redirectTo: '/my-profile',
+			redirect: false,
 		});
+
+		if (loginResult?.error) {
+			setError('Credenciais inválidas. Por favor, tente novamente.');
+		} else {
+			redirect(
+				searchParamRedirectTo ? searchParamRedirectTo : '/my-profile'
+			); // Navigate to the new post page
+		}
 	};
 
 	const handleCpfChange = (event: React.ChangeEvent<HTMLInputElement>) => {

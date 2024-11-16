@@ -2,6 +2,8 @@ import mongoose, { Model, Schema } from 'mongoose';
 import pointSchema from './helpers/PointSchema';
 
 export interface UsersType {
+	_id?: Schema.Types.ObjectId;
+
 	name: string;
 	email: string;
 	cpf: string;
