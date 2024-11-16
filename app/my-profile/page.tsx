@@ -31,6 +31,8 @@ import { ActivityTypeEnum } from '../lib/schemas/UserActivities';
 import { format } from 'date-fns';
 import getXpStats from '../_helpers/experience-calculator';
 import { getStolenItemsStatus } from '../_helpers/db/stolen-items';
+import { StolenItemsStatusEnum } from '../lib/schemas/StolenItems';
+import { getReportsStatus } from '../_helpers/db/reports';
 
 function getUserActivityTitle(userAct: ActivityTypeEnum) {
 	switch (userAct) {
@@ -68,6 +70,20 @@ export default async function MyProfile() {
 
 	const expStats = getXpStats(userData.experience);
 
+	const reportsIds = userActivities
+		.map((activity) => {
+			if (activity.activityType === ActivityTypeEnum.CREATE_REPORT)
+				return activity.reportId;
+		})
+		.filter((item) => item);
+
+	const reportsStatus = await getReportsStatus(
+		reportsIds as string[],
+		myHeaders
+	);
+
+	const numberOfReports = reportsStatus.length;
+
 	const stolenItemsIds = userActivities
 		.map((activity) => {
 			if (activity.activityType === ActivityTypeEnum.REGISTER_STOLEN_ITEM)
@@ -80,7 +96,21 @@ export default async function MyProfile() {
 		myHeaders
 	);
 
-	console.log(stolenItemsStatus);
+	const recoveredItems = stolenItemsStatus.filter(
+		(item) => item.status === StolenItemsStatusEnum.SOLVED_RECUPERATED
+	).length;
+
+	const totalStolenItems = stolenItemsStatus.length;
+
+	const numberOfResponses = userActivities.filter(
+		(activity) => activity.activityType === ActivityTypeEnum.ANSWER_REQUEST
+	).length;
+
+	const numberOfActivitiesThisMonth = userActivities.filter(
+		(activity) =>
+			activity.createdAt &&
+			new Date(activity.createdAt).getMonth() === new Date().getMonth()
+	).length;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
@@ -255,7 +285,8 @@ export default async function MyProfile() {
 								<div className="flex items-center text-green-600">
 									<TrendingUp className="mr-2 h-4 w-4" />
 									<span className="font-medium">
-										Suas contribuições aumentaram 20% este
+										Você realizou{' '}
+										{numberOfActivitiesThisMonth} ações este
 										mês!
 									</span>
 								</div>
@@ -264,30 +295,38 @@ export default async function MyProfile() {
 						<CardContent className="h-52 space-y-4 overflow-y-auto">
 							<div className="flex items-center justify-between">
 								<span className="font-medium">
-									Relatórios Enviados
+									Relatos Enviados
 								</span>
-								<Badge variant="secondary">15</Badge>
+								<Badge variant="secondary">
+									{numberOfReports}
+								</Badge>
 							</div>
 							<hr />
 							<div className="flex items-center justify-between">
 								<span className="font-medium">
-									Itens Roubados
+									Registro de itens roubado
 								</span>
-								<Badge variant="secondary">3</Badge>
+								<Badge variant="secondary">
+									{totalStolenItems}
+								</Badge>
 							</div>
 							<hr />
 							<div className="flex items-center justify-between">
 								<span className="font-medium">
 									Itens Recuperados
 								</span>
-								<Badge variant="secondary">3</Badge>
+								<Badge variant="secondary">
+									{recoveredItems}
+								</Badge>
 							</div>
 							<hr />
 							<div className="flex items-center justify-between">
 								<span className="font-medium">
 									Investigações Auxiliadas
 								</span>
-								<Badge variant="secondary">7</Badge>
+								<Badge variant="secondary">
+									{numberOfResponses}
+								</Badge>
 							</div>
 							<hr />
 						</CardContent>

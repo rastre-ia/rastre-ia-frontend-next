@@ -1,8 +1,8 @@
 import dbConnect from '@/app/lib/mongodb';
-import StolenItems, {
-	StolenItemsSchemaInterface,
-	StolenItemsStatusEnum,
-} from '@/app/lib/schemas/StolenItems';
+import Reports, {
+	ReportSchemaInterface,
+	ReportStatusEnum,
+} from '@/app/lib/schemas/Reports';
 import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
@@ -22,17 +22,16 @@ export const GET = auth(async function GET(req) {
 		try {
 			await dbConnect();
 
-			const stolenItems =
-				await StolenItems.find<StolenItemsSchemaInterface>({
-					_id: { $in: idArray },
-				});
+			const reports = await Reports.find<ReportSchemaInterface>({
+				_id: { $in: idArray },
+			});
 
 			const statusArray: {
 				id: string;
-				status: StolenItemsStatusEnum;
+				status: ReportStatusEnum;
 			}[] = [];
 
-			stolenItems.forEach((item) => {
+			reports.forEach((item) => {
 				if (!item._id || !item.status) return;
 
 				statusArray.push({

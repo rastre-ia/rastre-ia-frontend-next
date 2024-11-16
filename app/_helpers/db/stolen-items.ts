@@ -39,9 +39,7 @@ export async function getStolenItemsStatus(
 
 		const parsedResp = await resp.json();
 
-		return [];
-
-		return parsedResp;
+		return parsedResp.statusArray;
 	} catch (error) {
 		console.error('Error getting stolen items:', error);
 	}
