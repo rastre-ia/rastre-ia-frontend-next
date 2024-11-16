@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import Reports, { ReportSchemaInterface } from '@/app/lib/schemas/Reports';
+import Reports, {
+	ReportAssistanceNeededEnum,
+	ReportSchemaInterface,
+	ReportStatusEnum,
+} from '@/app/lib/schemas/Reports';
 import { auth } from '@/auth';
 import generateUserActivity from '@/app/lib/generate-user-activity';
 import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
@@ -33,7 +37,9 @@ export const GET = auth(async function GET(req) {
 
 			const reports = await await query.exec();
 
-			const pageCount = Math.ceil(reports.length / perPage);
+			const pageCount = Math.ceil(
+				(await Reports.countDocuments().exec()) / perPage
+			);
 
 			return NextResponse.json({
 				reports: reports,
@@ -72,28 +78,39 @@ export const POST = auth(async function POST(req) {
 				{ status: 401 }
 			);
 
+		const sts =
+			assistanceNeeded === ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE
+				? ReportStatusEnum.PENDING
+				: ReportStatusEnum.NOT_APPLICABLE;
+
+		console.log('sts:', sts);
+
+		console.log(
+			assistanceNeeded,
+			ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE
+		);
+
 		try {
 			const session = await Reports.startSession();
 
+			const data: ReportSchemaInterface = {
+				userId: userId,
+				title: title,
+				location: location,
+				description: description,
+				images: images,
+				status: sts,
+				assistanceNeeded: assistanceNeeded,
+				type: type,
+				submissionMethod: submissionMethod,
+				chatHistory: chatHistory,
+				embeddings: embeddings,
+			};
+
 			const reportRegistration =
-				await Reports.create<ReportSchemaInterface>(
-					[
-						{
-							userId,
-							title,
-							location,
-							description,
-							images,
-							status,
-							assistanceNeeded,
-							type,
-							submissionMethod,
-							chatHistory,
-							embeddings,
-						},
-					],
-					{ session: session }
-				);
+				await Reports.create<ReportSchemaInterface>([data], {
+					session: session,
+				});
 
 			await generateUserActivity(
 				{

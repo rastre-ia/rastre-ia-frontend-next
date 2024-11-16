@@ -43,6 +43,7 @@ import {
 } from '@/app/lib/schemas/Reports';
 import { getReports } from '@/app/_helpers/db/reports';
 import { format } from 'date-fns';
+import reportStatusTranslator from '@/app/_helpers/report-status-translator';
 
 const iconesTipoRelato = {
 	[ReportTypeEnum.STRANGE_ACTIVITY]: AlertTriangle,
@@ -97,6 +98,7 @@ export default function BuscarRelatos() {
 			statusFilter,
 			typeFilter
 		);
+
 		setReports(response.reports);
 		setPageCount(response.pageCount);
 		setCarregando(false);
@@ -108,7 +110,10 @@ export default function BuscarRelatos() {
 	};
 
 	const handleAlterarFiltro = (valor: string) => {
-		setStatusFilter(valor as ReportStatusEnum);
+		if (valor === 'todos') setStatusFilter(null);
+		else {
+			setStatusFilter(valor as ReportStatusEnum);
+		}
 		setPaginaAtual(1);
 	};
 
@@ -136,6 +141,7 @@ export default function BuscarRelatos() {
 							Buscar
 						</Button>
 					</div>
+
 					<Select
 						value={statusFilter?.toString() || 'todos'}
 						onValueChange={handleAlterarFiltro}
@@ -145,9 +151,16 @@ export default function BuscarRelatos() {
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="todos">Todos</SelectItem>
-							<SelectItem value="ativo">Ativo</SelectItem>
-							<SelectItem value="pendente">Pendente</SelectItem>
-							<SelectItem value="resolvido">Resolvido</SelectItem>
+							{Object.values(ReportStatusEnum).map(
+								(status, idx) => (
+									<SelectItem
+										key={`status-${idx}`}
+										value={status}
+									>
+										{reportStatusTranslator(status)}
+									</SelectItem>
+								)
+							)}
 						</SelectContent>
 					</Select>
 				</CardContent>
@@ -204,7 +217,7 @@ export default function BuscarRelatos() {
 												: 'outline'
 										}
 									>
-										{relato.status}
+										{reportStatusTranslator(relato.status)}
 									</Badge>
 									{relato.assistanceNeeded ===
 										ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE && (
