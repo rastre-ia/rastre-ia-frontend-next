@@ -253,17 +253,18 @@ export default function RegisterItem() {
 								className="flex items-center gap-2 mb-2"
 							>
 								<FileText className="h-4 w-4" />
-								Qual é o objeto?
+								Qual é o objeto?*
 							</Label>
 							<Input
 								id="object"
 								placeholder="ex: iPhone 12, Relógio Rolex"
+								required
 							/>
 							<Label
 								htmlFor="event-date"
 								className="flex items-center gap-2 mb-2"
 							>
-								<Calendar className="h-4 w-4" /> Data do roubo
+								<Calendar className="h-4 w-4" /> Data do roubo*
 							</Label>
 							<Input id="event-date" type="datetime-local" />
 							<Label className="flex items-center gap-2 mb-2">
@@ -305,11 +306,12 @@ export default function RegisterItem() {
 								className="flex items-center gap-2 mb-2"
 							>
 								<FileText className="h-4 w-4" />
-								Descrição do objeto
+								Descrição do objeto*
 							</Label>
 							<Textarea
 								id="objectDescription"
 								placeholder="Forneça uma descrição detalhada do item"
+								required
 							/>
 							<motion.div
 								initial={{ opacity: 0, x: -20 }}
@@ -351,11 +353,12 @@ export default function RegisterItem() {
 									className="flex items-center gap-2 mb-2"
 								>
 									<FileText className="h-4 w-4" />
-									Descrição do evento
+									Descrição do evento*
 								</Label>
 								<Textarea
 									id="eventDescription"
 									placeholder="Descreva como ocorreu o roubo"
+									required
 								/>
 							</motion.div>
 
@@ -369,11 +372,12 @@ export default function RegisterItem() {
 									className="flex items-center gap-2 mb-2"
 								>
 									<User className="h-4 w-4" />
-									Características do ladrão
+									Características do ladrão*
 								</Label>
 								<Textarea
 									id="suspectCharacteristics"
 									placeholder="Descreva quaisquer características notáveis do ladrão"
+									required
 								/>
 							</motion.div>
 

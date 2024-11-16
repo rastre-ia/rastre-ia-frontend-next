@@ -6,7 +6,6 @@ import {
 	User,
 	Smartphone,
 	LogOut,
-	AlertTriangle,
 	Award,
 } from 'lucide-react';
 
@@ -156,9 +155,9 @@ export default async function MyProfile() {
 									</h2>
 									<p className="text-muted-foreground">
 										Cidadão{' '}
-										<div className="inline text-blue-600 font-bold">
+										<span className="inline text-blue-600 font-bold">
 											Nível {expStats.currentLevel}
-										</div>
+										</span>
 									</p>
 								</div>
 							</div>
