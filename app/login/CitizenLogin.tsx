@@ -23,20 +23,20 @@ export default function CitizenLogin({}: {}) {
 			: ''
 	);
 
-	const credentialsAction = async (formData: FormData) => {
+	const credentialsAction = async () => {
 		if (!isValidCPF(cpf)) {
 			setError(
 				'CPF inválido. Por favor, insira um CPF no formato XXX.XXX.XXX-XX.'
 			);
+			return;
 		}
 
 		// Remove all non-numeric characters
 		const cleanedCpf = cpf.replace(/\D/g, '');
 
-		const loginResult = await signIn('credentials', {
+		const loginResult = await signIn('cpf_credentials', {
 			password: password,
 			cpf: cleanedCpf,
-			redirectTo: '/my-profile',
 			redirect: false,
 		});
 

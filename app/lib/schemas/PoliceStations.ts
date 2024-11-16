@@ -1,9 +1,29 @@
 import mongoose, { Schema } from 'mongoose';
+import RolesEnum from './helpers/RolesEnum';
 
-const policeStationsSchema = new Schema({
+export interface PoliceStationsSchemaInterface {
+	_id?: string;
+	name: string;
+	email: string;
+	passwordHash: string;
+	role: RolesEnum;
+
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+
+const policeStationsSchema = new Schema<PoliceStationsSchemaInterface>({
 	name: { type: String, required: true },
 	email: { type: String, required: true, unique: true },
 	passwordHash: { type: String, required: true },
+
+	role: {
+		type: String,
+		enum: Object.values(RolesEnum),
+		required: true,
+		default: RolesEnum.POLICE_STATION,
+		immutable: true,
+	},
 
 	createdAt: { type: Date, default: () => Date.now(), immutable: true },
 	updatedAt: { type: Date, default: () => Date.now() },

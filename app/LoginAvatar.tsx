@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
+import RolesEnum from './lib/schemas/helpers/RolesEnum';
 interface LoginAvatarProps {}
 
 const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
@@ -20,9 +21,19 @@ const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
 		);
 	}
 
+	const user = session.user;
+
+	if (user.role === RolesEnum.USER) {
+		return (
+			<Link href={'/my-profile'}>
+				<Button>Meu perfil</Button>
+			</Link>
+		);
+	}
+
 	return (
-		<Link href={'/my-profile'}>
-			<Button>Meu perfil</Button>
+		<Link href={'/dashboard'}>
+			<Button>Dashboard</Button>
 		</Link>
 	);
 };
