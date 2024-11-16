@@ -1,6 +1,7 @@
 import {
 	ReportSchemaInterface,
 	ReportStatusEnum,
+	ReportTypeEnum,
 } from '@/app/lib/schemas/Reports';
 import BACKEND_URL from '../backend-path';
 
@@ -14,6 +15,31 @@ export async function createNewReport(report: ReportSchemaInterface) {
 		body: JSON.stringify(report),
 	});
 	return resp;
+}
+
+export async function getReports(
+	perPage: number = 12,
+	page: number = 1,
+	status?: ReportStatusEnum | null,
+	type?: ReportTypeEnum | null
+): Promise<{ reports: ReportSchemaInterface[]; pageCount: number }> {
+	const pageMinusOne = page - 1;
+
+	const params = new URLSearchParams();
+	params.append('per_page', perPage.toString());
+	params.append('page', pageMinusOne.toString());
+	if (status) params.append('status', status);
+	if (type) params.append('type', type);
+
+	const resp = await fetch(BACKEND_URL + '/db/reports?' + params.toString(), {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+		},
+	});
+	const parsedResp = await resp.json();
+	return parsedResp;
 }
 
 export async function getReportsStatus(

@@ -15,7 +15,7 @@ export const GET = auth(async function GET(req) {
 			);
 		}
 
-		const perPage = Number(req.nextUrl.searchParams.get('per_page')) ?? 10;
+		const perPage = Number(req.nextUrl.searchParams.get('per_page')) ?? 12;
 		const page = Number(req.nextUrl.searchParams.get('page')) ?? 0;
 		const status = req.nextUrl.searchParams.get('status') ?? undefined; // Undefined means all
 		const type = req.nextUrl.searchParams.get('type') ?? undefined;
