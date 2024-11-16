@@ -8,9 +8,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	},
 	providers: [
 		CredentialsProvider({
-			// The name to display on the sign in form (e.g. "Sign in with...")
 			name: 'CPF_Credentials',
-
+			id: 'cpf_credentials',
 			credentials: {
 				cpf: {
 					label: 'CPF',
@@ -22,7 +21,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 			async authorize(credentials, req) {
 				'use server';
-				// Add logic here to look up the user from the credentials supplied
 				if (!credentials.cpf || !credentials.password) {
 					return null;
 				}
@@ -44,13 +42,51 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 				if (parsedResp.success && parsedResp.user) {
 					return parsedResp.user;
-					return {
-						id: parsedResp.user._id,
-						name: parsedResp.user.name,
-						email: parsedResp.user.email,
-						cpf: parsedResp.user.cpf,
-						experience: parsedResp.user.experience,
-					};
+				} else {
+					console.log('check your credentials');
+					return null;
+				}
+			},
+		}),
+		CredentialsProvider({
+			name: 'Police_Credentials',
+			id: 'police_credentials',
+			credentials: {
+				email: {
+					label: 'Email',
+					type: 'text',
+					placeholder: 'police@gov.com',
+				},
+				password: { label: 'Senha', type: 'password' },
+			},
+
+			async authorize(credentials, req) {
+				'use server';
+
+				if (!credentials.email || !credentials.password) {
+					return null;
+				}
+
+				const body = {
+					email: String(credentials.email),
+					password: credentials.password,
+				};
+
+				const resp = await fetch(
+					BACKEND_URL + '/db/police-stations/login',
+					{
+						method: 'POST',
+						headers: {
+							Accept: 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(body),
+					}
+				);
+				const parsedResp = await resp.json();
+
+				if (parsedResp.success && parsedResp.policeStation) {
+					return parsedResp.policeStation;
 				} else {
 					console.log('check your credentials');
 					return null;
@@ -66,12 +102,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			if (user) {
 				//@ts-ignore
 				token._id = user._id;
+				//@ts-ignore
+				token.role = user.role;
 			}
 			return token;
 		},
 		session({ session, token }) {
 			//@ts-ignore
 			session.user._id = token._id as string;
+			//@ts-ignore
+			session.user.role = token.role as string;
 
 			return session;
 		},

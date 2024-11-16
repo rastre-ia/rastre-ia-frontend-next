@@ -32,6 +32,7 @@ import getXpStats from '../_helpers/experience-calculator';
 import { getStolenItemsStatus } from '../_helpers/db/stolen-items';
 import { StolenItemsStatusEnum } from '../lib/schemas/StolenItems';
 import { getReportsStatus } from '../_helpers/db/reports';
+import RolesEnum from '../lib/schemas/helpers/RolesEnum';
 
 function getUserActivityTitle(userAct: ActivityTypeEnum) {
 	switch (userAct) {
@@ -52,7 +53,23 @@ export default async function MyProfile() {
 	const session = await auth();
 	const user = session?.user;
 
-	if (!user) return <div> Você não está autenticado </div>;
+	if (!user) {
+		return (
+			<div>
+				Você não está autenticado
+				<Link href={'/'}>Voltar</Link>
+			</div>
+		);
+	}
+
+	if (user.role !== RolesEnum.USER) {
+		return (
+			<div>
+				Você não tem permissão para acessar esta página
+				<Link href={'/'}>Voltar</Link>
+			</div>
+		);
+	}
 
 	const myHeaders = await headers();
 

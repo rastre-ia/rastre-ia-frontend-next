@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema } from 'mongoose';
 import pointSchema from './helpers/PointSchema';
+import RolesEnum from './helpers/RolesEnum';
 
 export interface UsersType {
 	_id?: Schema.Types.ObjectId;
@@ -7,6 +8,7 @@ export interface UsersType {
 	name: string;
 	email: string;
 	cpf: string;
+	role: RolesEnum;
 
 	cep: string;
 	location: any;
@@ -22,7 +24,13 @@ const usersSchema = new Schema<UsersType>({
 	name: { type: String, required: true },
 	email: { type: String, required: true, unique: true },
 	cpf: { type: String, required: true, unique: true },
-
+	role: {
+		type: String,
+		enum: Object.values(RolesEnum),
+		required: true,
+		default: RolesEnum.USER,
+		immutable: true,
+	},
 	cep: { type: String, required: true },
 	location: {
 		type: pointSchema,

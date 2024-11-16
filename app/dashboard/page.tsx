@@ -14,23 +14,45 @@ import Link from 'next/link';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Overview from './Overview';
 import LlmSearch from './LlmSearch';
 import RequestAssistance from './RequestAssistance';
 import AnimatedLogo from '@/components/AnimatedLogo';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
-import { signOut } from '@/auth';
+
 import { Button } from '@/components/ui/button';
 import SearchReports from './SearchReports';
 import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchStolenItems from './SearchStolenItems';
+import { auth, signOut } from '@/auth';
+import RolesEnum from '../lib/schemas/helpers/RolesEnum';
 
-export default function PoliceDashboard() {
+export default async function PoliceDashboard() {
+	const session = await auth();
+	const user = session?.user;
+
+	if (!user) {
+		return (
+			<div>
+				Você não está autenticado
+				<Link href={'/'}>Voltar</Link>
+			</div>
+		);
+	}
+
+	if (
+		!(
+			user.role === RolesEnum.POLICE_STATION ||
+			user.role === RolesEnum.ADMIN
+		)
+	) {
+		return (
+			<div>
+				Você não tem permissão para acessar esta página
+				<Link href={'/'}>Voltar</Link>
+			</div>
+		);
+	}
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
 			<div className="max-w-7xl mx-auto space-y-6">
