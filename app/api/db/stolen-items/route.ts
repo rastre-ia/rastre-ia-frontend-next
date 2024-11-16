@@ -1,24 +1,27 @@
+import { dbSession } from '@/app/lib/mongodb';
+import StolenItems, {
+	StolenItemsSchemaInterface,
+} from '@/app/lib/schemas/StolenItems';
 import { NextResponse } from 'next/server';
-import Reports, { ReportSchemaInterface } from '@/app/lib/schemas/Reports';
 import { auth } from '@/auth';
 import generateUserActivity from '@/app/lib/generate-user-activity';
 import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
 
+// Route to create a new stolen item report
+// Uses a transaction to ensure that the user activity is created
 export const POST = auth(async function POST(req) {
 	if (req.auth) {
 		const {
 			userId,
-			title,
-			location,
-			description,
+			object,
+			objectDescription,
 			images,
-			status,
-			assistanceNeeded,
-			type,
-			submissionMethod,
-			chatHistory,
+			location,
+			eventDate,
+			eventDescription,
+			suspectCharacteristics,
 			embeddings,
-		} = (await req.json()) as ReportSchemaInterface;
+		} = (await req.json()) as StolenItemsSchemaInterface;
 
 		if ((userId as string) !== req.auth.user._id)
 			return NextResponse.json(
@@ -27,22 +30,20 @@ export const POST = auth(async function POST(req) {
 			);
 
 		try {
-			const session = await Reports.startSession();
+			const session = await StolenItems.startSession();
 
-			const reportRegistration =
-				await Reports.create<ReportSchemaInterface>(
+			const stolenItemRegistration =
+				await StolenItems.create<StolenItemsSchemaInterface>(
 					[
 						{
 							userId,
-							title,
-							location,
-							description,
+							object,
+							objectDescription,
 							images,
-							status,
-							assistanceNeeded,
-							type,
-							submissionMethod,
-							chatHistory,
+							location,
+							eventDate,
+							eventDescription,
+							suspectCharacteristics,
 							embeddings,
 						},
 					],
@@ -52,13 +53,13 @@ export const POST = auth(async function POST(req) {
 			await generateUserActivity(
 				{
 					userId,
-					activityType: ActivityTypeEnum.CREATE_REPORT,
-					reportId: reportRegistration[0]._id,
+					activityType: ActivityTypeEnum.REGISTER_STOLEN_ITEM,
+					stolenItemId: stolenItemRegistration[0]._id,
 				},
 				session
 			);
 
-			await session.endSession();
+			session.endSession();
 
 			return NextResponse.json({
 				message: 'Report created successfully',
@@ -67,6 +68,7 @@ export const POST = auth(async function POST(req) {
 			console.error('Error creating report:', error);
 			return NextResponse.json(
 				{ message: 'Error creating report', error },
+
 				{ status: 500 }
 			);
 		}

@@ -1,8 +1,24 @@
 import mongoose, { Schema } from 'mongoose';
-import pointSchema from './helpers/PointSchema';
-import embeddedImageSchema from './helpers/EmbeddedImageSchema';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
+import embeddedImageSchema, {
+	EmbeddedImageSchemaInterface,
+} from './helpers/EmbeddedImageSchema';
 
-const StolenItemsSchema = new Schema({
+export interface StolenItemsSchemaInterface {
+	userId: Schema.Types.ObjectId | string;
+	object: string;
+	objectDescription: string;
+	images: EmbeddedImageSchemaInterface[];
+	location: PointSchemaInterface;
+	eventDate: Date;
+	eventDescription: string;
+	suspectCharacteristics: string;
+	embeddings: number[];
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+
+const StolenItemsSchema = new Schema<StolenItemsSchemaInterface>({
 	userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
 
 	object: { type: String, required: true },
@@ -28,6 +44,9 @@ StolenItemsSchema.pre('save', function (next) {
 
 const StolenItems =
 	mongoose.models.StolenItems ||
-	mongoose.model('StolenItems', StolenItemsSchema);
+	mongoose.model<StolenItemsSchemaInterface>(
+		'StolenItems',
+		StolenItemsSchema
+	);
 
 export default StolenItems;

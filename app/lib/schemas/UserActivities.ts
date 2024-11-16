@@ -7,15 +7,16 @@ export enum ActivityTypeEnum {
 	OTHER = 'other',
 }
 
-interface UserActivitiesType {
-	userId: Schema.Types.ObjectId;
-	activityType: String;
-	requestId: Schema.Types.ObjectId;
-	reportId: Schema.Types.ObjectId;
-	stolenItemId: Schema.Types.ObjectId;
-	createdAt: Date;
-	updatedAt: Date;
-	data: String;
+export interface UserActivitiesType {
+	userId: Schema.Types.ObjectId | string;
+	activityType: ActivityTypeEnum;
+	requestId?: Schema.Types.ObjectId;
+	reportId?: Schema.Types.ObjectId;
+	stolenItemId?: Schema.Types.ObjectId;
+	extraData?: String;
+
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 const userActivitiesSchema = new Schema<UserActivitiesType>({
@@ -29,7 +30,7 @@ const userActivitiesSchema = new Schema<UserActivitiesType>({
 	requestId: { type: Schema.Types.ObjectId, ref: 'AnswerRequests' },
 	reportId: { type: Schema.Types.ObjectId, ref: 'Reports' },
 	stolenItemId: { type: Schema.Types.ObjectId, ref: 'StolenItems' },
-	data: { type: String },
+	extraData: { type: String },
 
 	createdAt: { type: Date, default: () => Date.now(), immutable: true },
 	updatedAt: { type: Date, default: () => Date.now() },
@@ -51,7 +52,7 @@ userActivitiesSchema.pre('validate', function (next) {
 	)
 		next(new Error('stolenItemId is required'));
 
-	if (this.activityType === ActivityTypeEnum.OTHER && !this.data)
+	if (this.activityType === ActivityTypeEnum.OTHER && !this.extraData)
 		next(new Error('data is required for other activities'));
 
 	next();
