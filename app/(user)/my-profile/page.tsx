@@ -22,17 +22,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import AnimatedLogo from '@/components/AnimatedLogo';
 import { auth, signOut } from '@/auth';
-import BACKEND_URL from '../_helpers/backend-path';
+import BACKEND_URL from '../../_helpers/backend-path';
 import { headers } from 'next/headers';
-import { UsersType } from '../lib/schemas/Users';
-import { findUserActivitiesByUserId } from '../_helpers/db/user-activities';
-import { ActivityTypeEnum } from '../lib/schemas/UserActivities';
+import { UsersType } from '../../lib/schemas/Users';
+import { findUserActivitiesByUserId } from '../../_helpers/db/user-activities';
+import { ActivityTypeEnum } from '../../lib/schemas/UserActivities';
 import { format } from 'date-fns';
-import getXpStats from '../_helpers/experience-calculator';
-import { getStolenItemsStatus } from '../_helpers/db/stolen-items';
-import { StolenItemsStatusEnum } from '../lib/schemas/StolenItems';
-import { getReportsStatus } from '../_helpers/db/reports';
-import RolesEnum from '../lib/schemas/helpers/RolesEnum';
+import getXpStats from '../../_helpers/experience-calculator';
+import { getStolenItemsStatus } from '../../_helpers/db/stolen-items';
+import { StolenItemsStatusEnum } from '../../lib/schemas/StolenItems';
+import { getReportsStatus } from '../../_helpers/db/reports';
+import { redirect } from 'next/navigation';
 
 function getUserActivityTitle(userAct: ActivityTypeEnum) {
 	switch (userAct) {
@@ -54,21 +54,7 @@ export default async function MyProfile() {
 	const user = session?.user;
 
 	if (!user) {
-		return (
-			<div>
-				Você não está autenticado
-				<Link href={'/'}>Voltar</Link>
-			</div>
-		);
-	}
-
-	if (user.role !== RolesEnum.USER) {
-		return (
-			<div>
-				Você não tem permissão para acessar esta página
-				<Link href={'/'}>Voltar</Link>
-			</div>
-		);
+		redirect('/no-permission?redirect_to=/my-profile');
 	}
 
 	const myHeaders = await headers();

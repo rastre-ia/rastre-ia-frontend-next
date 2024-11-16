@@ -39,9 +39,9 @@ import { CldUploadWidget } from 'next-cloudinary';
 import { useSession } from 'next-auth/react';
 import { redirect, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { StolenItemsSchemaInterface } from '../lib/schemas/StolenItems';
-import { EmbeddedImageSchemaInterface } from '../lib/schemas/helpers/EmbeddedImageSchema';
-import { registerNewStolenItem } from '../_helpers/db/stolen-items';
+import { StolenItemsSchemaInterface } from '../../lib/schemas/StolenItems';
+import { EmbeddedImageSchemaInterface } from '../../lib/schemas/helpers/EmbeddedImageSchema';
+import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
 
 interface LatLng {
 	lat: number;

@@ -24,7 +24,7 @@ import SearchReports from './SearchReports';
 import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchStolenItems from './SearchStolenItems';
 import { auth, signOut } from '@/auth';
-import RolesEnum from '../lib/schemas/helpers/RolesEnum';
+import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
 
 export default async function PoliceDashboard() {
 	const session = await auth();

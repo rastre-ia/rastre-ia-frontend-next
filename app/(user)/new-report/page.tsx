@@ -42,11 +42,11 @@ import {
 	ReportStatusEnum,
 	ReportSubmissionMethodEnum,
 	ReportTypeEnum,
-} from '../lib/schemas/Reports';
-import { validReportTypesTranslated } from '../_helpers/report-type-translator';
+} from '../../lib/schemas/Reports';
+import { validReportTypesTranslated } from '../../_helpers/report-type-translator';
 import { useSession } from 'next-auth/react';
-import { getUserObjectIdById } from '../_helpers/db/users';
-import { createNewReport } from '../_helpers/db/reports';
+import { getUserObjectIdById } from '../../_helpers/db/users';
+import { createNewReport } from '../../_helpers/db/reports';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { redirect } from 'next/navigation';
@@ -93,7 +93,7 @@ export default function ReportPage() {
 	const router = useRouter();
 
 	if (status === 'unauthenticated') {
-		redirect('/login?redirect_to=/new-report');
+		redirect('/no-permission?redirect_to=/new-report');
 	}
 
 	if (!userId) {
