@@ -1,6 +1,6 @@
 'use client';
 
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState, useEffect } from 'react';
 import {
 	BarChart,
 	Bar,
@@ -17,100 +17,96 @@ import {
 	ResponsiveContainer,
 } from 'recharts';
 
-import { useState, useEffect } from 'react';
-
 import 'leaflet/dist/leaflet.css';
 import { BarChart3 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Mock function to get dashboard stats
-const getDashboardStats = async () => {
+// Função simulada para obter estatísticas do painel
+const obterEstatisticasDoPainel = async (): Promise<Estatisticas> => {
 	await new Promise((resolve) => setTimeout(resolve, 500));
 	return {
-		activeCases: 42,
-		solvedCases: 18,
-		pendingReports: 7,
-		recoveredItems: 15,
+		casosAtivos: 42,
+		casosResolvidos: 18,
+		relatoriosPendentes: 7,
+		itensRecuperados: 15,
 	};
 };
 
-// Mock function to get chart data
-const getChartData = async () => {
+// Função simulada para obter dados dos gráficos
+const obterDadosDosGraficos = async (): Promise<DadosGraficos> => {
 	await new Promise((resolve) => setTimeout(resolve, 500));
 	return {
-		barData: [
-			{ name: 'Active Cases', value: 42 },
-			{ name: 'Solved Cases', value: 18 },
-			{ name: 'Pending Reports', value: 7 },
-			{ name: 'Recovered Items', value: 15 },
+		dadosBarra: [
+			{ nome: 'Casos Ativos', valor: 42 },
+			{ nome: 'Casos Resolvidos', valor: 18 },
+			{ nome: 'Relatórios Pendentes', valor: 7 },
+			{ nome: 'Itens Recuperados', valor: 15 },
 		],
-		lineData: Array(7)
+		dadosLinha: Array(7)
 			.fill(null)
 			.map((_, i) => ({
-				date: new Date(
+				data: new Date(
 					Date.now() - (6 - i) * 86400000
-				).toLocaleDateString(),
-				reports: Math.floor(Math.random() * 20) + 5,
-				recoveries: Math.floor(Math.random() * 10),
+				).toLocaleDateString('pt-BR'),
+				relatorios: Math.floor(Math.random() * 20) + 5,
+				recuperacoes: Math.floor(Math.random() * 10),
 			})),
-		pieData: [
-			{ name: 'Theft', value: 35 },
-			{ name: 'Assault', value: 20 },
-			{ name: 'Fraud', value: 15 },
-			{ name: 'Vandalism', value: 10 },
-			{ name: 'Other', value: 20 },
+		dadosPizza: [
+			{ nome: 'Roubo', valor: 35 },
+			{ nome: 'Assalto', valor: 20 },
+			{ nome: 'Fraude', valor: 15 },
+			{ nome: 'Vandalismo', valor: 10 },
+			{ nome: 'Outros', valor: 20 },
 		],
 	};
 };
 
-interface OverviewProps {}
-
-interface ChartData {
-	barData: { name: string; value: number }[];
-	lineData: { date: string; reports: number; recoveries: number }[];
-	pieData: { name: string; value: number }[];
+interface Estatisticas {
+	casosAtivos: number;
+	casosResolvidos: number;
+	relatoriosPendentes: number;
+	itensRecuperados: number;
 }
 
-const Overview: FunctionComponent<OverviewProps> = () => {
-	interface Stats {
-		activeCases: number;
-		solvedCases: number;
-		pendingReports: number;
-		recoveredItems: number;
-	}
+interface DadosGraficos {
+	dadosBarra: { nome: string; valor: number }[];
+	dadosLinha: { data: string; relatorios: number; recuperacoes: number }[];
+	dadosPizza: { nome: string; valor: number }[];
+}
 
-	const [stats, setStats] = useState<Stats | null>(null);
-	const [chartData, setChartData] = useState<ChartData>({
-		barData: [],
-		lineData: [],
-		pieData: [],
+const VisaoGeral: FunctionComponent = () => {
+	const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null);
+	const [dadosGraficos, setDadosGraficos] = useState<DadosGraficos>({
+		dadosBarra: [],
+		dadosLinha: [],
+		dadosPizza: [],
 	});
 
 	useEffect(() => {
-		getDashboardStats().then(setStats);
-		getChartData().then(setChartData);
+		obterEstatisticasDoPainel().then(setEstatisticas);
+		obterDadosDosGraficos().then(setDadosGraficos);
 	}, []);
 
 	return (
 		<>
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				{stats &&
-					Object.entries(stats).map(([key, value]) => (
-						<Card key={key}>
+				{estatisticas &&
+					Object.entries(estatisticas).map(([chave, valor]) => (
+						<Card key={chave}>
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 								<CardTitle className="text-sm font-medium">
-									{key
+									{chave
 										.replace(/([A-Z])/g, ' $1')
-										.replace(/^./, function (str) {
-											return str.toUpperCase();
-										})}
+										.replace(/^./, (str) =>
+											str.toUpperCase()
+										)}
 								</CardTitle>
 								<BarChart3 className="h-4 w-4 text-muted-foreground" />
 							</CardHeader>
 							<CardContent>
 								<div className="text-2xl font-bold">
-									{value}
+									{valor}
 								</div>
 							</CardContent>
 						</Card>
@@ -120,19 +116,19 @@ const Overview: FunctionComponent<OverviewProps> = () => {
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<Card>
 					<CardHeader>
-						<CardTitle>Case Overview</CardTitle>
+						<CardTitle>Visão Geral dos Casos</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<div className="h-[200px]">
 							<ResponsiveContainer width="100%" height="100%">
-								<BarChart data={chartData.barData}>
+								<BarChart data={dadosGraficos.dadosBarra}>
 									<CartesianGrid strokeDasharray="3 3" />
-									<XAxis dataKey="name" />
+									<XAxis dataKey="nome" />
 									<YAxis />
 									<Tooltip />
 									<Legend />
 									<Bar
-										dataKey="value"
+										dataKey="valor"
 										fill="hsl(var(--primary))"
 									/>
 								</BarChart>
@@ -143,25 +139,25 @@ const Overview: FunctionComponent<OverviewProps> = () => {
 
 				<Card>
 					<CardHeader>
-						<CardTitle>Weekly Trends</CardTitle>
+						<CardTitle>Tendências Semanais</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<div className="h-[200px]">
 							<ResponsiveContainer width="100%" height="100%">
-								<LineChart data={chartData.lineData}>
+								<LineChart data={dadosGraficos.dadosLinha}>
 									<CartesianGrid strokeDasharray="3 3" />
-									<XAxis dataKey="date" />
+									<XAxis dataKey="data" />
 									<YAxis />
 									<Tooltip />
 									<Legend />
 									<Line
 										type="monotone"
-										dataKey="reports"
+										dataKey="relatorios"
 										stroke="hsl(var(--primary))"
 									/>
 									<Line
 										type="monotone"
-										dataKey="recoveries"
+										dataKey="recuperacoes"
 										stroke="hsl(var(--secondary))"
 									/>
 								</LineChart>
@@ -172,22 +168,22 @@ const Overview: FunctionComponent<OverviewProps> = () => {
 
 				<Card>
 					<CardHeader>
-						<CardTitle>Case Types Distribution</CardTitle>
+						<CardTitle>Distribuição dos Tipos de Casos</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<div className="h-[200px]">
 							<ResponsiveContainer width="100%" height="100%">
 								<PieChart>
 									<Pie
-										data={chartData.pieData}
+										data={dadosGraficos.dadosPizza}
 										cx="50%"
 										cy="50%"
 										outerRadius={80}
 										fill="hsl(var(--primary))"
-										dataKey="value"
+										dataKey="valor"
 										label
 									>
-										{chartData.pieData.map(
+										{dadosGraficos.dadosPizza.map(
 											(entry, index) => (
 												<Cell
 													key={`cell-${index}`}
@@ -210,4 +206,4 @@ const Overview: FunctionComponent<OverviewProps> = () => {
 	);
 };
 
-export default Overview;
+export default VisaoGeral;

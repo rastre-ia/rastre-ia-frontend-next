@@ -58,9 +58,10 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Request Citizen Assistance</CardTitle>
+				<CardTitle>Pedir assistência à população</CardTitle>
 				<CardDescription>
-					Select area and send alert to citizens
+					Selecione uma área no mapa e envie uma mensagem para os
+					cidadãos
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
@@ -82,11 +83,11 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 					</MapContainer>
 				</div>
 				<div>
-					<Label htmlFor="radius">Radius (meters)</Label>
+					<Label htmlFor="radius">Raio (metros)</Label>
 					<Slider
 						id="radius"
 						min={100}
-						max={5000}
+						max={1000000}
 						step={100}
 						value={[radius]}
 						onValueChange={(value) => setRadius(value[0])}
@@ -102,7 +103,7 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 					className="w-full"
 				>
 					<Send className="mr-2 h-4 w-4" />
-					Send Assistance Request
+					Enviar pedido de assistência
 				</Button>
 			</CardContent>
 		</Card>

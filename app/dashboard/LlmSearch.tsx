@@ -36,22 +36,23 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 		<>
 			<Card>
 				<CardHeader>
-					<CardTitle>LLM-Assisted Search</CardTitle>
+					<CardTitle>Busca incrementada por IA</CardTitle>
 					<CardDescription>
-						Search for items, reports, or any relevant information
+						Procure por itens, relatórios ou qualquer informação
+						relevante
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div className="flex space-x-2">
 						<Input
 							type="text"
-							placeholder="Search..."
+							placeholder="Buscando..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
 						<Button onClick={handleSearch} disabled={isSearching}>
 							{isSearching ? (
-								'Searching...'
+								'Buscando...'
 							) : (
 								<Search className="h-4 w-4" />
 							)}

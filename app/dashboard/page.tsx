@@ -4,8 +4,11 @@ import {
 	BarChart3,
 	HelpCircle,
 	User,
-	Shield,
+	FileText,
 	LogOut,
+	Megaphone,
+	Locate,
+	PackageSearch,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -23,6 +26,9 @@ import {
 } from '@/components/ui/popover';
 import { signOut } from '@/auth';
 import { Button } from '@/components/ui/button';
+import SearchReports from './SearchReports';
+import ActiveAssistanceRequests from './ActiveAssistanceRequests';
+import SearchStolenItems from './SearchStolenItems';
 
 export default function PoliceDashboard() {
 	return (
@@ -34,46 +40,43 @@ export default function PoliceDashboard() {
 							<AnimatedLogo className="inline" />
 						</h1>
 					</Link>
-					<Popover>
-						<PopoverTrigger>
-							<Avatar className="">
-								<AvatarFallback>
-									<User className="h-12 w-12 bg-card" />
-								</AvatarFallback>
-							</Avatar>
-						</PopoverTrigger>
-						<PopoverContent className="max-w-sm">
-							<form
-								action={async () => {
-									'use server';
-									await signOut({ redirectTo: '/' });
-								}}
-							>
-								<Button
-									variant="ghost"
-									type="submit"
-									className="w-full"
-								>
-									<LogOut className="mr-2 h-4 w-4" />
-									Sair
-								</Button>
-							</form>
-						</PopoverContent>
-					</Popover>
+					<form
+						action={async () => {
+							'use server';
+							await signOut({ redirectTo: '/' });
+						}}
+					>
+						<Button variant="ghost" type="submit">
+							<LogOut className="mr-2 h-4 w-4" />
+							Sair
+						</Button>
+					</form>
 				</header>
 				<Tabs defaultValue="overview" className="space-y-4">
 					<TabsList>
 						<TabsTrigger value="overview">
 							<BarChart3 className="h-4 w-4 mr-2" />
-							Overview
+							Visão geral
 						</TabsTrigger>
 						<TabsTrigger value="search">
 							<Search className="h-4 w-4 mr-2" />
-							Search
+							Procurar com IA
 						</TabsTrigger>
 						<TabsTrigger value="assistance">
-							<HelpCircle className="h-4 w-4 mr-2" />
-							Request Assistance
+							<Megaphone className="h-4 w-4 mr-2" />
+							Pedir assistência
+						</TabsTrigger>
+						<TabsTrigger value="active-assistance-requests">
+							<Locate className="h-4 w-4 mr-2" />
+							Pedidos de assistência ativos
+						</TabsTrigger>
+						<TabsTrigger value="search-reports">
+							<FileText className="h-4 w-4 mr-2" />
+							Buscar reportes
+						</TabsTrigger>
+						<TabsTrigger value="search-stolen-items">
+							<PackageSearch className="h-4 w-4 mr-2" />
+							Buscar itens roubados
 						</TabsTrigger>
 					</TabsList>
 
@@ -87,6 +90,21 @@ export default function PoliceDashboard() {
 
 					<TabsContent value="assistance" className="space-y-4">
 						<RequestAssistance />
+					</TabsContent>
+					<TabsContent
+						value="active-assistance-requests"
+						className="space-y-4"
+					>
+						<ActiveAssistanceRequests />
+					</TabsContent>
+					<TabsContent value="search-reports" className="space-y-4">
+						<SearchReports />
+					</TabsContent>
+					<TabsContent
+						value="search-stolen-items"
+						className="space-y-4"
+					>
+						<SearchStolenItems />
 					</TabsContent>
 				</Tabs>
 			</div>

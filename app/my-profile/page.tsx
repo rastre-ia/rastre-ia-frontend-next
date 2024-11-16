@@ -6,7 +6,6 @@ import {
 	User,
 	Smartphone,
 	LogOut,
-	AlertTriangle,
 	Award,
 } from 'lucide-react';
 
