@@ -30,6 +30,12 @@ const answerRequestsSchema = new Schema({
 		default: 1000, // 1000 meters
 		min: [1, 'The request radius must be greater than 1 meter'],
 	},
+	usersRequested: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Users',
+		},
+	],
 
 	priority: {
 		type: String,
