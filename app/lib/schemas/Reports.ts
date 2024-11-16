@@ -30,6 +30,8 @@ export enum ReportSubmissionMethodEnum {
 }
 
 export interface ReportSchemaInterface {
+	_id?: Schema.Types.ObjectId;
+
 	userId: Schema.Types.ObjectId | string;
 	title: string;
 	location: PointSchemaInterface;

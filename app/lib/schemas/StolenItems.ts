@@ -4,7 +4,17 @@ import embeddedImageSchema, {
 	EmbeddedImageSchemaInterface,
 } from './helpers/EmbeddedImageSchema';
 
+export enum StolenItemsStatusEnum {
+	PENDING = 'pending',
+	ON_INVESTIGATION = 'on_investigation',
+	SOLVED_NOT_RECUPERATED = 'solved_not_recuperated',
+	SOLVED_RECUPERATED = 'solved_recuperated',
+	NOT_SOLVED = 'not_solved',
+}
+
 export interface StolenItemsSchemaInterface {
+	_id?: Schema.Types.ObjectId;
+
 	userId: Schema.Types.ObjectId | string;
 	object: string;
 	objectDescription: string;
@@ -14,6 +24,8 @@ export interface StolenItemsSchemaInterface {
 	eventDescription: string;
 	suspectCharacteristics: string;
 	embeddings: number[];
+
+	status?: StolenItemsStatusEnum;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -30,6 +42,13 @@ const StolenItemsSchema = new Schema<StolenItemsSchemaInterface>({
 	eventDate: { type: Date, required: true },
 	eventDescription: { type: String, required: true },
 	suspectCharacteristics: { type: String },
+
+	status: {
+		type: String,
+		enum: Object.values(StolenItemsStatusEnum),
+		required: true,
+		default: StolenItemsStatusEnum.PENDING,
+	},
 
 	embeddings: { type: [Number], required: true },
 

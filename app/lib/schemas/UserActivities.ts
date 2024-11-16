@@ -7,19 +7,20 @@ export enum ActivityTypeEnum {
 	OTHER = 'other',
 }
 
-export interface UserActivitiesType {
+export interface UserActivitiesInterface {
+	_id?: Schema.Types.ObjectId | string;
 	userId: Schema.Types.ObjectId | string;
 	activityType: ActivityTypeEnum;
-	requestId?: Schema.Types.ObjectId;
-	reportId?: Schema.Types.ObjectId;
-	stolenItemId?: Schema.Types.ObjectId;
+	requestId?: Schema.Types.ObjectId | string;
+	reportId?: Schema.Types.ObjectId | string;
+	stolenItemId?: Schema.Types.ObjectId | string;
 	extraData?: String;
 
 	createdAt?: Date;
 	updatedAt?: Date;
 }
 
-const userActivitiesSchema = new Schema<UserActivitiesType>({
+const userActivitiesSchema = new Schema<UserActivitiesInterface>({
 	userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
 	activityType: {
 		type: String,
@@ -65,6 +66,9 @@ userActivitiesSchema.pre('save', function (next) {
 
 const UserActivities =
 	mongoose.models.UserActivities ||
-	mongoose.model<UserActivitiesType>('UserActivities', userActivitiesSchema);
+	mongoose.model<UserActivitiesInterface>(
+		'UserActivities',
+		userActivitiesSchema
+	);
 
-export default UserActivities as Model<UserActivitiesType>;
+export default UserActivities as Model<UserActivitiesInterface>;

@@ -4,53 +4,58 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import argon2 from '@node-rs/argon2';
 import { cepLookup } from '@/app/_helpers/brasil-api';
+import { auth } from '@/auth';
 
-export async function GET(req: NextRequest) {
+export const GET = auth(async function GET(req) {
 	const lat = req.nextUrl.searchParams.get('lat');
 	const lon = req.nextUrl.searchParams.get('lon');
 	const radius = req.nextUrl.searchParams.get('radius');
-
-	const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-	// Validate token
-	if (!token) {
-		return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-	}
-
 	await dbConnect();
 
-	try {
-		let query = Users.find();
+	const queryResult: {
+		users: any[];
+		total: number;
+	} = {
+		users: [],
+		total: 0,
+	};
 
-		// Geospatial query if latitude, longitude, and radius are provided
-		if (lat && lon && radius) {
-			const maxDistance = parseInt(radius); // Assuming radius is in meters
+	if (req.auth) {
+		try {
+			let query = Users.find();
 
-			query = query.where('location').near({
-				center: {
-					type: 'Point',
-					coordinates: [parseFloat(lon), parseFloat(lat)],
-				},
-				maxDistance: maxDistance,
-			});
+			// Geospatial query if latitude, longitude, and radius are provided
+			if (lat && lon && radius) {
+				const maxDistance = parseInt(radius); // Assuming radius is in meters
+
+				query = query.where('location').near({
+					center: {
+						type: 'Point',
+						coordinates: [parseFloat(lon), parseFloat(lat)],
+					},
+					maxDistance: maxDistance,
+				});
+			}
+
+			// Execute the query
+			const users = await query.exec();
+
+			queryResult.users = users;
+		} catch (error) {
+			console.error('Error fetching users:', error);
+			return NextResponse.json(
+				{ message: 'Error fetching users' },
+				{ status: 500 }
+			);
 		}
-
-		// if (cpf) {
-		// 	query = query.where('cpf').equals(cpf);
-		// }
-
-		// Execute the query
-		const users = await query.exec();
-
-		return NextResponse.json({ users });
-	} catch (error) {
-		console.error('Error fetching users:', error);
-		return NextResponse.json(
-			{ message: 'Error fetching users' },
-			{ status: 500 }
-		);
 	}
-}
+
+	const usersCount = await Users.countDocuments({});
+
+	queryResult.total = usersCount;
+
+	return NextResponse.json(queryResult);
+});
 
 export async function POST(req: NextRequest) {
 	const { name, email, cpf, cep, password } = await req.json();
