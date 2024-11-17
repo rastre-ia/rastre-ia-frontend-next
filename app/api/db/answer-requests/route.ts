@@ -4,6 +4,7 @@ import AnswerRequests, {
 	AnswerRequestSchemaInterface,
 } from '@/app/lib/schemas/AnswerRequests';
 import dbConnect from '@/app/lib/mongodb';
+import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
 
 export const POST = auth(async function POST(req) {
 	if (req.auth) {
@@ -53,18 +54,35 @@ export const GET = auth(async function GET(req) {
 		try {
 			await dbConnect();
 
-			const answerRequests =
-				await AnswerRequests.find<AnswerRequestSchemaInterface>()
-					.where('usersRequested')
-					.equals(userId)
-					.exec();
+			let response: {
+				answerRequests: AnswerRequestSchemaInterface[];
+				total: number;
+			} = {
+				answerRequests: [],
+				total: 0,
+			};
 
 			const answerRequestsCount = await AnswerRequests.countDocuments({});
+			response.total = answerRequestsCount;
 
-			return NextResponse.json({
-				answerRequests: answerRequests,
-				total: answerRequestsCount,
-			});
+			if (req.auth.user.role === RolesEnum.USER) {
+				const answerRequests =
+					await AnswerRequests.find<AnswerRequestSchemaInterface>()
+						.where('usersRequested')
+						.equals(userId)
+						.exec();
+				response.answerRequests = answerRequests;
+			}
+			if (req.auth.user.role === RolesEnum.POLICE_STATION) {
+				const answerRequests =
+					await AnswerRequests.find<AnswerRequestSchemaInterface>()
+						.where('policeStationId')
+						.equals(userId)
+						.exec();
+				response.answerRequests = answerRequests;
+			}
+
+			return NextResponse.json(response);
 		} catch (error) {
 			console.error('Error fetching reports:', error);
 			return NextResponse.json(
