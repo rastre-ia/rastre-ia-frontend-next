@@ -10,7 +10,7 @@ export async function createNewAnswerRequest(
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(answerRequest),
+		body: JSON.stringify({ answerRequest: answerRequest }),
 	});
 	return resp;
 }

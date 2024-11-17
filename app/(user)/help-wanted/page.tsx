@@ -26,45 +26,23 @@ import { redirect } from 'next/navigation';
 import BACKEND_URL from '@/app/_helpers/backend-path';
 import { headers } from 'next/headers';
 import { UsersSchema } from '@/app/lib/schemas/Users';
+import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
+import { AnswersSchemaInterface } from '@/app/lib/schemas/Answers';
 
 const expertise = ['Testemunha', 'Conhecimento Local'];
 
-// Mock data for personalized assistance requests
-const mockRequests = [
-	{
-		id: 1,
-		title: 'Testemunha Necessária para Assalto na Rua Principal',
-		description:
-			'Estamos buscando testemunhas que possam ter visto um assalto que ocorreu na Rua Principal em 15 de junho por volta das 22:00. Seu conhecimento local pode ser crucial para resolver este caso.',
-		location: 'Rua Principal',
-		urgency: 'Alta',
-		matchScore: 95,
-		skillsNeeded: ['Conhecimento Local', 'Observação'],
-	},
-	{
-		id: 2,
-		title: 'Informações sobre Veículo Suspeito na Área do Centro',
-		description:
-			'Estamos em busca de informações sobre um sedã azul com a placa ABC-123 visto na área central em várias ocasiões. Sua familiaridade com a área pode fornecer informações valiosas.',
-		location: 'Centro',
-		urgency: 'Média',
-		matchScore: 88,
-		skillsNeeded: ['Conhecimento Local', 'Atenção aos Detalhes'],
-	},
-	{
-		id: 3,
-		title: 'Ajuda para Identificar Suspeito de Filmagem de Segurança',
-		description:
-			'Precisamos de ajuda para identificar um suspeito capturado em filmagens de segurança próximo ao Parque Central. Sua experiência como testemunha em casos anteriores faz de você um candidato ideal para ajudar nesta investigação.',
-		location: 'Parque Central',
-		urgency: 'Alta',
-		matchScore: 92,
-		skillsNeeded: ['Experiência como Testemunha', 'Identificação Visual'],
-	},
-];
+function checkIfAnswered(
+	answerRequestId: string,
+	myAnswers: AnswersSchemaInterface[]
+) {
+	return myAnswers.find(
+		(element) => element.answerRequestId === answerRequestId
+	)
+		? true
+		: false;
+}
 
 export default async function HelpWanted() {
-	const requests = mockRequests;
 	const session = await auth();
 	const user = session?.user;
 
@@ -74,11 +52,34 @@ export default async function HelpWanted() {
 
 	const myHeaders = await headers();
 
-	const res = await fetch(BACKEND_URL + '/db/users/' + user._id, {
+	const resUsers = await fetch(BACKEND_URL + '/db/users/' + user._id, {
 		method: 'GET',
 		headers: myHeaders,
 	});
-	const userData = (await res.json()).user as UsersSchema;
+	const userData = (await resUsers.json()).user as UsersSchema;
+
+	const resAnswerRequests = await fetch(
+		BACKEND_URL + '/db/answer-requests?id=' + user._id,
+		{
+			method: 'GET',
+			headers: myHeaders,
+		}
+	);
+	const myAnswerRequests = (await resAnswerRequests.json()) as {
+		answerRequests: AnswerRequestSchemaInterface[];
+		total: number;
+	};
+
+	const resMyAnswers = await fetch(
+		BACKEND_URL + '/db/answers?id=' + user._id,
+		{
+			method: 'GET',
+			headers: myHeaders,
+		}
+	);
+	const myAnswers = (await resMyAnswers.json()) as {
+		answers: AnswersSchemaInterface[];
+	};
 
 	const expStats = getXpStats(userData.experience);
 
@@ -112,12 +113,20 @@ export default async function HelpWanted() {
 						</CardHeader>
 						<CardContent>
 							<div className="space-y-4">
-								{requests.map((request) => (
-									<HelpWantedRequest
-										request={request}
-										key={`HelpWantedRequest-${request.id}`}
-									/>
-								))}
+								{myAnswerRequests.answerRequests.map(
+									(request) => (
+										<HelpWantedRequest
+											userId={user._id}
+											request={request}
+											answered={checkIfAnswered(
+												request._id as string,
+												myAnswers.answers
+											)}
+											myHeaders={myHeaders}
+											key={`HelpWantedRequest-${request._id}`}
+										/>
+									)
+								)}
 							</div>
 						</CardContent>
 					</Card>

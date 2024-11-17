@@ -186,6 +186,7 @@ export default function BuscarRelatos() {
 								location={relato.location}
 								title={relato.title}
 								id={relato._id}
+								key={`RequestAssistDialog-${idx}`}
 								type={AnswerRequestEventTypeEnum.REPORTS}
 								formattedData={`Título: ${relato.title}\nDescrição: ${relato.description}`}
 							>

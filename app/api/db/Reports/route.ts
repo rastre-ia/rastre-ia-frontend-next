@@ -83,13 +83,6 @@ export const POST = auth(async function POST(req) {
 				? ReportStatusEnum.PENDING
 				: ReportStatusEnum.NOT_APPLICABLE;
 
-		console.log('sts:', sts);
-
-		console.log(
-			assistanceNeeded,
-			ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE
-		);
-
 		try {
 			const session = await Reports.startSession();
 

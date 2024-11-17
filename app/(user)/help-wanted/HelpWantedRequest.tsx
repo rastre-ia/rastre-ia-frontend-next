@@ -8,6 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogClose,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -18,84 +19,115 @@ import {
 	CardTitle,
 	CardFooter,
 } from '@/components/ui/card';
-import { MessageSquare, MapPin, Star } from 'lucide-react';
+import { MessageSquare, MapPin, Star, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-function urgencyToXp(urgency: string) {
-	switch (urgency) {
-		case 'Alta':
-			return 75;
-		case 'Média':
-			return 35;
-		case 'Baixa':
-			return 10;
-		default:
-			return 0;
-	}
-}
+import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
+import { AnswerRequestPriorityEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
+import answerRequestPriorityTranslator from '@/app/_helpers/answer-request-priority-translator';
+import { createNewAnswer } from '@/app/_helpers/db/answer';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
 
 interface HelpWantedRequestProps {
-	request: any;
+	request: AnswerRequestSchemaInterface;
+	myHeaders: Headers;
+	userId: string;
+	answered: boolean;
 }
 
 const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
 	request,
+	myHeaders,
+	userId,
+	answered,
 }) => {
+	if (!request._id) {
+		return null;
+	}
+
 	async function handleSubmitResponse(formData: FormData) {
 		'use server';
 
-		console.log(`Resposta enviada para a solicitação:`, formData);
+		const responseMessage = formData.get('response_message') as string;
+
+		await createNewAnswer(
+			{
+				answerRequestId: request._id as string,
+				userId: userId,
+				content: responseMessage,
+			},
+			myHeaders
+		);
+
+		revalidatePath('help-wanted');
+		redirect('/help-wanted');
 	}
+
 	return (
-		<Card key={request.id}>
+		<Card key={request._id as string}>
 			<CardHeader>
 				<div className="flex justify-between items-start">
 					<div>
 						<CardTitle>{request.title}</CardTitle>
 						<CardDescription className="flex items-center mt-1">
 							<MapPin className="h-4 w-4 mr-1" />
-							{request.location}
+							{/* {request.location} */}
 						</CardDescription>
 					</div>
 					<Badge
 						variant={
-							request.urgency === 'Alta'
+							request.priority === AnswerRequestPriorityEnum.HIGH
 								? 'destructive'
 								: 'secondary'
 						}
 					>
-						Urgência {request.urgency}
+						Urgência{' '}
+						{answerRequestPriorityTranslator(request.priority)}
 					</Badge>
 				</div>
 			</CardHeader>
 			<CardContent>
-				<p className="mb-4">{request.description}</p>
+				<p className="mb-4">{request.message}</p>
 				<div className="flex flex-wrap gap-2 mb-4">
-					{request.skillsNeeded.map((skill: any) => (
+					{/* {request.skillsNeeded.map((skill: any) => (
 						<Badge key={skill} variant="outline">
 							{skill}
 						</Badge>
-					))}
+					))} */}
 				</div>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center">
-						<Star className="h-4 w-4 text-yellow-400 mr-1" />
-						<span className="font-semibold">
-							{urgencyToXp(request.urgency)} XP
-						</span>
+						{answered ? (
+							<div className="flex gap-4 align-middle bg-secondary p-2 rounded-md">
+								<ThumbsUp /> Respondida
+							</div>
+						) : (
+							<>
+								<Star className="h-4 w-4 text-yellow-400 mr-1" />
+								<span className="font-semibold">
+									{calculateAnswerExperience(
+										request.priority
+									)}{' '}
+									XP
+								</span>
+							</>
+						)}
 					</div>
 					<Dialog>
 						<DialogTrigger asChild>
-							<Button>
+							<Button variant={answered ? 'outline' : 'default'}>
 								<MessageSquare className="h-4 w-4 mr-2" />
-								Responder
+								{answered
+									? 'Enviar nova resposta'
+									: 'Responder'}
 							</Button>
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>
-									Responder à Solicitação
+									Responder à "{request.title}""
 								</DialogTitle>
 								<DialogDescription>
 									Suas informações são cruciais para esta
@@ -105,11 +137,15 @@ const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
 							</DialogHeader>
 							<form action={handleSubmitResponse}>
 								<Textarea
-									name="response"
+									name="response_message"
 									placeholder="Digite sua resposta aqui..."
 									className="mb-4"
 								/>
-								<Button type="submit">Enviar Resposta</Button>
+								<DialogClose asChild>
+									<Button type="submit">
+										Enviar Resposta
+									</Button>
+								</DialogClose>
 							</form>
 						</DialogContent>
 					</Dialog>
