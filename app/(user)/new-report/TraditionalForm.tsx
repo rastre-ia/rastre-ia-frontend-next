@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Upload, Camera } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -32,8 +32,9 @@ import { createNewReport } from '../../_helpers/db/reports';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { FunctionComponent } from 'react';
-import L from 'leaflet';
+import L, { LatLng, latLng } from 'leaflet';
 import { CldUploadWidget } from 'next-cloudinary';
+import { RotatingLines } from 'react-loader-spinner';
 
 function LocationPicker({
 	onLocationChange,
@@ -81,6 +82,27 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 	const { toast } = useToast();
 	const router = useRouter();
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	const [userLocation, setUserLocation] = useState<LatLng>(
+		latLng(-24.724443, -53.740623)
+	);
+
+	useEffect(() => {
+		navigator.geolocation.getCurrentPosition((position) => {
+			setUserLocation(
+				latLng(position.coords.latitude, position.coords.longitude)
+			);
+			setReportData((prev) => ({
+				...prev,
+				location: {
+					type: 'Point',
+					coordinates: [
+						position.coords.longitude,
+						position.coords.latitude,
+					],
+				},
+			}));
+		});
+	}, []);
 
 	const handleFormSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -201,7 +223,7 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 					<Label>Localização</Label>
 					<div className="h-[300px] mb-2">
 						<MapContainer
-							center={[51.505, -0.09]}
+							center={userLocation}
 							zoom={13}
 							style={{
 								height: '100%',
@@ -283,9 +305,21 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 						</div>
 					</RadioGroup>
 				</div>
-				<Button type="submit">
-					<Upload className="h-4 w-4 mr-2" />
-					Enviar
+				<Button type="submit" disabled={isLoading}>
+					{isLoading ? (
+						<>
+							Enviando{' '}
+							<RotatingLines
+								ariaLabel="chat-loading"
+								strokeColor="white"
+							/>
+						</>
+					) : (
+						<>
+							<Upload className="h-4 w-4 mr-2" />
+							Enviar
+						</>
+					)}
 				</Button>
 			</form>
 		</TabsContent>
