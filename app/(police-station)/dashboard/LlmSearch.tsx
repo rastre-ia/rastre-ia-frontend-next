@@ -1,11 +1,7 @@
 'use client';
 
-import { FunctionComponent } from 'react';
-import { useState } from 'react';
-
-import 'leaflet/dist/leaflet.css';
+import { FunctionComponent, useState } from 'react';
 import { Search } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,68 +12,100 @@ import {
 	CardTitle,
 	CardFooter,
 } from '@/components/ui/card';
-
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import BACKEND_URL from "@/app/_helpers/backend-path";
 
 interface LlmSearchProps {}
 
 const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
-	const [searchQuery, setSearchQuery] = useState('');
-	const [searchResults, setSearchResults] = useState<any[]>([]);
-	const [isSearching, setIsSearching] = useState(false);
+	const [response, setResponse] = useState<string | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-	const handleSearch = async () => {
-		setIsSearching(true);
-		setIsSearching(false);
+	const handleSearch = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setLoading(true);
+		setError(null);
+		setResponse(null);
+
+		const searchQuery = (e.target as any).search_query.value;
+
+		if (!searchQuery) {
+			setError('Por favor, insira uma consulta.');
+			setLoading(false);
+			return;
+		}
+
+		try {
+			const res = await fetch(BACKEND_URL + '/other/llama-search', {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					query: searchQuery,
+				}),
+			});
+
+			if (!res.ok) {
+				throw new Error(`Erro na requisição: ${res.status}`);
+			}
+
+			const data = (await res.json()).results;
+			console.log(data);
+			setResponse(data);
+		} catch (err) {
+			console.error('Erro durante a busca:', err);
+			setError('Ocorreu um erro ao processar a sua solicitação.');
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
 		<>
 			<Card>
 				<CardHeader>
-					<CardTitle>Busca incrementada por IA</CardTitle>
+					<CardTitle>Busca com IA</CardTitle>
 					<CardDescription>
-						Procure por itens, relatórios ou qualquer informação
-						relevante
+						Consulte informações utilizando IA.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="flex space-x-2">
-						<Input
-							type="text"
-							placeholder="Buscando..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-						/>
-						<Button onClick={handleSearch} disabled={isSearching}>
-							{isSearching ? (
-								'Buscando...'
-							) : (
-								<Search className="h-4 w-4" />
-							)}
-						</Button>
-					</div>
+					<form onSubmit={handleSearch}>
+						<div className="flex space-x-2">
+							<Input
+								type="text"
+								id="search_query"
+								name="search_query"
+								placeholder="Digite sua consulta"
+							/>
+							<Button type="submit" disabled={loading}>
+								{loading ? 'Buscando...' : <Search className="h-4 w-4" />}
+							</Button>
+						</div>
+					</form>
 				</CardContent>
 			</Card>
 
-			<ScrollArea className="h-[400px]">
-				<div className="space-y-4">
-					{searchResults.map((item) => (
-						<Card key={item.id}>
-							<CardHeader>
-								<CardTitle>{item.title}</CardTitle>
-								<CardDescription>{item.type}</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<p>{item.description}</p>
-							</CardContent>
-							<CardFooter className="flex justify-between">
-								<Badge>{item.status}</Badge>
-							</CardFooter>
-						</Card>
-					))}
-				</div>
+			<ScrollArea className="h-[400px] mt-4">
+				{error && (
+					<div className="text-red-600 font-semibold">{error}</div>
+				)}
+				{ response? (
+					<Card className=" hover:shadow-xl transition-all duration-300">
+						<CardHeader>
+							<CardTitle>Resultado</CardTitle>
+						</CardHeader>
+						<CardContent>
+						<p dangerouslySetInnerHTML={{ __html: response.replace(/\n/g, '<br>') }} />						</CardContent>
+						<CardFooter>
+							<Badge className="bg-green-500 text-white">IA</Badge>
+						</CardFooter>
+					</Card>
+				): null}
 			</ScrollArea>
 		</>
 	);

@@ -1,13 +1,12 @@
 'use client';
 
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import { useState } from 'react';
-import { MapContainer, TileLayer, Circle, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, useMap, useMapEvents } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
-import { Search, BarChart3, HelpCircle, Send } from 'lucide-react';
-import Link from 'next/link';
-
+import { Search, Send } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -17,10 +16,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { LatLngExpression } from 'leaflet';
 
@@ -42,19 +37,58 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 	const [center, setCenter] = useState<LatLngExpression>([51.505, -0.09]);
 	const [radius, setRadius] = useState(1000);
 
+	// Função para obter a localização atual do dispositivo
+	const getCurrentLocation = () => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					const { latitude, longitude } = position.coords;
+					setCenter([latitude, longitude]); // Atualiza o centro do estado
+				},
+				(error) => {
+					console.error("Erro ao obter localização: ", error);
+					// Defina um centro padrão caso haja erro
+					setCenter([51.505, -0.09]);
+				}
+			);
+		} else {
+			console.log("Geolocalização não suportada neste navegador.");
+		}
+	};
+
+	// Função para enviar o pedido de assistência
 	const handleSendAssistanceRequest = () => {
 		console.log('Sending assistance request:', {
 			center,
 			radius,
 			message: assistanceMessage,
 		});
-		// Here you would typically send this data to your backend
+		// Aqui você enviaria esses dados para o backend
 		setAssistanceMessage('');
 	};
 
+	// Atualizar o centro quando o mapa for clicado
 	const handleMapClick = (latlng: { lat: number; lng: number }) => {
 		setCenter([latlng.lat, latlng.lng]);
 	};
+
+	
+	const MapFlyTo = () => {
+		const map = useMap(); 
+		useEffect(() => {
+			if (center) {
+				map.flyTo(center, 13, {
+					duration: 2, 
+				});
+			}
+		}, [center]); 
+		return null;
+	};
+
+	useEffect(() => {
+		getCurrentLocation();
+	}, []);
+
 	return (
 		<Card>
 			<CardHeader>
@@ -79,6 +113,7 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 							attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 						/>
 						<Circle center={center} radius={radius} />
+						<MapFlyTo /> {/* Componente que vai "voar" até a localização */}
 						<MapEvents onClick={handleMapClick} />
 					</MapContainer>
 				</div>
@@ -86,9 +121,9 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 					<Label htmlFor="radius">Raio (metros)</Label>
 					<Slider
 						id="radius"
-						min={100}
-						max={1000000}
-						step={100}
+						min={10}
+						max={10000}
+						step={10}
 						value={[radius]}
 						onValueChange={(value) => setRadius(value[0])}
 					/>
@@ -104,6 +139,13 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 				>
 					<Send className="mr-2 h-4 w-4" />
 					Enviar pedido de assistência
+				</Button>
+				<Button
+					onClick={getCurrentLocation}
+					className="mt-4 w-full"
+				>
+					<Search className="mr-2 h-4 w-4" />
+					Obter localização atual
 				</Button>
 			</CardContent>
 		</Card>
