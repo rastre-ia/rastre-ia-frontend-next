@@ -4,5 +4,5 @@
 	"prettier.tabWidth": 4,
 	"prettier.useTabs": true,
 	"prettier.singleQuote": true,
-	"cSpell.words": ["Cidadao", "dont", "DONT"]
+	"cSpell.words": ["Cidadao", "dont", "DONT", "stolenitems"]
 }

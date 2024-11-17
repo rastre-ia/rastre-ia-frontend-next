@@ -2,7 +2,7 @@ import mongoose, { Model, Schema } from 'mongoose';
 import pointSchema from './helpers/PointSchema';
 import RolesEnum from './helpers/RolesEnum';
 
-export interface UsersType {
+export interface UsersSchema {
 	_id?: Schema.Types.ObjectId;
 
 	name: string;
@@ -20,7 +20,7 @@ export interface UsersType {
 	updatedAt: Date;
 }
 
-const usersSchema = new Schema<UsersType>({
+const usersSchema = new Schema<UsersSchema>({
 	name: { type: String, required: true },
 	email: { type: String, required: true, unique: true },
 	cpf: { type: String, required: true, unique: true },
@@ -51,6 +51,6 @@ usersSchema.pre('save', function (next) {
 });
 
 const Users =
-	mongoose.models.Users || mongoose.model<UsersType>('Users', usersSchema);
+	mongoose.models.Users || mongoose.model<UsersSchema>('Users', usersSchema);
 
-export default Users as Model<UsersType>;
+export default Users as Model<UsersSchema>;

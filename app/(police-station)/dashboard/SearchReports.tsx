@@ -45,6 +45,16 @@ import { getReports } from '@/app/_helpers/db/reports';
 import { format } from 'date-fns';
 import reportStatusTranslator from '@/app/_helpers/report-status-translator';
 
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
+import reportTypeTranslator from '@/app/_helpers/report-type-translator';
+import RequestAssistDialog from '@/components/RequestAssistDialog';
+import { AnswerRequestEventTypeEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
+
 const iconesTipoRelato = {
 	[ReportTypeEnum.STRANGE_ACTIVITY]: AlertTriangle,
 	[ReportTypeEnum.TRAFFIC]: Car,
@@ -59,7 +69,7 @@ const estilosTipoRelato = {
 	[ReportTypeEnum.TRAFFIC]: 'border-l-4 border-l-blue-500',
 	[ReportTypeEnum.PEACE_DISTURBANCE]: 'border-l-4 border-l-purple-500',
 	[ReportTypeEnum.PHYSICAL_ASSAULT]: 'border-l-4 border-l-red-500',
-	[ReportTypeEnum.ROBBERY]: 'border-l-4 border-l-green-500',
+	[ReportTypeEnum.ROBBERY]: 'border-l-4 border-l-black',
 	[ReportTypeEnum.OTHER]: 'border-l-4 border-l-gray-500',
 };
 
@@ -68,7 +78,7 @@ const coresIconesTipoRelato = {
 	[ReportTypeEnum.TRAFFIC]: 'text-blue-500',
 	[ReportTypeEnum.PEACE_DISTURBANCE]: 'text-purple-500',
 	[ReportTypeEnum.PHYSICAL_ASSAULT]: 'text-red-500',
-	[ReportTypeEnum.ROBBERY]: 'text-green-500',
+	[ReportTypeEnum.ROBBERY]: 'text-black',
 	[ReportTypeEnum.OTHER]: 'text-gray-500',
 };
 
@@ -118,7 +128,7 @@ export default function BuscarRelatos() {
 	};
 
 	return (
-		<>
+		<TooltipProvider>
 			<Card>
 				<CardHeader>
 					<CardTitle>Busca e Filtros</CardTitle>
@@ -167,69 +177,88 @@ export default function BuscarRelatos() {
 			</Card>
 
 			<ScrollArea>
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ duration: 0.5, delay: 0.2 }}
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-				>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 					{reports.map((relato, idx) => {
+						if (relato._id === undefined) return null;
 						const Icone = iconesTipoRelato[relato.type];
 						return (
-							<Card
-								key={`card-report-${idx}`}
-								className={`${estilosTipoRelato[relato.type]}`}
+							<RequestAssistDialog
+								location={relato.location}
+								title={relato.title}
+								id={relato._id}
+								type={AnswerRequestEventTypeEnum.REPORTS}
+								formattedData={`Título: ${relato.title}\nDescrição: ${relato.description}`}
 							>
-								<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-									<CardTitle className="text-md font-medium">
-										{relato.title}
-									</CardTitle>
-									<Icone
-										className={`h-4 w-4 ${
-											coresIconesTipoRelato[relato.type]
-										}`}
-									/>
-								</CardHeader>
+								<Card
+									key={`card-report-${idx}`}
+									className={`${
+										estilosTipoRelato[relato.type]
+									} transition-all ease-in-out duration-100 hover:shadow-lg cursor-pointer`}
+								>
+									<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+										<CardTitle className="text-md font-medium">
+											{relato.title}
+										</CardTitle>
+										<Tooltip delayDuration={0}>
+											<TooltipTrigger>
+												<Icone
+													className={`h-4 w-4 ${
+														coresIconesTipoRelato[
+															relato.type
+														]
+													}`}
+												/>
+											</TooltipTrigger>
+											<TooltipContent>
+												{reportTypeTranslator(
+													relato.type
+												)}
+											</TooltipContent>
+										</Tooltip>
+									</CardHeader>
 
-								{relato.createdAt !== undefined && (
-									<CardContent>
-										<p className="text-xs text-muted-foreground">
-											Enviado em{' '}
-											{format(
-												relato.createdAt,
-												'dd/MM/yyyy HH:mm'
-											)}
-										</p>
-										<p className="mt-2">
-											{relato.description}
-										</p>
-									</CardContent>
-								)}
-								<CardFooter className="flex justify-between items-center">
-									<Badge
-										variant={
-											relato.status ===
-											ReportStatusEnum.PENDING
-												? 'default'
-												: relato.status ===
-												  ReportStatusEnum.RESOLVED
-												? 'secondary'
-												: 'outline'
-										}
-									>
-										{reportStatusTranslator(relato.status)}
-									</Badge>
-									{relato.assistanceNeeded ===
-										ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE && (
-										<Badge variant="destructive">
-											Precisa de assistência
-										</Badge>
+									{relato.createdAt !== undefined && (
+										<CardContent>
+											<p className="text-xs text-muted-foreground">
+												Enviado em{' '}
+												{format(
+													relato.createdAt,
+													'dd/MM/yyyy HH:mm'
+												)}
+											</p>
+											<p className="mt-2">
+												{relato.description}
+											</p>
+										</CardContent>
 									)}
-								</CardFooter>
-							</Card>
+									<CardFooter className="flex justify-between items-center">
+										<Badge
+											variant={
+												relato.status ===
+												ReportStatusEnum.PENDING
+													? 'default'
+													: relato.status ===
+													  ReportStatusEnum.RESOLVED
+													? 'secondary'
+													: 'outline'
+											}
+										>
+											{reportStatusTranslator(
+												relato.status
+											)}
+										</Badge>
+										{relato.assistanceNeeded ===
+											ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE && (
+											<Badge variant="destructive">
+												Precisa de assistência
+											</Badge>
+										)}
+									</CardFooter>
+								</Card>
+							</RequestAssistDialog>
 						);
 					})}
-				</motion.div>
+				</div>
 			</ScrollArea>
 
 			<Pagination>
@@ -261,6 +290,6 @@ export default function BuscarRelatos() {
 					</Button>
 				</div>
 			</Pagination>
-		</>
+		</TooltipProvider>
 	);
 }

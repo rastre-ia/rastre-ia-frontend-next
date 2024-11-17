@@ -23,7 +23,7 @@ CLOUDINARY_URL="Your Cloudinary Url"
 
 NEXT_PUBLIC_BACKEND_URL="http://localhost:3000/api"
 
-EMBEDDING_ENDPOINT_URL="http://127.0.0.1:8000/"
+EMBEDDING_ENDPOINT_URL="http://127.0.0.1:8000"
 ```
 
 ## To run use:
