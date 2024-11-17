@@ -7,13 +7,15 @@ import {
 } from './helpers/AnswerRequestsEnums';
 
 export interface AnswerRequestSchemaInterface {
-	_id?: Schema.Types.ObjectId;
+	_id?: Schema.Types.ObjectId | string;
 
 	policeStationId: Schema.Types.ObjectId | string;
 	location: PointSchemaInterface;
 	requestRadius: number;
 	usersRequested: Schema.Types.ObjectId[] | string[];
 	priority: AnswerRequestPriorityEnum;
+
+	title: string;
 	message: string;
 	status: AnswerRequestStatusEnum;
 
@@ -56,6 +58,8 @@ const answerRequestsSchema = new Schema<AnswerRequestSchemaInterface>({
 		required: true,
 		default: AnswerRequestPriorityEnum.MEDIUM,
 	},
+
+	title: { type: String, required: true },
 	message: { type: String, required: true },
 
 	status: {

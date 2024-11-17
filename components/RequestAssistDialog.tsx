@@ -1,9 +1,8 @@
 'use client';
 
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
@@ -76,6 +75,7 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 }) => {
 	const [open, setOpen] = useState(false);
 
+	const [assistanceTitle, setAssistanceTitle] = useState('');
 	const [assistanceMessage, setAssistanceMessage] = useState('');
 	const [center, setCenter] = useState<LatLng>(
 		latLng(location.coordinates[1], location.coordinates[0])
@@ -87,6 +87,10 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 		useState<AnswerRequestPriorityEnum>(AnswerRequestPriorityEnum.MEDIUM);
 	const { toast } = useToast();
 	const { data: session } = useSession();
+
+	useEffect(() => {
+		setCenter(latLng(location.coordinates[1], location.coordinates[0]));
+	}, [location]);
 
 	const handleMapClick = (latlng: { lat: number; lng: number }) => {
 		setCenter(latLng(latlng.lat, latlng.lng));
@@ -101,6 +105,27 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 			console.error('No police station id found');
 			return;
 		}
+
+		if (!assistanceTitle) {
+			toast({
+				title: 'Erro',
+				description:
+					'Você precisa preencher o título para enviar o pedido de assistência',
+				variant: 'destructive',
+			});
+			return;
+		}
+
+		if (!assistanceMessage) {
+			toast({
+				title: 'Erro',
+				description:
+					'Você precisa preencher a mensagem para enviar o pedido de assistência',
+				variant: 'destructive',
+			});
+			return;
+		}
+
 		setSubmitting(true);
 
 		try {
@@ -124,6 +149,8 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 					requestRadius: radius,
 					usersRequested: usersIds,
 					priority: requestPriority,
+
+					title: assistanceTitle,
 					message: assistanceMessage,
 					status: AnswerRequestStatusEnum.ON_GOING,
 
@@ -165,11 +192,21 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 	};
 
 	const requestAI = async () => {
+		if (!assistanceTitle) {
+			toast({
+				title: 'Erro',
+				description:
+					'Você precisa preencher o título para gerar a resposta da IA',
+				variant: 'destructive',
+			});
+			return;
+		}
+
 		setFetchingLlmResponse(true);
 		try {
 			const prompt = getPromptById(
 				PromptTypeEnum.REQUEST_ASSIST_REPORTS,
-				formattedData
+				`Título do pedido: ${assistanceTitle} Informações: ${formattedData}`
 			);
 			const resp = await chat(prompt, {
 				temperature: 0.3,
@@ -229,6 +266,17 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 					</div>
 					<div className="mt-2 pb-2" />
 					<div>
+						<Label htmlFor="title">Título*</Label>
+						<Input
+							type="text"
+							disabled={fetchingLlmResponse || submitting}
+							value={assistanceTitle}
+							onChange={(e) => setAssistanceTitle(e.target.value)}
+							placeholder='Ex: "Ajuda para investigação de roubo na rua 15 de setembro"'
+						/>
+					</div>{' '}
+					<div className="mt-2 pb-2" />
+					<div>
 						<Label htmlFor="radius">Raio [metros]</Label>
 						<div className="flex gap-4">
 							<Slider
@@ -254,7 +302,6 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 						</div>
 					</div>
 					<div className="mt-2 pb-2" />
-
 					<Textarea
 						placeholder={
 							fetchingLlmResponse
@@ -265,7 +312,6 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 						value={assistanceMessage}
 						onChange={(e) => setAssistanceMessage(e.target.value)}
 						disabled={fetchingLlmResponse || submitting}
-						required
 					/>
 					<div className="mt-2 pb-2" />
 					<div>
@@ -298,9 +344,7 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 							</SelectContent>
 						</Select>
 					</div>
-
 					<div className="mt-2 pb-2" />
-
 					<DialogFooter className="mx-auto flex w-full justify-between">
 						<Button
 							onClick={requestAI}

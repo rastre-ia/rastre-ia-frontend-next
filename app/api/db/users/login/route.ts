@@ -10,8 +10,6 @@ export async function POST(req: Request) {
 
 	const hashedPassword = await argon2.hash(password);
 
-	console.log(hashedPassword);
-
 	const user = await Users.findOne({
 		cpf: cpf,
 	});
