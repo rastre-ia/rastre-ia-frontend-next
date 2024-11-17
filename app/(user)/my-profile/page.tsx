@@ -33,6 +33,7 @@ import { getStolenItemsStatus } from '../../_helpers/db/stolen-items';
 import { StolenItemsStatusEnum } from '../../lib/schemas/StolenItems';
 import { getReportsStatus } from '../../_helpers/db/reports';
 import { redirect } from 'next/navigation';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function getUserActivityTitle(userAct: ActivityTypeEnum) {
 	switch (userAct) {
@@ -175,7 +176,11 @@ export default async function MyProfile() {
 									</span>
 								</div>
 								<Progress
-									value={expStats.progressToNextLevel * 100}
+									value={
+										(userData.experience * 100) /
+										expStats.xpForNextLevel
+									}
+									className="flex-grow mr-4"
 								/>
 							</div>
 							<div>
@@ -198,44 +203,46 @@ export default async function MyProfile() {
 						<CardHeader>
 							<CardTitle>Atividades Recentes</CardTitle>
 						</CardHeader>
-						<CardContent className="h-52 overflow-y-auto">
-							<ul className="space-y-4">
-								{userActivities.map((activity, index) => (
-									<li
-										key={index}
-										className="flex items-start space-x-3"
-									>
-										{activity.activityType ===
-											ActivityTypeEnum.ANSWER_REQUEST && (
-											<Handshake className="h-5 w-5 text-green-600" />
-										)}
-										{activity.activityType ===
-											ActivityTypeEnum.CREATE_REPORT && (
-											<FileText className="h-5 w-5 text-blue-600" />
-										)}
-										{activity.activityType ===
-											ActivityTypeEnum.REGISTER_STOLEN_ITEM && (
-											<Smartphone className="h-5 w-5 text-red-600" />
-										)}
-										<div>
-											<p className="text-sm font-medium">
-												{getUserActivityTitle(
-													activity.activityType
-												)}
-											</p>
-											{activity.createdAt !==
-												undefined && (
-												<p className="text-xs text-muted-foreground">
-													{format(
-														activity.createdAt,
-														'dd/MM/yyyy HH:mm'
+						<CardContent>
+							<ScrollArea className="h-52">
+								<ul className="space-y-4">
+									{userActivities.map((activity, index) => (
+										<li
+											key={index}
+											className="flex items-start space-x-3"
+										>
+											{activity.activityType ===
+												ActivityTypeEnum.ANSWER_REQUEST && (
+												<Handshake className="h-5 w-5 text-green-600" />
+											)}
+											{activity.activityType ===
+												ActivityTypeEnum.CREATE_REPORT && (
+												<FileText className="h-5 w-5 text-blue-600" />
+											)}
+											{activity.activityType ===
+												ActivityTypeEnum.REGISTER_STOLEN_ITEM && (
+												<Smartphone className="h-5 w-5 text-red-600" />
+											)}
+											<div>
+												<p className="text-sm font-medium">
+													{getUserActivityTitle(
+														activity.activityType
 													)}
 												</p>
-											)}
-										</div>
-									</li>
-								))}
-							</ul>
+												{activity.createdAt !==
+													undefined && (
+													<p className="text-xs text-muted-foreground">
+														{format(
+															activity.createdAt,
+															'dd/MM/yyyy HH:mm'
+														)}
+													</p>
+												)}
+											</div>
+										</li>
+									))}
+								</ul>
+							</ScrollArea>
 						</CardContent>
 					</Card>
 					<Card>
@@ -294,44 +301,45 @@ export default async function MyProfile() {
 								</div>
 							</CardDescription>
 						</CardHeader>
-						<CardContent className="h-52 space-y-4 overflow-y-auto">
-							<div className="flex items-center justify-between">
-								<span className="font-medium">
-									Relatos Enviados
-								</span>
-								<Badge variant="secondary">
-									{numberOfReports}
-								</Badge>
-							</div>
-							<hr />
-							<div className="flex items-center justify-between">
-								<span className="font-medium">
-									Registro de itens roubado
-								</span>
-								<Badge variant="secondary">
-									{totalStolenItems}
-								</Badge>
-							</div>
-							<hr />
-							<div className="flex items-center justify-between">
-								<span className="font-medium">
-									Itens Recuperados
-								</span>
-								<Badge variant="secondary">
-									{recoveredItems}
-								</Badge>
-							</div>
-							<hr />
-							<div className="flex items-center justify-between">
-								<span className="font-medium">
-									Investigações Auxiliadas
-								</span>
-								<Badge variant="secondary">
-									{numberOfResponses}
-								</Badge>
-							</div>
-							<hr />
-						</CardContent>
+						<ScrollArea className="h-52">
+							<CardContent className="h-52 space-y-4">
+								<div className="flex items-center justify-between">
+									<span className="font-medium">
+										Relatos Enviados
+									</span>
+									<Badge variant="secondary">
+										{numberOfReports}
+									</Badge>
+								</div>
+								<hr />
+								<div className="flex items-center justify-between">
+									<span className="font-medium">
+										Registro de itens roubado
+									</span>
+									<Badge variant="secondary">
+										{totalStolenItems}
+									</Badge>
+								</div>
+								<hr />
+								<div className="flex items-center justify-between">
+									<span className="font-medium">
+										Itens Recuperados
+									</span>
+									<Badge variant="secondary">
+										{recoveredItems}
+									</Badge>
+								</div>
+								<hr />
+								<div className="flex items-center justify-between">
+									<span className="font-medium">
+										Investigações Auxiliadas
+									</span>
+									<Badge variant="secondary">
+										{numberOfResponses}
+									</Badge>
+								</div>
+							</CardContent>
+						</ScrollArea>
 					</Card>
 				</div>
 			</div>
