@@ -124,7 +124,7 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
 			}}
 		>
-			<Popup>
+			<Popup  className="leaflet-popup">
 				<p>Latitude: {position.lat}</p>
 				<p>Longitude: {position.lng}</p>
 				<p>Endereço: {address ? address : 'Carregando...'}</p>
@@ -325,7 +325,9 @@ export default function RegisterItem() {
 								<div className="h-[300px] mt-2 rounded-md overflow-hidden">
 									<MapContainer
 										center={center}
-										zoom={9}
+										zoom={10}
+										minZoom={10}
+										scrollWheelZoom={true}
 										style={{
 											height: '100%',
 											width: '100%',
@@ -336,6 +338,7 @@ export default function RegisterItem() {
 											attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 										/>
 										<LocationMarker
+											
 											position={position}
 											setPosition={setPosition}
 										/>

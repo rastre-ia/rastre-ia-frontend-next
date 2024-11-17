@@ -79,7 +79,9 @@ body {
 .leaflet-bottom {
 	z-index: 1 !important;
 }
-
+.leaflet-popup {
+	z-index: 9999 !important;
+  }
 .leaflet-marker-icon {
-	z-index: 99999 !important;
+	z-index: 9999 !important;
 }
