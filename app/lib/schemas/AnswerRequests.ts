@@ -1,18 +1,31 @@
-import mongoose, { Schema } from 'mongoose';
-import pointSchema from './helpers/PointSchema';
+import mongoose, { Schema, model, Document } from 'mongoose'; // Explicitly import `Document` for type safety
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
+import {
+	AnswerRequestEventTypeEnum,
+	AnswerRequestPriorityEnum,
+	AnswerRequestStatusEnum,
+} from './helpers/AnswerRequestsEnums';
 
-export enum AnswerRequestStatusEnum {
-	ON_GOING = 'on_going',
-	CLOSED = 'closed',
+export interface AnswerRequestSchemaInterface {
+	_id?: Schema.Types.ObjectId;
+
+	policeStationId: Schema.Types.ObjectId | string;
+	location: PointSchemaInterface;
+	requestRadius: number;
+	usersRequested: Schema.Types.ObjectId[] | string[];
+	priority: AnswerRequestPriorityEnum;
+	message: string;
+	status: AnswerRequestStatusEnum;
+
+	eventType: AnswerRequestEventTypeEnum;
+	reportId?: Schema.Types.ObjectId | string;
+	stolenItemId?: Schema.Types.ObjectId | string;
+
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
-export enum AnswerRequestPriorityEnum {
-	LOW = 'low',
-	MEDIUM = 'medium',
-	HIGH = 'high',
-}
-
-const answerRequestsSchema = new Schema({
+const answerRequestsSchema = new Schema<AnswerRequestSchemaInterface>({
 	policeStationId: {
 		type: Schema.Types.ObjectId,
 		ref: 'PoliceStations',
@@ -52,6 +65,15 @@ const answerRequestsSchema = new Schema({
 		default: AnswerRequestStatusEnum.ON_GOING,
 	},
 
+	eventType: {
+		type: String,
+		enum: Object.values(AnswerRequestEventTypeEnum),
+		required: true,
+		default: AnswerRequestEventTypeEnum.OTHER,
+	},
+	reportId: { type: Schema.Types.ObjectId, ref: 'Reports' },
+	stolenItemId: { type: Schema.Types.ObjectId, ref: 'StolenItems' },
+
 	createdAt: { type: Date, default: () => Date.now(), immutable: true },
 	updatedAt: { type: Date, default: () => Date.now() },
 });
@@ -63,6 +85,9 @@ answerRequestsSchema.pre('save', function (next) {
 
 const AnswerRequests =
 	mongoose.models.AnswerRequests ||
-	mongoose.model('AnswerRequests', answerRequestsSchema);
+	mongoose.model<AnswerRequestSchemaInterface>(
+		'AnswerRequests',
+		answerRequestsSchema
+	);
 
 export default AnswerRequests;

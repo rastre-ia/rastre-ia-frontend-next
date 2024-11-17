@@ -2,8 +2,6 @@ import 'leaflet/dist/leaflet.css';
 import {
 	Search,
 	BarChart3,
-	HelpCircle,
-	User,
 	FileText,
 	LogOut,
 	Megaphone,
@@ -16,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Overview from './Overview';
 import LlmSearch from './LlmSearch';
-import RequestAssistance from './RequestAssistance';
 import AnimatedLogo from '@/components/AnimatedLogo';
 
 import { Button } from '@/components/ui/button';
@@ -84,10 +81,6 @@ export default async function PoliceDashboard() {
 							<Search className="h-4 w-4 mr-2" />
 							Procurar com IA
 						</TabsTrigger>
-						<TabsTrigger value="assistance">
-							<Megaphone className="h-4 w-4 mr-2" />
-							Pedir assistência
-						</TabsTrigger>
 						<TabsTrigger value="active-assistance-requests">
 							<Locate className="h-4 w-4 mr-2" />
 							Pedidos de assistência ativos
@@ -110,9 +103,6 @@ export default async function PoliceDashboard() {
 						<LlmSearch />
 					</TabsContent>
 
-					<TabsContent value="assistance" className="space-y-4">
-						<RequestAssistance />
-					</TabsContent>
 					<TabsContent
 						value="active-assistance-requests"
 						className="space-y-4"

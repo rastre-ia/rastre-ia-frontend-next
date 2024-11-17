@@ -24,7 +24,7 @@ import AnimatedLogo from '@/components/AnimatedLogo';
 import { auth, signOut } from '@/auth';
 import BACKEND_URL from '../../_helpers/backend-path';
 import { headers } from 'next/headers';
-import { UsersType } from '../../lib/schemas/Users';
+import { UsersSchema } from '../../lib/schemas/Users';
 import { findUserActivitiesByUserId } from '../../_helpers/db/user-activities';
 import { ActivityTypeEnum } from '../../lib/schemas/UserActivities';
 import { format } from 'date-fns';
@@ -63,7 +63,7 @@ export default async function MyProfile() {
 		method: 'GET',
 		headers: myHeaders,
 	});
-	const userData = (await res.json()).user as UsersType;
+	const userData = (await res.json()).user as UsersSchema;
 
 	const userActivities = await findUserActivitiesByUserId(
 		user._id,

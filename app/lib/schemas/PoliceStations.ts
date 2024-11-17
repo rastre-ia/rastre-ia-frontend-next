@@ -3,6 +3,7 @@ import RolesEnum from './helpers/RolesEnum';
 
 export interface PoliceStationsSchemaInterface {
 	_id?: string;
+
 	name: string;
 	email: string;
 	passwordHash: string;
