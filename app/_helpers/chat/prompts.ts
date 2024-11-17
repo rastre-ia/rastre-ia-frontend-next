@@ -2,6 +2,7 @@ import { MessageInterface } from '../types/ChatTypes';
 
 export enum PromptTypeEnum {
 	REQUEST_ASSIST_REPORTS = 'request-assist-reports',
+	FILL_REPORT = 'fill-report',
 }
 
 const requestAssistReportsPrompt: MessageInterface[] = [
@@ -22,6 +23,14 @@ const requestAssistReportsPrompt: MessageInterface[] = [
 	},
 ];
 
+const fillReportPrompt: MessageInterface[] = [
+	{
+		role: 'system',
+		content:
+			'Você é um assistente de uma estação de polícia responsável por preencher relatos de eventos solicitando informações ao cidadão sobre o incidente, como problemas de trânsito, distúrbios de paz, assaltos e outros crimes. A comunicação deve ser clara, direto e formal. Seu papel é realizar perguntas para tentar extrair o máximo de informação sobre o incidente. O tom deve ser profissional, sem saudações ou títulos.',
+	},
+];
+
 export function getPromptById(
 	promptType: PromptTypeEnum,
 	data: string
@@ -33,6 +42,19 @@ export function getPromptById(
 				{ role: 'user', content: data },
 			];
 			return prompt;
+		default:
+			return [];
+	}
+}
+
+export function getPromptByType(
+	promptType: PromptTypeEnum
+): MessageInterface[] {
+	switch (promptType) {
+		case PromptTypeEnum.REQUEST_ASSIST_REPORTS:
+			return requestAssistReportsPrompt;
+		case PromptTypeEnum.FILL_REPORT:
+			return fillReportPrompt;
 		default:
 			return [];
 	}

@@ -4,7 +4,6 @@ import {
 	MessageInterface,
 	OptionsInterface,
 } from '@/app/_helpers/types/ChatTypes';
-import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
 import { EMBEDDINGS_URL } from '@/app/lib/embeddings-api';
 
 export const POST = auth(async function POST(req) {
@@ -14,12 +13,12 @@ export const POST = auth(async function POST(req) {
 			options: OptionsInterface;
 		};
 
-		if (req.auth.user.role !== RolesEnum.POLICE_STATION) {
-			return NextResponse.json(
-				{ message: 'Unauthorized' },
-				{ status: 401 }
-			);
-		}
+		// if (req.auth.user.role !== RolesEnum.POLICE_STATION) {
+		// 	return NextResponse.json(
+		// 		{ message: 'Unauthorized' },
+		// 		{ status: 401 }
+		// 	);
+		// }
 
 		console.log('Chat Message sent: ', messages);
 
