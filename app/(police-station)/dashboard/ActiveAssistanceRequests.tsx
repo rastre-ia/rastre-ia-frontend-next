@@ -1,10 +1,4 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { MapContainer, TileLayer, Circle, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Search, MapPin, Users, Clock } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,58 +12,35 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import BACKEND_URL from '@/app/_helpers/backend-path';
+import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
+import { format } from 'date-fns';
+import ActiveAssistanceRequestsMap from '@/components/ActiveAssistanceRequests/ActiveAssistanceRequestsMap';
 
-// Tipo para as solicitações simuladas de assistência
-type AssistanceRequest = {
-	id: number;
-	title: string;
-	description: string;
-	location: [number, number];
-	radius: number;
-	respondents: number;
-	createdAt: string;
-};
+export default async function ActiveAssistanceRequests() {
+	const session = await auth();
+	const user = session?.user;
 
-// Função simulada para buscar solicitações ativas de assistência
-const fetchAssistanceRequests = async (): Promise<AssistanceRequest[]> => {
-	await new Promise((resolve) => setTimeout(resolve, 500));
-	return Array(5)
-		.fill(null)
-		.map((_, i) => ({
-			id: i + 1,
-			title: `Solicitação de Assistência ${i + 1}`,
-			description: `Descrição da Solicitação de Assistência ${i + 1}`,
-			location: [
-				51.505 + Math.random() * 0.1 - 0.05,
-				-0.09 + Math.random() * 0.1 - 0.05,
-			],
-			radius: Math.floor(Math.random() * 1000) + 500,
-			respondents: Math.floor(Math.random() * 50),
-			createdAt: new Date(
-				Date.now() - Math.floor(Math.random() * 86400000)
-			).toLocaleString('pt-BR'),
-		}));
-};
+	if (!user) {
+		redirect('/no-permission?redirect_to=/my-profile');
+	}
 
-export default function ActiveAssistanceRequests() {
-	const [requests, setRequests] = useState<AssistanceRequest[]>([]);
-	const [searchQuery, setSearchQuery] = useState<string>('');
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const myHeaders = await headers();
 
-	useEffect(() => {
-		loadRequests();
-	}, []);
+	const resAnswerRequests = await fetch(
+		BACKEND_URL + '/db/answer-requests?id=' + user._id,
+		{
+			method: 'GET',
+			headers: myHeaders,
+		}
+	);
 
-	const loadRequests = async () => {
-		setIsLoading(true);
-		const fetchedRequests = await fetchAssistanceRequests();
-		setRequests(fetchedRequests);
-		setIsLoading(false);
-	};
-
-	const handleSearch = () => {
-		// Implementar a funcionalidade de busca aqui
-		console.log('Buscando por:', searchQuery);
+	const myAnswerRequests = (await resAnswerRequests.json()) as {
+		answerRequests: AnswerRequestSchemaInterface[];
+		total: number;
 	};
 
 	return (
@@ -86,11 +57,11 @@ export default function ActiveAssistanceRequests() {
 						<Input
 							type="text"
 							placeholder="Pesquisar solicitações..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
+							// value={searchQuery}
+							// onChange={(e) => setSearchQuery(e.target.value)}
 							className="flex-grow"
 						/>
-						<Button onClick={handleSearch} disabled={isLoading}>
+						<Button>
 							<Search className="h-4 w-4 mr-2" />
 							Buscar
 						</Button>
@@ -99,11 +70,7 @@ export default function ActiveAssistanceRequests() {
 			</Card>
 
 			<div className="grid md:grid-cols-2 gap-6">
-				<motion.div
-					initial={{ opacity: 0, x: -20 }}
-					animate={{ opacity: 1, x: 0 }}
-					transition={{ duration: 0.5, delay: 0.2 }}
-				>
+				<div>
 					<Card>
 						<CardHeader>
 							<CardTitle>Mapa de Solicitações</CardTitle>
@@ -114,41 +81,15 @@ export default function ActiveAssistanceRequests() {
 						</CardHeader>
 						<CardContent>
 							<div className="h-[400px]">
-								<MapContainer
-									center={[51.505, -0.09]}
-									zoom={11}
-									style={{ height: '100%', width: '100%' }}
-								>
-									<TileLayer
-										url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-										attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-									/>
-									{requests.map((request) => (
-										<Circle
-											key={request.id}
-											center={request.location}
-											radius={request.radius}
-											pathOptions={{ color: 'red' }}
-										>
-											<Popup>
-												<h3 className="font-bold">
-													{request.title}
-												</h3>
-												<p>{request.description}</p>
-											</Popup>
-										</Circle>
-									))}
-								</MapContainer>
+								<ActiveAssistanceRequestsMap
+									requests={myAnswerRequests.answerRequests}
+								/>
 							</div>
 						</CardContent>
 					</Card>
-				</motion.div>
+				</div>
 
-				<motion.div
-					initial={{ opacity: 0, x: 20 }}
-					animate={{ opacity: 1, x: 0 }}
-					transition={{ duration: 0.5, delay: 0.4 }}
-				>
+				<div>
 					<Card>
 						<CardHeader>
 							<CardTitle>Lista de Solicitações</CardTitle>
@@ -159,46 +100,59 @@ export default function ActiveAssistanceRequests() {
 						<CardContent>
 							<ScrollArea className="h-[400px]">
 								<div className="space-y-4">
-									{requests.map((request) => (
-										<Card key={request.id}>
-											<CardHeader>
-												<CardTitle>
-													{request.title}
-												</CardTitle>
-												<CardDescription>
-													Criado em:{' '}
-													{request.createdAt}
-												</CardDescription>
-											</CardHeader>
-											<CardContent>
-												<p>{request.description}</p>
-												<div className="flex items-center mt-2 space-x-4">
-													<Badge variant="secondary">
-														<MapPin className="h-4 w-4 mr-1" />
-														{request.radius}m raio
-													</Badge>
-													<Badge variant="outline">
-														<Users className="h-4 w-4 mr-1" />
-														{request.respondents}{' '}
-														respondentes
-													</Badge>
-												</div>
-											</CardContent>
-											<CardFooter>
-												<Button
-													variant="outline"
-													className="w-full"
-												>
-													Ver Detalhes
-												</Button>
-											</CardFooter>
-										</Card>
-									))}
+									{myAnswerRequests.answerRequests.map(
+										(request) => (
+											<Card key={request._id as string}>
+												<CardHeader>
+													<CardTitle>
+														{request.title}
+													</CardTitle>
+													{request.createdAt !==
+														undefined && (
+														<CardDescription>
+															Criado em:{' '}
+															{format(
+																request.createdAt,
+																'dd/MM/yyyy HH:mm'
+															)}
+														</CardDescription>
+													)}
+												</CardHeader>
+												<CardContent>
+													<p>{request.message}</p>
+													<div className="flex items-center mt-2 space-x-4">
+														<Badge variant="secondary">
+															<MapPin className="h-4 w-4 mr-1" />
+															{
+																request.requestRadius
+															}
+															m raio
+														</Badge>
+														{/* <Badge variant="outline">
+															<Users className="h-4 w-4 mr-1" />
+															{
+																request.respondents
+															}{' '}
+															respondentes
+														</Badge> */}
+													</div>
+												</CardContent>
+												<CardFooter>
+													<Button
+														variant="outline"
+														className="w-full"
+													>
+														Ver Detalhes
+													</Button>
+												</CardFooter>
+											</Card>
+										)
+									)}
 								</div>
 							</ScrollArea>
 						</CardContent>
 					</Card>
-				</motion.div>
+				</div>
 			</div>
 		</>
 	);
