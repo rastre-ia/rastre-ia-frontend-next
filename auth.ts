@@ -100,17 +100,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	callbacks: {
 		jwt({ token, user }) {
 			if (user) {
-				//@ts-ignore
+				//@ts-expect-error
 				token._id = user._id;
-				//@ts-ignore
+				//@ts-expect-error
 				token.role = user.role;
 			}
 			return token;
 		},
 		session({ session, token }) {
-			//@ts-ignore
+			//@ts-expect-error
 			session.user._id = token._id as string;
-			//@ts-ignore
+			//@ts-expect-error
 			session.user.role = token.role as string;
 
 			return session;

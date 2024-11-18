@@ -1,7 +1,5 @@
 'use server';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
@@ -15,7 +13,7 @@ import {
 	CardFooter,
 } from '@/components/ui/card';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import AnimatedLogo from '@/components/AnimatedLogo';

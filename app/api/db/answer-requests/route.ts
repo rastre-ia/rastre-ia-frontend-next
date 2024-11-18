@@ -54,7 +54,7 @@ export const GET = auth(async function GET(req) {
 		try {
 			await dbConnect();
 
-			let response: {
+			const response: {
 				answerRequests: AnswerRequestSchemaInterface[];
 				total: number;
 			} = {

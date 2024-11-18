@@ -118,6 +118,8 @@ export default function SignUp() {
 					'There was a problem creating your account. Please try again.',
 				variant: 'destructive',
 			});
+			console.error('Error creating user: ', error);
+
 			setIsSubmitting(false);
 		}
 	};

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { FunctionComponent, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
@@ -24,11 +24,11 @@ import {
 } from '@/components/ui/select';
 import axios from 'axios';
 
-import BACKEND_URL from "@/app/_helpers/backend-path"
+import BACKEND_URL from '@/app/_helpers/backend-path';
 
 interface LlmSearchProps {}
 
-const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
+const LlmSearch: FunctionComponent<LlmSearchProps> = ({}) => {
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 	const [addresses, setAddresses] = useState<string[]>([]);
 
@@ -38,7 +38,12 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 		const searchQuery = (e.target as any).search_query.value;
 		const collectionSelector = (e.target as any).collection_selector.value;
 
-		console.log("Searchquery: ", searchQuery, "collections: ", collectionSelector);
+		console.log(
+			'Searchquery: ',
+			searchQuery,
+			'collections: ',
+			collectionSelector
+		);
 
 		if (!searchQuery) {
 			return;
@@ -55,7 +60,7 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 					searchQuery: searchQuery,
 					collection: collectionSelector,
 					numCandidates: 3,
-					limit: 3
+					limit: 3,
 				}),
 			});
 
@@ -75,13 +80,18 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 
 						// Extrair os campos específicos do endereço
 						const street = addressData?.road || '';
-						const neighborhood = addressData?.suburb || addressData?.neighbourhood || '';
-						const city = addressData?.city || addressData?.town || '';
+						const neighborhood =
+							addressData?.suburb ||
+							addressData?.neighbourhood ||
+							'';
+						const city =
+							addressData?.city || addressData?.town || '';
 						const state = addressData?.state || '';
 						const postcode = addressData?.postcode || '';
 
 						// Montar o endereço formatado
-						const formattedAddress = `${street}, ${neighborhood}, ${city}, ${state} - ${postcode}`.trim();
+						const formattedAddress =
+							`${street}, ${neighborhood}, ${city}, ${state} - ${postcode}`.trim();
 						return formattedAddress || 'Endereço não encontrado';
 					} catch (error) {
 						console.error('Erro ao obter o endereço:', error);
@@ -106,7 +116,8 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 				<CardHeader>
 					<CardTitle>Busca Incrementada por IA</CardTitle>
 					<CardDescription>
-						Procure por itens, relatórios ou qualquer informação relevante
+						Procure por itens, relatórios ou qualquer informação
+						relevante
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -126,8 +137,12 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 									<SelectValue placeholder="Selecione a coleção" />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="stolenitems">Itens Roubados</SelectItem>
-									<SelectItem value="reports">Reportes</SelectItem>
+									<SelectItem value="stolenitems">
+										Itens Roubados
+									</SelectItem>
+									<SelectItem value="reports">
+										Reportes
+									</SelectItem>
 								</SelectContent>
 							</Select>
 							<Button type="submit">
@@ -141,21 +156,42 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 			<ScrollArea className="h-[400px]">
 				<div className="space-y-4">
 					{searchResults.map((item, index) => (
-						<Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300">
+						<Card
+							key={index}
+							className="shadow-lg hover:shadow-xl transition-all duration-300"
+						>
 							<CardHeader>
-								<CardTitle>{item.object || 'Sem título'}</CardTitle>
+								<CardTitle>
+									{item.object || 'Sem título'}
+								</CardTitle>
 								<CardDescription>
 									{item.objectDescription || 'Sem descrição'}
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<p className="font-semibold text-lg text-gray-800">Score: {item.score?.toFixed(4)}</p>
-								<p className="text-sm text-gray-600">Localização: {addresses[index] || 'Desconhecida'}</p>
-								<p className="text-sm text-gray-600">Data do evento: {item.eventDate || 'Desconhecida'}</p>
+								<p className="font-semibold text-lg text-gray-800">
+									Score: {item.score?.toFixed(4)}
+								</p>
+								<p className="text-sm text-gray-600">
+									Localização:{' '}
+									{addresses[index] || 'Desconhecida'}
+								</p>
+								<p className="text-sm text-gray-600">
+									Data do evento:{' '}
+									{item.eventDate || 'Desconhecida'}
+								</p>
 							</CardContent>
 							<CardFooter className="flex justify-between items-center">
-								<Badge className="bg-blue-500 text-white">Resultado {index + 1}</Badge>
-								<Button variant="link" size="sm" className="text-blue-600">Ver mais</Button>
+								<Badge className="bg-blue-500 text-white">
+									Resultado {index + 1}
+								</Badge>
+								<Button
+									variant="link"
+									size="sm"
+									className="text-blue-600"
+								>
+									Ver mais
+								</Button>
 							</CardFooter>
 						</Card>
 					))}

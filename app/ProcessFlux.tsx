@@ -35,7 +35,7 @@ const ProcessStep: React.FC<ProcessStepProps> = ({
 
 interface ProcessFluxProps {}
 
-const ProcessFlux: FunctionComponent<ProcessFluxProps> = () => {
+const ProcessFlux: FunctionComponent<ProcessFluxProps> = ({}) => {
 	return (
 		<section className="container mx-auto px-6 py-20">
 			<h2 className="text-3xl font-bold mb-12 text-center">

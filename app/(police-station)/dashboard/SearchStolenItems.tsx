@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-	Search,
-	Filter,
-	ChevronDown,
-	ChevronUp,
-	MapPin,
-	ChevronLeft,
-	ChevronRight,
-} from 'lucide-react';
+import { Search, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +22,8 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Pagination } from '@/components/ui/pagination';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Image from 'next/image';
 
 interface StolenItem {
 	id: number;
@@ -46,8 +37,7 @@ interface StolenItem {
 
 // Função simulada para buscar itens roubados
 const fetchStolenItems = async (
-	page: number,
-	filter: string
+	page: number
 ): Promise<{ items: StolenItem[]; totalPages: number }> => {
 	await new Promise((resolve) => setTimeout(resolve, 500));
 	return {
@@ -79,24 +69,16 @@ export default function SearchStolenItems() {
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		const loadItems = async () => {
+			setIsLoading(true);
+			const { items, totalPages } = await fetchStolenItems(currentPage);
+			setItems(items);
+			setTotalPages(totalPages);
+			setIsLoading(false);
+		};
+
 		loadItems();
 	}, [currentPage, filter]);
-
-	const loadItems = async () => {
-		setIsLoading(true);
-		const { items, totalPages } = await fetchStolenItems(
-			currentPage,
-			filter
-		);
-		setItems(items);
-		setTotalPages(totalPages);
-		setIsLoading(false);
-	};
-
-	const handleSearch = () => {
-		setCurrentPage(1);
-		loadItems();
-	};
 
 	const handleFilterChange = (value: string) => {
 		setFilter(value);
@@ -129,7 +111,7 @@ export default function SearchStolenItems() {
 								onChange={(e) => setSearchQuery(e.target.value)}
 								className="flex-grow"
 							/>
-							<Button onClick={handleSearch} disabled={isLoading}>
+							<Button disabled={isLoading}>
 								<Search className="h-4 w-4 mr-2" />
 								Buscar
 							</Button>
@@ -171,7 +153,7 @@ export default function SearchStolenItems() {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<img
+							<Image
 								src={item.image}
 								alt={item.name}
 								className="w-full h-32 object-cover mb-4 rounded-md"

@@ -42,6 +42,7 @@ import { useToast } from '@/hooks/use-toast';
 import { StolenItemsSchemaInterface } from '../../lib/schemas/StolenItems';
 import { EmbeddedImageSchemaInterface } from '../../lib/schemas/helpers/EmbeddedImageSchema';
 import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
+import Image from 'next/image';
 
 interface LatLng {
 	lat: number;
@@ -124,7 +125,7 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
 			}}
 		>
-			<Popup  className="leaflet-popup">
+			<Popup className="leaflet-popup">
 				<p>Latitude: {position.lat}</p>
 				<p>Longitude: {position.lng}</p>
 				<p>Endereço: {address ? address : 'Carregando...'}</p>
@@ -273,8 +274,8 @@ export default function RegisterItem() {
 							</Label>
 							<CldUploadWidget
 								uploadPreset="ml_default"
-								onSuccess={(result, { widget }) => {
-									// @ts-ignore
+								onSuccess={() => {
+									//@ts-expect-error - O tipo de retorno não está definido
 									setImageUrl(result.info?.secure_url);
 								}}
 								onQueuesEnd={(result, { widget }) => {
@@ -294,7 +295,7 @@ export default function RegisterItem() {
 
 							{/* Renderização da imagem após o upload */}
 							{imageUrl && (
-								<img
+								<Image
 									src={imageUrl}
 									alt="Imagem do objeto"
 									className="mt-4 w-full h-auto"
@@ -338,7 +339,6 @@ export default function RegisterItem() {
 											attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 										/>
 										<LocationMarker
-											
 											position={position}
 											setPosition={setPosition}
 										/>

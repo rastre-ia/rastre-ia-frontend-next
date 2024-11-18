@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
 	Search,
-	Filter,
 	AlertTriangle,
 	Car,
 	Volume2,
@@ -91,33 +89,28 @@ export default function BuscarRelatos() {
 	const [statusFilter, setStatusFilter] = useState<ReportStatusEnum | null>(
 		null
 	);
-	const [typeFilter, setTypeFilter] = useState<ReportTypeEnum | null>(null);
+	const [typeFilter] = useState<ReportTypeEnum | null>(null);
 
 	const [busca, setBusca] = useState('');
 	const [carregando, setCarregando] = useState(false);
 
 	useEffect(() => {
+		const carregarRelatos = async () => {
+			setCarregando(true);
+			const response = await getReports(
+				perPage,
+				paginaAtual,
+				statusFilter,
+				typeFilter
+			);
+
+			setReports(response.reports);
+			setPageCount(response.pageCount);
+			setCarregando(false);
+		};
+
 		carregarRelatos();
-	}, [paginaAtual, statusFilter, typeFilter]);
-
-	const carregarRelatos = async () => {
-		setCarregando(true);
-		const response = await getReports(
-			perPage,
-			paginaAtual,
-			statusFilter,
-			typeFilter
-		);
-
-		setReports(response.reports);
-		setPageCount(response.pageCount);
-		setCarregando(false);
-	};
-
-	const handleBusca = () => {
-		setPaginaAtual(1);
-		carregarRelatos();
-	};
+	}, [paginaAtual, statusFilter, typeFilter, perPage]);
 
 	const handleAlterarFiltro = (valor: string) => {
 		if (valor === 'todos') setStatusFilter(null);
@@ -146,7 +139,7 @@ export default function BuscarRelatos() {
 							onChange={(e) => setBusca(e.target.value)}
 							className="flex-grow"
 						/>
-						<Button onClick={handleBusca} disabled={carregando}>
+						<Button disabled={carregando}>
 							<Search className="h-4 w-4 mr-2" />
 							Buscar
 						</Button>

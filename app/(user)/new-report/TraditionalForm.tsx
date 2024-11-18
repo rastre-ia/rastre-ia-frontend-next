@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Upload, Camera } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { Button } from '@/components/ui/button';
@@ -35,20 +35,12 @@ import { FunctionComponent } from 'react';
 import L, { LatLng, latLng } from 'leaflet';
 import { CldUploadWidget } from 'next-cloudinary';
 import { RotatingLines } from 'react-loader-spinner';
+import Image from 'next/image';
 
-function LocationPicker({
-	onLocationChange,
-}: {
+function LocationPicker({}: {
 	onLocationChange: (latlng: { lat: number; lng: number }) => void;
 }) {
-	const [position, setPosition] = useState({ lat: 51.505, lng: -0.09 });
-
-	const map = useMapEvents({
-		click(e) {
-			setPosition(e.latlng);
-			onLocationChange(e.latlng);
-		},
-	});
+	const [position] = useState({ lat: 51.505, lng: -0.09 });
 
 	return <Marker position={position} icon={customIcon} />;
 }
@@ -68,7 +60,7 @@ interface TraditionalFormProps {
 const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 	userId,
 }) => {
-	const [messages, setMessages] = useState([]);
+	const [messages] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [reportData, setReportData] = useState({
 		title: '',
@@ -244,9 +236,9 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 					</Label>
 					<CldUploadWidget
 						uploadPreset="ml_default"
-						onSuccess={(result, { widget }) => {
+						onSuccess={(result) => {
 							setImageUrl(
-								// @ts-ignore
+								//@ts-expect-error - secure_url is a valid property
 								result.info?.secure_url
 							);
 						}}
@@ -263,7 +255,7 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 					</CldUploadWidget>
 					{imageUrl && (
 						<div className="w-28">
-							<img
+							<Image
 								src={imageUrl}
 								alt="Imagem do objeto"
 								className="mt-4 w-full h-auto"

@@ -14,7 +14,7 @@ export interface UserActivitiesInterface {
 	requestId?: Schema.Types.ObjectId | string;
 	reportId?: Schema.Types.ObjectId | string;
 	stolenItemId?: Schema.Types.ObjectId | string;
-	extraData?: String;
+	extraData?: string;
 
 	createdAt?: Date;
 	updatedAt?: Date;

@@ -1,5 +1,4 @@
 import { UserActivitiesInterface } from '@/app/lib/schemas/UserActivities';
-import { Schema } from 'mongoose';
 import BACKEND_URL from '../backend-path';
 
 export async function findUserActivitiesByUserId(

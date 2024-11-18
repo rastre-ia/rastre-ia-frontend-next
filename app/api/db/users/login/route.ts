@@ -8,8 +8,6 @@ export async function POST(req: Request) {
 
 	await dbConnect();
 
-	const hashedPassword = await argon2.hash(password);
-
 	const user = await Users.findOne({
 		cpf: cpf,
 	});

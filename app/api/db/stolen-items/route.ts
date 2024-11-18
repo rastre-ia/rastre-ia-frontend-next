@@ -33,7 +33,7 @@ export const POST = auth(async function POST(req) {
 			);
 
 		let textEmbeddings: number[] = [];
-		let imageEmbeddings: EmbeddedImageSchemaInterface[] = [];
+		const imageEmbeddings: EmbeddedImageSchemaInterface[] = [];
 
 		try {
 			const textForEmbeddings = `Data: ${eventDate} Tipo do objeto: ${object} Descrição do objeto: ${objectDescription} Descrição do evento: ${eventDescription} Descrição do suspeito: ${suspectCharacteristics}`;

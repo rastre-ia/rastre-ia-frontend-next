@@ -4,7 +4,6 @@ import {
 	BarChart3,
 	FileText,
 	LogOut,
-	Megaphone,
 	Locate,
 	PackageSearch,
 } from 'lucide-react';

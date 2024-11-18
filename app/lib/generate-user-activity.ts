@@ -8,6 +8,7 @@ export default async function generateUserActivity(
 	newActivity: UserActivitiesInterface,
 	session: ClientSession
 ) {
+	await dbConnect();
 	try {
 		await UserActivities.create([newActivity], {
 			session: session,

@@ -10,7 +10,7 @@ export async function GET(
 	return auth(async () => {
 		const params = await context.params;
 
-		// @ts-ignore
+		// @ts-expect-error  auth is not defined
 		if (request.auth) {
 			await dbConnect();
 

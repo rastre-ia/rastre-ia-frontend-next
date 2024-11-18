@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Document } from 'mongoose'; // Explicitly import `Document` for type safety
+import mongoose, { Schema } from 'mongoose'; // Explicitly import `Document` for type safety
 import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 import {
 	AnswerRequestEventTypeEnum,

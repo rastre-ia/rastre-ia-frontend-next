@@ -20,7 +20,7 @@ export const POST = auth(async function POST(req) {
 		// 	);
 		// }
 
-		console.log('Chat Message sent: ', messages);
+		// console.log('Chat Message sent: ', messages);
 
 		try {
 			const resp = await fetch(EMBEDDINGS_URL + '/chat', {
