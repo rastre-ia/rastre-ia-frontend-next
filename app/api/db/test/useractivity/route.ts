@@ -61,8 +61,9 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ newUserActivities, success: true });
 	} catch (error) {
+		console.error('Error creating User Activity:', error);
 		return NextResponse.json(
-			{ message: 'Error creating Police Station' },
+			{ message: 'Error creating User Activity' },
 			{ status: 500 }
 		);
 	}

@@ -111,7 +111,7 @@ export default function SignUp() {
 				cpf: cleanedCpf,
 				redirectTo: '/my-profile',
 			});
-		} catch (error) {
+		} catch {
 			toast({
 				title: 'Error',
 				description:

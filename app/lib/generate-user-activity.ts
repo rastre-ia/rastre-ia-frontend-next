@@ -1,7 +1,7 @@
 import UserActivities, {
 	UserActivitiesInterface,
 } from './schemas/UserActivities';
-import dbConnect from './mongodb';
+// import dbConnect from './mongodb';
 import { ClientSession } from 'mongoose';
 
 export default async function generateUserActivity(

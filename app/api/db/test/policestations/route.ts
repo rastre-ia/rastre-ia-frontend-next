@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ newPoliceStation, success: true });
 	} catch (error) {
+		console.error('Error creating Police station:', error);
 		return NextResponse.json(
 			{ message: 'Error creating Police Station' },
 			{ status: 500 }

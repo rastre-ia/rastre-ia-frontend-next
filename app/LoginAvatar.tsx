@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
 import RolesEnum from './lib/schemas/helpers/RolesEnum';
-interface LoginAvatarProps {}
+// interface LoginAvatarProps {}
 
-const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
+const LoginAvatar: FunctionComponent = async () => {
 	const session = await auth();
 
 	if (!session) {

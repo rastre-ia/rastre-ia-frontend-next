@@ -64,7 +64,7 @@ export const POST = auth(async function POST(req) {
 			location,
 			description,
 			images,
-			status,
+
 			assistanceNeeded,
 			type,
 			submissionMethod,

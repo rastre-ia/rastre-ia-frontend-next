@@ -17,7 +17,6 @@ import {
 	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardFooter,
 } from '@/components/ui/card';
 import { MessageSquare, MapPin, Star, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -127,7 +126,7 @@ const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>
-									Responder à "{request.title}""
+									Responder à &quot; {request.title} &quot;
 								</DialogTitle>
 								<DialogDescription>
 									Suas informações são cruciais para esta

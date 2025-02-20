@@ -4,7 +4,6 @@ import {
 	BarChart3,
 	FileText,
 	LogOut,
-	Megaphone,
 	Locate,
 	PackageSearch,
 } from 'lucide-react';
@@ -19,7 +18,7 @@ import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
 import SearchReports from './SearchReports';
 import ActiveAssistanceRequests from './ActiveAssistanceRequests';
-import SearchStolenItems from './SearchStolenItems';
+// import SearchStolenItems from './SearchStolenItems';
 import { auth, signOut } from '@/auth';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
 
@@ -116,7 +115,7 @@ export default async function PoliceDashboard() {
 						value="search-stolen-items"
 						className="space-y-4"
 					>
-						<SearchStolenItems />
+						{/* <SearchStolenItems /> */}
 					</TabsContent>
 				</Tabs>
 			</div>

@@ -7,9 +7,9 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
-interface MotionHeaderProps {}
+// interface MotionHeaderProps {}
 
-const MotionHeader: FunctionComponent<MotionHeaderProps> = () => {
+const MotionHeader: FunctionComponent = () => {
 	return (
 		<section className="container mx-auto px-6 py-20 text-center">
 			<motion.h1

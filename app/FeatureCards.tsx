@@ -67,9 +67,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 	);
 };
 
-interface FeatureCardsProps {}
+//interface FeatureCardsProps {}
 
-const FeatureCards: FunctionComponent<FeatureCardsProps> = () => {
+const FeatureCards: FunctionComponent = () => {
 	return (
 		<>
 			<FeatureCard

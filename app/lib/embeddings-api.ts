@@ -57,12 +57,18 @@ export async function getImageEmbeddings(url: string): Promise<number[]> {
 	return embeddings;
 }
 
+interface VectorSearchResults {
+	_id: string;
+	score: number;
+	metadata?: Record<string, unknown>;
+}
+
 export async function getVectorSearchResults(
 	queryVector: number[],
 	collection_name: string,
 	numCandidates: number,
 	limit: number
-): Promise<any[]> {
+): Promise<VectorSearchResults[]> {
 	const resp = await fetch(EMBEDDINGS_URL + '/vector-search', {
 		method: 'POST',
 		headers: {
@@ -86,9 +92,12 @@ export async function getVectorSearchResults(
 	return parsedResp.results;
 }
 
-export async function getLlamaSearch(
-	query: string
-): Promise<any[]> {
+interface LlamaSearch {
+	query: string;
+	source?: string;
+}
+
+export async function getLlamaSearch(query: string): Promise<LlamaSearch[]> {
 	const resp = await fetch(EMBEDDINGS_URL + '/llama-search', {
 		method: 'POST',
 		headers: {

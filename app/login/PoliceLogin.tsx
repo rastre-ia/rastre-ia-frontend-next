@@ -8,7 +8,7 @@ import { Eye, EyeOff, Shield } from 'lucide-react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
-export default function PoliceLogin({}: {}) {
+export default function PoliceLogin() {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);

@@ -9,7 +9,7 @@ import { signIn } from 'next-auth/react';
 import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
 import { redirect, useSearchParams } from 'next/navigation';
 
-export default function CitizenLogin({}: {}) {
+export default function CitizenLogin() {
 	const [cpf, setCpf] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);

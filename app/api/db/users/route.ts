@@ -1,7 +1,7 @@
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+// import { getToken } from 'next-auth/jwt';
 import argon2 from '@node-rs/argon2';
 import { cepLookup } from '@/app/_helpers/brasil-api';
 import { auth } from '@/auth';
@@ -13,7 +13,7 @@ export const GET = auth(async function GET(req) {
 	await dbConnect();
 
 	const queryResult: {
-		users: any[];
+		users: unknown[];
 		total: number;
 	} = {
 		users: [],
@@ -92,20 +92,28 @@ export async function POST(req: NextRequest) {
 	const hashedPassword = await argon2.hash(password);
 
 	try {
-		const newUser = await Users.create({
-			name: name,
-			email: email,
-			cpf: cpf,
-			cep: cep,
-			location: {
-				type: 'Point',
-				coordinates: [longitude, latitude],
-			},
-			passwordHash: hashedPassword,
+		const newUser = await new Promise(async (resolve, reject) => {
+			try {
+				const user = await Users.create({
+					name: name,
+					email: email,
+					cpf: cpf,
+					cep: cep,
+					location: {
+						type: 'Point',
+						coordinates: [longitude, latitude],
+					},
+					passwordHash: hashedPassword,
+				});
+				resolve(user);
+			} catch (error) {
+				reject(error);
+			}
 		});
 
 		return NextResponse.json({ newUser, success: true });
 	} catch (error) {
+		console.error('Error creating user:', error);
 		return NextResponse.json(
 			{ message: 'Error creating user' },
 			{ status: 500 }

@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from 'mongoose';
-import pointSchema from './helpers/PointSchema';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 import RolesEnum from './helpers/RolesEnum';
 
 export interface UsersSchema {
@@ -11,7 +11,7 @@ export interface UsersSchema {
 	role: RolesEnum;
 
 	cep: string;
-	location: any;
+	location: PointSchemaInterface;
 
 	experience: number;
 

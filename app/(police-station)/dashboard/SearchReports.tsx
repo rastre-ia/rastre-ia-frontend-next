@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
 	Search,
-	Filter,
 	AlertTriangle,
 	Car,
 	Volume2,
@@ -91,7 +89,7 @@ export default function BuscarRelatos() {
 	const [statusFilter, setStatusFilter] = useState<ReportStatusEnum | null>(
 		null
 	);
-	const [typeFilter, setTypeFilter] = useState<ReportTypeEnum | null>(null);
+	const [typeFilter] = useState<ReportTypeEnum | null>(null);
 
 	const [busca, setBusca] = useState('');
 	const [carregando, setCarregando] = useState(false);

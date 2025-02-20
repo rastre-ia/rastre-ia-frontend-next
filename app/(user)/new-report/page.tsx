@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { ArrowLeft, MessageSquare, FileText } from 'lucide-react';
 import Link from 'next/link';
 import 'leaflet/dist/leaflet.css';

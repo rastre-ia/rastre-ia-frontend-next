@@ -2,7 +2,13 @@
 
 import { FunctionComponent, useEffect } from 'react';
 import { useState } from 'react';
-import { MapContainer, TileLayer, Circle, useMap, useMapEvents } from 'react-leaflet';
+import {
+	MapContainer,
+	TileLayer,
+	Circle,
+	useMap,
+	useMapEvents,
+} from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 import { Search, Send } from 'lucide-react';
@@ -30,9 +36,9 @@ function MapEvents({
 	return null;
 }
 
-interface RequestAssistanceProps {}
+// interface RequestAssistanceProps {}
 
-const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
+const RequestAssistance: FunctionComponent = () => {
 	const [assistanceMessage, setAssistanceMessage] = useState('');
 	const [center, setCenter] = useState<LatLngExpression>([51.505, -0.09]);
 	const [radius, setRadius] = useState(1000);
@@ -46,13 +52,13 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 					setCenter([latitude, longitude]); // Atualiza o centro do estado
 				},
 				(error) => {
-					console.error("Erro ao obter localização: ", error);
+					console.error('Erro ao obter localização: ', error);
 					// Defina um centro padrão caso haja erro
 					setCenter([51.505, -0.09]);
 				}
 			);
 		} else {
-			console.log("Geolocalização não suportada neste navegador.");
+			console.log('Geolocalização não suportada neste navegador.');
 		}
 	};
 
@@ -72,16 +78,15 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 		setCenter([latlng.lat, latlng.lng]);
 	};
 
-	
 	const MapFlyTo = () => {
-		const map = useMap(); 
+		const map = useMap();
 		useEffect(() => {
 			if (center) {
 				map.flyTo(center, 13, {
-					duration: 2, 
+					duration: 2,
 				});
 			}
-		}, [center]); 
+		}, [center]);
 		return null;
 	};
 
@@ -113,7 +118,8 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 							attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 						/>
 						<Circle center={center} radius={radius} />
-						<MapFlyTo /> {/* Componente que vai "voar" até a localização */}
+						<MapFlyTo />{' '}
+						{/* Componente que vai "voar" até a localização */}
 						<MapEvents onClick={handleMapClick} />
 					</MapContainer>
 				</div>
@@ -140,10 +146,7 @@ const RequestAssistance: FunctionComponent<RequestAssistanceProps> = () => {
 					<Send className="mr-2 h-4 w-4" />
 					Enviar pedido de assistência
 				</Button>
-				<Button
-					onClick={getCurrentLocation}
-					className="mt-4 w-full"
-				>
+				<Button onClick={getCurrentLocation} className="mt-4 w-full">
 					<Search className="mr-2 h-4 w-4" />
 					Obter localização atual
 				</Button>

@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
 	const policeStation = await PoliceStations.findById(policeStationId).catch(
 		(error) => {
+			console.error('Error fetching police station:', error);
 			return NextResponse.json(
 				{ message: 'Police Station not found' },
 				{ status: 404 }

@@ -75,7 +75,7 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 		map.locate({ setView: true, maxZoom: 16 });
 	}, [map]);
 
-	const handleDrag = (event: any) => {
+	const handleDrag = (event: L.DragEndEvent) => {
 		const { lat, lng } = event.target.getLatLng();
 		setPosition({ lat, lng });
 	};
@@ -121,10 +121,10 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 			icon={customIcon}
 			draggable={true}
 			eventHandlers={{
-				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
+				dragend: handleDrag,
 			}}
 		>
-			<Popup  className="leaflet-popup">
+			<Popup className="leaflet-popup">
 				<p>Latitude: {position.lat}</p>
 				<p>Longitude: {position.lng}</p>
 				<p>Endereço: {address ? address : 'Carregando...'}</p>
@@ -273,8 +273,8 @@ export default function RegisterItem() {
 							</Label>
 							<CldUploadWidget
 								uploadPreset="ml_default"
-								onSuccess={(result, { widget }) => {
-									// @ts-ignore
+								onSuccess={(result) => {
+									// @ts-expect-error - result is not null
 									setImageUrl(result.info?.secure_url);
 								}}
 								onQueuesEnd={(result, { widget }) => {
@@ -338,7 +338,6 @@ export default function RegisterItem() {
 											attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 										/>
 										<LocationMarker
-											
 											position={position}
 											setPosition={setPosition}
 										/>

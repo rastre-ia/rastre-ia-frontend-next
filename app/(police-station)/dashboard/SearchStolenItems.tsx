@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-	Search,
-	Filter,
-	ChevronDown,
-	ChevronUp,
-	MapPin,
-	ChevronLeft,
-	ChevronRight,
-} from 'lucide-react';
+import { Search, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +22,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Pagination } from '@/components/ui/pagination';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface StolenItem {
 	id: number;
@@ -46,8 +36,7 @@ interface StolenItem {
 
 // Função simulada para buscar itens roubados
 const fetchStolenItems = async (
-	page: number,
-	filter: string
+	page: number
 ): Promise<{ items: StolenItem[]; totalPages: number }> => {
 	await new Promise((resolve) => setTimeout(resolve, 500));
 	return {
@@ -83,154 +72,163 @@ export default function SearchStolenItems() {
 	}, [currentPage, filter]);
 
 	const loadItems = async () => {
-		setIsLoading(true);
-		const { items, totalPages } = await fetchStolenItems(
-			currentPage,
-			filter
-		);
-		setItems(items);
-		setTotalPages(totalPages);
-		setIsLoading(false);
-	};
+		const loadItems = async () => {
+			setIsLoading(true);
+			const { items, totalPages } = await fetchStolenItems(currentPage);
+			setItems(items);
+			setTotalPages(totalPages);
+			setIsLoading(false);
+		};
+		const handleSearch = () => {
+			setCurrentPage(1);
+			loadItems();
+		};
 
-	const handleSearch = () => {
-		setCurrentPage(1);
-		loadItems();
-	};
+		const handleFilterChange = (value: string) => {
+			setFilter(value);
+			setCurrentPage(1);
+		};
 
-	const handleFilterChange = (value: string) => {
-		setFilter(value);
-		setCurrentPage(1);
-	};
-
-	return (
-		<>
-			<motion.div
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-			>
-				<Card>
-					<CardHeader>
-						<CardTitle>
-							Pesquisar e Filtrar Itens Roubados
-						</CardTitle>
-						<CardDescription>
-							Use as opções abaixo para encontrar itens
-							específicos
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="flex space-x-2">
-							<Input
-								type="text"
-								placeholder="Buscar itens..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="flex-grow"
-							/>
-							<Button onClick={handleSearch} disabled={isLoading}>
-								<Search className="h-4 w-4 mr-2" />
-								Buscar
-							</Button>
-						</div>
-						<Select
-							value={filter}
-							onValueChange={handleFilterChange}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Filtrar por status" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">
-									Todos os Itens
-								</SelectItem>
-								<SelectItem value="active">Ativo</SelectItem>
-								<SelectItem value="recovered">
-									Recuperado
-								</SelectItem>
-								<SelectItem value="closed">Fechado</SelectItem>
-							</SelectContent>
-						</Select>
-					</CardContent>
-				</Card>
-			</motion.div>
-
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ duration: 0.5, delay: 0.2 }}
-				className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-			>
-				{items.map((item) => (
-					<Card key={item.id}>
+		return (
+			<>
+				<motion.div
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5 }}
+				>
+					<Card>
 						<CardHeader>
-							<CardTitle>{item.name}</CardTitle>
+							<CardTitle>
+								Pesquisar e Filtrar Itens Roubados
+							</CardTitle>
 							<CardDescription>
-								Reportado em {item.date}
+								Use as opções abaixo para encontrar itens
+								específicos
 							</CardDescription>
 						</CardHeader>
-						<CardContent>
-							<img
-								src={item.image}
-								alt={item.name}
-								className="w-full h-32 object-cover mb-4 rounded-md"
-							/>
-							<p>{item.description}</p>
-							<div className="flex items-center mt-2 space-x-2">
-								<Badge
-									variant={
-										item.status === 'Ativo'
-											? 'default'
-											: item.status === 'Recuperado'
-											? 'secondary'
-											: 'outline'
+						<CardContent className="space-y-4">
+							<div className="flex space-x-2">
+								<Input
+									type="text"
+									placeholder="Buscar itens..."
+									value={searchQuery}
+									onChange={(e) =>
+										setSearchQuery(e.target.value)
 									}
+									className="flex-grow"
+								/>
+								<Button
+									onClick={handleSearch}
+									disabled={isLoading}
 								>
-									{item.status}
-								</Badge>
-								<Badge variant="outline">
-									<MapPin className="h-4 w-4 mr-1" />
-									{item.location}
-								</Badge>
+									<Search className="h-4 w-4 mr-2" />
+									Buscar
+								</Button>
 							</div>
+							<Select
+								value={filter}
+								onValueChange={handleFilterChange}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Filtrar por status" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">
+										Todos os Itens
+									</SelectItem>
+									<SelectItem value="active">
+										Ativo
+									</SelectItem>
+									<SelectItem value="recovered">
+										Recuperado
+									</SelectItem>
+									<SelectItem value="closed">
+										Fechado
+									</SelectItem>
+								</SelectContent>
+							</Select>
 						</CardContent>
-						<CardFooter>
-							<Button variant="outline" className="w-full">
-								Ver Detalhes
-							</Button>
-						</CardFooter>
 					</Card>
-				))}
-			</motion.div>
+				</motion.div>
 
-			<Pagination>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() =>
-						setCurrentPage((prev) => Math.max(prev - 1, 1))
-					}
-					disabled={currentPage === 1}
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.5, delay: 0.2 }}
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
 				>
-					<ChevronLeft className="h-4 w-4 mr-2" />
-					Anterior
-				</Button>
-				<div className="mx-4">
-					Página {currentPage} / {totalPages}
-				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() =>
-						setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-					}
-					disabled={currentPage === totalPages}
-				>
-					Próximo
-					<ChevronRight className="h-4 w-4 ml-2" />
-				</Button>
-			</Pagination>
-		</>
-	);
+					{items.map((item) => (
+						<Card key={item.id}>
+							<CardHeader>
+								<CardTitle>{item.name}</CardTitle>
+								<CardDescription>
+									Reportado em {item.date}
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<img
+									src={item.image}
+									alt={item.name}
+									className="w-full h-32 object-cover mb-4 rounded-md"
+								/>
+								<p>{item.description}</p>
+								<div className="flex items-center mt-2 space-x-2">
+									<Badge
+										variant={
+											item.status === 'Ativo'
+												? 'default'
+												: item.status === 'Recuperado'
+												? 'secondary'
+												: 'outline'
+										}
+									>
+										{item.status}
+									</Badge>
+									<Badge variant="outline">
+										<MapPin className="h-4 w-4 mr-1" />
+										{item.location}
+									</Badge>
+								</div>
+							</CardContent>
+							<CardFooter>
+								<Button variant="outline" className="w-full">
+									Ver Detalhes
+								</Button>
+							</CardFooter>
+						</Card>
+					))}
+				</motion.div>
+
+				<Pagination>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() =>
+							setCurrentPage((prev) => Math.max(prev - 1, 1))
+						}
+						disabled={currentPage === 1}
+					>
+						<ChevronLeft className="h-4 w-4 mr-2" />
+						Anterior
+					</Button>
+					<div className="mx-4">
+						Página {currentPage} / {totalPages}
+					</div>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() =>
+							setCurrentPage((prev) =>
+								Math.min(prev + 1, totalPages)
+							)
+						}
+						disabled={currentPage === totalPages}
+					>
+						Próximo
+						<ChevronRight className="h-4 w-4 ml-2" />
+					</Button>
+				</Pagination>
+			</>
+		);
+	};
 }

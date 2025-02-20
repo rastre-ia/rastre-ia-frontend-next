@@ -22,9 +22,9 @@ const defaultAssistantMessage: MessageInterface = {
 		'Olá! Estou aqui para ajudá-lo a registrar uma denúncia. O que você gostaria de relatar hoje? Seja um roubo, atividade suspeita ou qualquer outra coisa, estou aqui para ouvir e reunir detalhes importantes.',
 };
 
-interface AiChatProps {}
+// interface AiChatProps {}
 
-const AiChat: FunctionComponent<AiChatProps> = () => {
+const AiChat: FunctionComponent = () => {
 	const { data: session, status } = useSession();
 	const [messages, setMessages] = useState<MessageInterface[]>([
 		defaultAssistantMessage,

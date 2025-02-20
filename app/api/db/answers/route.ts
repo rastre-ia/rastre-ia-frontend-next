@@ -47,6 +47,7 @@ export const POST = auth(async function POST(req) {
 					answers.answerRequestId as string
 				);
 			} catch (error) {
+				console.error('Error increasing XP:', error);
 				return NextResponse.json(
 					{ message: 'Invalid answerRequestId' },
 					{ status: 400 }

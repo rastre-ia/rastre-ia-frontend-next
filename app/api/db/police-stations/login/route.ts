@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
 	await dbConnect();
 
-	const hashedPassword = await argon2.hash(password);
+	// const hashedPassword = await argon2.hash(password);
 
 	const policeStation = await PoliceStations.findOne({
 		email: email,
