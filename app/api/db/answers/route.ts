@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
 import dbConnect from '@/app/lib/mongodb';
 import Answers, { AnswersSchemaInterface } from '@/app/lib/schemas/Answers';
 import Users from '@/app/lib/schemas/Users';
@@ -17,7 +16,6 @@ async function increaseXP(userId: string, requestId: string) {
 	}
 
 	const amountOfXp = calculateAnswerExperience(requestBeingAnswered.priority);
-
 	console.log('increment', amountOfXp);
 
 	await Users.updateOne(
@@ -26,17 +24,32 @@ async function increaseXP(userId: string, requestId: string) {
 	);
 }
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
+interface AuthParams {
+	auth: {
+		user: {
+			_id: string;
+			role: string;
+		};
+	};
+}
+
+export async function POST(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
+
+	if (auth) {
 		const { answers } = (await req.json()) as {
 			answers: AnswersSchemaInterface;
 		};
 
-		if ((answers.userId as string) !== req.auth.user._id)
+		if ((answers.userId as string) !== auth.user._id) {
 			return NextResponse.json(
 				{ message: 'Unauthorized to create report' },
 				{ status: 401 }
 			);
+		}
 
 		try {
 			await dbConnect();
@@ -55,7 +68,6 @@ export const POST = auth(async function POST(req) {
 			}
 
 			const newAnswerRequest = new Answers(answers);
-
 			await newAnswerRequest.save();
 
 			return NextResponse.json({
@@ -65,19 +77,24 @@ export const POST = auth(async function POST(req) {
 			console.error('Error creating Answer:', error);
 			return NextResponse.json(
 				{ message: 'Error creating Answer', error },
-
 				{ status: 500 }
 			);
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}
 
-export const GET = auth(async function GET(req) {
-	if (req.auth) {
-		const userId = req.nextUrl.searchParams.get('id');
+export async function GET(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
 
-		if (req.auth.user._id !== userId) {
+	if (auth) {
+		const url = new URL(req.url);
+		const userId = url.searchParams.get('id');
+
+		if (auth.user._id !== userId) {
 			return NextResponse.json(
 				{ message: 'Unauthorized' },
 				{ status: 401 }
@@ -104,4 +121,4 @@ export const GET = auth(async function GET(req) {
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

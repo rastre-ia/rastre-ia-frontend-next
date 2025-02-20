@@ -4,25 +4,30 @@ import Reports, {
 	ReportSchemaInterface,
 	ReportStatusEnum,
 } from '@/app/lib/schemas/Reports';
-import { auth } from '@/auth';
 import generateUserActivity from '@/app/lib/generate-user-activity';
 import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
 import dbConnect from '@/app/lib/mongodb';
 import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
 
-export const GET = auth(async function GET(req) {
-	if (req.auth) {
-		if (req.auth.user.role !== RolesEnum.POLICE_STATION) {
+export async function GET(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
+
+	if (auth) {
+		if (auth.user.role !== RolesEnum.POLICE_STATION) {
 			return NextResponse.json(
 				{ message: 'Unauthorized' },
 				{ status: 401 }
 			);
 		}
 
-		const perPage = Number(req.nextUrl.searchParams.get('per_page')) ?? 12;
-		const page = Number(req.nextUrl.searchParams.get('page')) ?? 0;
-		const status = req.nextUrl.searchParams.get('status') ?? undefined; // Undefined means all
-		const type = req.nextUrl.searchParams.get('type') ?? undefined;
+		const url = new URL(req.url);
+		const perPage = Number(url.searchParams.get('per_page')) ?? 12;
+		const page = Number(url.searchParams.get('page')) ?? 0;
+		const status = url.searchParams.get('status') ?? undefined; // Undefined means all
+		const type = url.searchParams.get('type') ?? undefined;
 
 		try {
 			await dbConnect();
@@ -32,11 +37,9 @@ export const GET = auth(async function GET(req) {
 			query = query.limit(perPage).skip(perPage * page);
 
 			if (status) query = query.where('status').equals(status);
-
 			if (type) query = query.where('type').equals(type);
 
-			const reports = await await query.exec();
-
+			const reports = await query.exec();
 			const pageCount = Math.ceil(
 				(await Reports.countDocuments().exec()) / perPage
 			);
@@ -54,17 +57,29 @@ export const GET = auth(async function GET(req) {
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}
+interface AuthParams {
+	auth: {
+		user: {
+			_id: string;
+			role: string;
+		};
+	};
+}
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
+export async function POST(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
+
+	if (auth) {
 		const {
 			userId,
 			title,
 			location,
 			description,
 			images,
-
 			assistanceNeeded,
 			type,
 			submissionMethod,
@@ -72,11 +87,12 @@ export const POST = auth(async function POST(req) {
 			embeddings,
 		} = (await req.json()) as ReportSchemaInterface;
 
-		if ((userId as string) !== req.auth.user._id)
+		if ((userId as string) !== auth.user._id) {
 			return NextResponse.json(
 				{ message: 'Unauthorized to create report' },
 				{ status: 401 }
 			);
+		}
 
 		const sts =
 			assistanceNeeded === ReportAssistanceNeededEnum.REQUIRE_ASSISTANCE
@@ -128,4 +144,4 @@ export const POST = auth(async function POST(req) {
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

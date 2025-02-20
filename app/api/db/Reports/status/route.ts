@@ -3,19 +3,33 @@ import Reports, {
 	ReportSchemaInterface,
 	ReportStatusEnum,
 } from '@/app/lib/schemas/Reports';
-import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
-// receives an array of ids and returns an array with the status of each item
-export const GET = auth(async function GET(req) {
-	if (req.auth) {
-		const ids = req.nextUrl.searchParams.get('ids');
+interface AuthParams {
+	auth: {
+		user: {
+			_id: string;
+			role: string;
+		};
+	};
+}
 
-		if (!ids)
+export async function GET(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
+
+	if (auth) {
+		const url = new URL(req.url);
+		const ids = url.searchParams.get('ids');
+
+		if (!ids) {
 			return NextResponse.json(
 				{ message: 'No ids provided' },
 				{ status: 400 }
 			);
+		}
 
 		const idArray = ids.split(',');
 
@@ -47,10 +61,9 @@ export const GET = auth(async function GET(req) {
 			console.error('Error fetching status:', error);
 			return NextResponse.json(
 				{ message: 'Error fetching status', error },
-
 				{ status: 500 }
 			);
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

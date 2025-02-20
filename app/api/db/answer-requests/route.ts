@@ -1,28 +1,41 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
 import AnswerRequests, {
 	AnswerRequestSchemaInterface,
 } from '@/app/lib/schemas/AnswerRequests';
 import dbConnect from '@/app/lib/mongodb';
 import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
+interface AuthParams {
+	auth: {
+		user: {
+			_id: string;
+			role: string; // Ensure you include the role for authorization checks
+			// Add other properties of user as needed
+		};
+	};
+}
+
+export async function POST(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params;
+	if (auth) {
 		const { answerRequest } = (await req.json()) as {
 			answerRequest: AnswerRequestSchemaInterface;
 		};
 
-		if ((answerRequest.policeStationId as string) !== req.auth.user._id)
+		if ((answerRequest.policeStationId as string) !== auth.user._id) {
 			return NextResponse.json(
 				{ message: 'Unauthorized to create report' },
 				{ status: 401 }
 			);
+		}
 
 		try {
 			await dbConnect();
 
 			const newAnswerRequest = new AnswerRequests(answerRequest);
-
 			await newAnswerRequest.save();
 
 			return NextResponse.json({
@@ -32,19 +45,22 @@ export const POST = auth(async function POST(req) {
 			console.error('Error creating Answer Request:', error);
 			return NextResponse.json(
 				{ message: 'Error creating Answer Request', error },
-
 				{ status: 500 }
 			);
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}
 
-export const GET = auth(async function GET(req) {
-	if (req.auth) {
-		const userId = req.nextUrl.searchParams.get('id');
+export async function GET(
+	req: Request,
+	{ params }: { params: Promise<AuthParams> }
+) {
+	const { auth } = await params; // Destructure auth from params
+	if (auth) {
+		const userId = (await params).auth.user._id;
 
-		if (req.auth.user._id !== userId) {
+		if (auth.user._id !== userId) {
 			return NextResponse.json(
 				{ message: 'Unauthorized' },
 				{ status: 401 }
@@ -65,7 +81,7 @@ export const GET = auth(async function GET(req) {
 			const answerRequestsCount = await AnswerRequests.countDocuments({});
 			response.total = answerRequestsCount;
 
-			if (req.auth.user.role === RolesEnum.USER) {
+			if (auth.user.role === RolesEnum.USER) {
 				const answerRequests =
 					await AnswerRequests.find<AnswerRequestSchemaInterface>()
 						.where('usersRequested')
@@ -73,7 +89,7 @@ export const GET = auth(async function GET(req) {
 						.exec();
 				response.answerRequests = answerRequests;
 			}
-			if (req.auth.user.role === RolesEnum.POLICE_STATION) {
+			if (auth.user.role === RolesEnum.POLICE_STATION) {
 				const answerRequests =
 					await AnswerRequests.find<AnswerRequestSchemaInterface>()
 						.where('policeStationId')
@@ -92,4 +108,4 @@ export const GET = auth(async function GET(req) {
 		}
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

@@ -1,40 +1,45 @@
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+
+interface AuthParams {
+	auth: {
+		user: {
+			_id: string;
+			role: string;
+		};
+	};
+}
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } } // Updated to destructure params directly
+	{ params }: { params: Promise<AuthParams> }
 ) {
-	// Call the auth function directly and return its result
-	return auth(async () => {
-		// @ts-expect-error - This is a valid check
-		if (request.auth) {
-			await dbConnect();
+	// Await the params to get the authentication details
+	const { auth } = await params;
 
-			try {
-				const user = await Users.findById(params.id); // Access params.id directly
+	// Ensure we have valid authentication
+	if (auth) {
+		await dbConnect();
 
-				if (!user) {
-					return NextResponse.json(
-						{ message: 'User not found' },
-						{ status: 404 }
-					);
-				}
+		try {
+			const user = await Users.findById(auth.user._id); // Use auth.user._id to find the user
 
-				return NextResponse.json({ user });
-			} catch (error) {
-				console.error('Error fetching user:', error);
+			if (!user) {
 				return NextResponse.json(
-					{ message: 'Error fetching user', error },
-					{ status: 500 }
+					{ message: 'User not found' },
+					{ status: 404 }
 				);
 			}
+
+			return NextResponse.json({ user });
+		} catch (error) {
+			console.error('Error fetching users:', error);
+			return NextResponse.json(
+				{ message: 'Error fetching users', error },
+				{ status: 500 }
+			);
 		}
-		return NextResponse.json(
-			{ message: 'Not authenticated' },
-			{ status: 401 }
-		);
-	})(request, { params }); // Pass params as part of the context
+	}
+	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
 }

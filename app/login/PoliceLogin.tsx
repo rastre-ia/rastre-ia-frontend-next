@@ -1,26 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Shield } from 'lucide-react';
-import { redirect, useSearchParams } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
 export default function PoliceLogin() {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-	const searchParams = useSearchParams();
-	const searchParamError = searchParams.get('error');
-	const searchParamRedirectTo = searchParams.get('redirect_to');
-
-	const [error, setError] = useState<string>(
-		searchParamError
-			? 'Credenciais inválidas. Por favor, tente novamente.'
-			: ''
+	const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
+		null
 	);
+	const [error, setError] = useState<string>('');
+
+	useEffect(() => {
+		setSearchParams(new URLSearchParams(window.location.search));
+	}, []);
+
+	const searchParamError = searchParams?.get('error');
+	const searchParamRedirectTo = searchParams?.get('redirect_to');
+
+	useEffect(() => {
+		if (searchParamError) {
+			setError(searchParamError);
+		}
+	}, [searchParamError]);
 
 	const credentialsAction = async () => {
 		const loginResult = await signIn('police_credentials', {
@@ -34,12 +42,17 @@ export default function PoliceLogin() {
 		} else {
 			redirect(
 				searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
-			); // Navigate to the new post page
+			);
 		}
 	};
 
 	return (
-		<form action={credentialsAction}>
+		<form
+			onSubmit={(e) => {
+				e.preventDefault();
+				credentialsAction();
+			}}
+		>
 			<div className="space-y-4">
 				{error && (
 					<div className="text-red-600 text-sm">
