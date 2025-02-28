@@ -1,4 +1,5 @@
-'use server';
+// HelpWantedRequest.tsx
+'use client';
 
 import { FunctionComponent } from 'react';
 import {
@@ -25,9 +26,6 @@ import { Badge } from '@/components/ui/badge';
 import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
 import { AnswerRequestPriorityEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
 import answerRequestPriorityTranslator from '@/app/_helpers/answer-request-priority-translator';
-import { createNewAnswer } from '@/app/_helpers/db/answer';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
 
 interface HelpWantedRequestProps {
@@ -35,35 +33,32 @@ interface HelpWantedRequestProps {
 	myHeaders: Headers;
 	userId: string;
 	answered: boolean;
+	handleSubmitResponse: (
+		requestId: string,
+		userId: string,
+		responseMessage: string
+	) => Promise<void>;
 }
 
-const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
+const HelpWantedRequest = ({
 	request,
 	myHeaders,
 	userId,
 	answered,
-}) => {
+	handleSubmitResponse,
+}: HelpWantedRequestProps) => {
 	if (!request._id) {
 		return null;
 	}
 
-	async function handleSubmitResponse(formData: FormData) {
-		'use server';
-
+	const onSubmit = async (formData: FormData) => {
 		const responseMessage = formData.get('response_message') as string;
-
-		await createNewAnswer(
-			{
-				answerRequestId: request._id as string,
-				userId: userId,
-				content: responseMessage,
-			},
-			myHeaders
+		await handleSubmitResponse(
+			request._id as string,
+			userId,
+			responseMessage
 		);
-
-		revalidatePath('help-wanted');
-		redirect('/help-wanted');
-	}
+	};
 
 	return (
 		<Card key={request._id as string}>
@@ -127,7 +122,7 @@ const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>
-									Responder à "{request.title}""
+									Responder à "{request.title}"
 								</DialogTitle>
 								<DialogDescription>
 									Suas informações são cruciais para esta
@@ -135,7 +130,7 @@ const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
 									informação relevante sobre esta solicitação.
 								</DialogDescription>
 							</DialogHeader>
-							<form action={handleSubmitResponse}>
+							<form action={onSubmit}>
 								<Textarea
 									name="response_message"
 									placeholder="Digite sua resposta aqui..."

@@ -1,12 +1,24 @@
+'use client';
+
 import { FunctionComponent } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
 import RolesEnum from './lib/schemas/helpers/RolesEnum';
+import React from 'react';
 interface LoginAvatarProps {}
 
-const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
-	const session = await auth();
+const LoginAvatar: FunctionComponent<LoginAvatarProps> = () => {
+	const [session, setSession] = React.useState<any>(null);
+
+	React.useEffect(() => {
+		const getSession = async () => {
+			const session = await auth();
+			setSession(session);
+		};
+
+		getSession();
+	}, []);
 
 	if (!session) {
 		return (

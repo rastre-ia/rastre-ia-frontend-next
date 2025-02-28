@@ -5,6 +5,7 @@ import chatSchema, { ChatSchemaInterface } from './helpers/ChatSchema';
 export enum ReportAssistanceNeededEnum {
 	REQUIRE_ASSISTANCE = 'require_assistance',
 	DONT_REQUIRE_ASSIST = 'dont_require_assist',
+	REQUIRE_ASSIST = 'REQUIRE_ASSIST',
 }
 
 export enum ReportStatusEnum {

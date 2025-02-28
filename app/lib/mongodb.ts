@@ -14,10 +14,11 @@ interface MongooseCache {
 }
 
 declare global {
+	// eslint-disable-next-line no-var -- This is necessary to avoid re-declaring the global variable.
 	var mongoose: MongooseCache; // This is necessary to avoid re-declaring the global variable.
 }
 
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
 if (!global.mongoose) {
 	global.mongoose = cached;

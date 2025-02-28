@@ -12,10 +12,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Shield, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import CitizenLogin from './CitizenLogin';
-import PoliceLogin from './PoliceLogin';
-import { Button } from '@/components/ui/button';
 
+import { Button } from '@/components/ui/button';
+import dynamic from 'next/dynamic';
+
+const CitizenLogin = dynamic(() => import('./CitizenLogin'), { ssr: false });
+const PoliceLogin = dynamic(() => import('./PoliceLogin'), { ssr: false });
 export default function Login() {
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900">

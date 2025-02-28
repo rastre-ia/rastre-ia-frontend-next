@@ -1,13 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
+import AnimatedLogo from '../components/AnimatedLogo';
+import dynamic from 'next/dynamic';
 
-import AnimatedLogo from '@/components/AnimatedLogo';
-import ProcessFlux from './ProcessFlux';
-import MotionHeader from './MotionHeader';
-import FeatureCards from './FeatureCards';
-import LoginAvatar from './LoginAvatar';
+const MotionHeader = dynamic(() => import('./MotionHeader'), { ssr: false });
+const ProcessFlux = dynamic(() => import('./ProcessFlux'), { ssr: false });
+const FeatureCards = dynamic(() => import('./FeatureCards'), { ssr: false });
+const LoginAvatar = dynamic(() => import('./LoginAvatar'), { ssr: false });
 
 const Home: React.FC = () => {
 	return (

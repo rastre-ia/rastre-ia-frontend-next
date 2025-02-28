@@ -24,7 +24,7 @@ const ActiveAssistanceRequestsMap: FunctionComponent<
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			/>
-			{requests.map((request) => (
+			{(requests || []).map((request) => (
 				<Circle
 					key={request._id as string}
 					center={latLng(

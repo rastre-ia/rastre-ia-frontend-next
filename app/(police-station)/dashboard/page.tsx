@@ -9,7 +9,8 @@ import {
 	PackageSearch,
 } from 'lucide-react';
 import Link from 'next/link';
-
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Overview from './Overview';
@@ -18,11 +19,14 @@ import AnimatedLogo from '@/components/AnimatedLogo';
 
 import { Button } from '@/components/ui/button';
 import SearchReports from './SearchReports';
-import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchStolenItems from './SearchStolenItems';
 import { auth, signOut } from '@/auth';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
 
+const ActiveAssistanceRequests = dynamic(
+	() => import('./ActiveAssistanceRequests'),
+	{ ssr: false }
+);
 export default async function PoliceDashboard() {
 	const session = await auth();
 	const user = session?.user;

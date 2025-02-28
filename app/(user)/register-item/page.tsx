@@ -11,6 +11,7 @@ import {
 import { motion } from 'framer-motion';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+
 import {
 	Upload,
 	ArrowLeft,
@@ -42,6 +43,7 @@ import { useToast } from '@/hooks/use-toast';
 import { StolenItemsSchemaInterface } from '../../lib/schemas/StolenItems';
 import { EmbeddedImageSchemaInterface } from '../../lib/schemas/helpers/EmbeddedImageSchema';
 import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
+import dynamic from 'next/dynamic';
 
 interface LatLng {
 	lat: number;
@@ -60,78 +62,67 @@ const customIcon = new L.Icon({
 	popupAnchor: [1, -34],
 });
 
-function LocationMarker({ position, setPosition }: LocationMarkerProps) {
-	const [address, setAddress] = useState<string | null>(null);
+const LocationMarker = dynamic(
+	() =>
+		Promise.resolve(({ position, setPosition }: LocationMarkerProps) => {
+			const [address, setAddress] = useState<string | null>(null);
+			const map = useMapEvents({
+				locationfound(e) {
+					setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
+					map.flyTo(e.latlng, map.getZoom());
+				},
+			});
 
-	const map = useMapEvents({
-		locationfound(e) {
-			// Quando a localização for encontrada, define a posição do marcador
-			setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
-			map.flyTo(e.latlng, map.getZoom());
-		},
-	});
+			useEffect(() => {
+				map.locate({ setView: true, maxZoom: 16 });
+			}, [map]);
 
-	useEffect(() => {
-		map.locate({ setView: true, maxZoom: 16 });
-	}, [map]);
+			const handleDrag = (event: {
+				target: { getLatLng: () => { lat: any; lng: any } };
+			}) => {
+				const { lat, lng } = event.target.getLatLng();
+				setPosition({ lat, lng });
+			};
 
-	const handleDrag = (event: any) => {
-		const { lat, lng } = event.target.getLatLng();
-		setPosition({ lat, lng });
-	};
+			const fetchAddress = async (lat: number, lng: number) => {
+				try {
+					const response = await fetch(
+						`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+					);
+					const data = await response.json();
+					const addressComponents = [
+						data.address.road,
+						data.address.neighbourhood,
+						data.address.city,
+						data.address.state,
+						data.address.postcode,
+					];
+					setAddress(addressComponents.filter(Boolean).join(', '));
+				} catch (error) {
+					console.error('Erro ao buscar endereço:', error);
+					setAddress('Endereço não encontrado');
+				}
+			};
 
-	// Função para buscar o endereço com base na latitude e longitude
-	const fetchAddress = async (lat: number, lng: number) => {
-		try {
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+			useEffect(() => {
+				if (position) {
+					fetchAddress(position.lat, position.lng);
+				}
+			}, [position]);
+
+			return position === null ? null : (
+				<Marker
+					position={position}
+					icon={customIcon}
+					draggable
+					eventHandlers={{ dragend: handleDrag }}
+				>
+					<Popup>{address || 'Carregando endereço...'}</Popup>
+				</Marker>
 			);
-			const data = await response.json();
-
-			const addressComponents = [
-				data.address.road, // Nome da rua
-				data.address.neighbourhood, // Bairro
-				data.address.city, // Cidade
-				data.address.state, // Estado
-				data.address.postcode, // CEP
-			];
-
-			// Filtra valores vazios e monta o endereço
-			const filteredAddress = addressComponents
-				.filter(Boolean)
-				.join(', ');
-
-			setAddress(filteredAddress);
-		} catch (error) {
-			console.error('Erro ao buscar endereço:', error);
-			setAddress('Endereço não encontrado');
-		}
-	};
-
-	// Sempre que a posição mudar, atualizamos o endereço
-	useEffect(() => {
-		if (position) {
-			fetchAddress(position.lat, position.lng);
-		}
-	}, [position]);
-
-	return position === null ? null : (
-		<Marker
-			position={position}
-			icon={customIcon}
-			draggable={true}
-			eventHandlers={{
-				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
-			}}
-		>
-			<Popup  className="leaflet-popup">
-				<p>Latitude: {position.lat}</p>
-				<p>Longitude: {position.lng}</p>
-				<p>Endereço: {address ? address : 'Carregando...'}</p>
-			</Popup>
-		</Marker>
-	);
-}
+		}),
+	{ ssr: false }
+);
 
 export default function RegisterItem() {
 	const [position, setPosition] = useState<LatLng | null>(null);
@@ -170,7 +161,7 @@ export default function RegisterItem() {
 						imageURL: imageUrl,
 						embeddings: [],
 					},
-			  ]
+				]
 			: [];
 
 		try {
@@ -338,7 +329,6 @@ export default function RegisterItem() {
 											attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 										/>
 										<LocationMarker
-											
 											position={position}
 											setPosition={setPosition}
 										/>

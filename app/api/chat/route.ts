@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import {
 	MessageInterface,
@@ -6,23 +6,16 @@ import {
 } from '@/app/_helpers/types/ChatTypes';
 import { EMBEDDINGS_URL } from '@/app/lib/embeddings-api';
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
-		const { messages, options } = (await req.json()) as {
-			messages: MessageInterface[];
-			options: OptionsInterface;
-		};
-
-		// if (req.auth.user.role !== RolesEnum.POLICE_STATION) {
-		// 	return NextResponse.json(
-		// 		{ message: 'Unauthorized' },
-		// 		{ status: 401 }
-		// 	);
-		// }
-
-		console.log('Chat Message sent: ', messages);
-
+export async function POST(req: NextRequest) {
+	if ((req as any).auth) {
 		try {
+			const { messages, options } = (await req.json()) as {
+				messages: MessageInterface[];
+				options: OptionsInterface;
+			};
+
+			console.log('Chat Message sent: ', messages);
+
 			const resp = await fetch(EMBEDDINGS_URL + '/chat', {
 				method: 'POST',
 				headers: {
@@ -36,16 +29,16 @@ export const POST = auth(async function POST(req) {
 			});
 
 			const parsedResp = await resp.json();
-
 			return NextResponse.json(parsedResp);
 		} catch (error) {
 			console.error('Error creating report:', error);
 			return NextResponse.json(
 				{ message: 'Error creating report', error },
-
 				{ status: 500 }
 			);
 		}
+	} else {
+		// Handle the case where authentication fails.  Important for security!
+		return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 	}
-	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

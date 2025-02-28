@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, MapPin } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,36 +16,38 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
-import BACKEND_URL from '@/app/_helpers/backend-path';
-import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
 import { format } from 'date-fns';
 import ActiveAssistanceRequestsMap from '@/components/ActiveAssistanceRequests/ActiveAssistanceRequestsMap';
+import BACKEND_URL from '@/app/_helpers/backend-path';
+import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
 
-export default async function ActiveAssistanceRequests() {
-	const session = await auth();
-	const user = session?.user;
+export default function ActiveAssistanceRequests() {
+	const [myAnswerRequests, setMyAnswerRequests] = useState<
+		AnswerRequestSchemaInterface[]
+	>([]);
+	const router = useRouter();
 
-	if (!user) {
-		redirect('/no-permission?redirect_to=/my-profile');
-	}
+	useEffect(() => {
+		const fetchRequests = async () => {
+			try {
+				const res = await fetch(`${BACKEND_URL}/db/answer-requests`, {
+					method: 'GET',
+					credentials: 'include',
+				});
 
-	const myHeaders = await headers();
+				if (!res.ok) {
+					throw new Error('Erro ao buscar solicitações.');
+				}
 
-	const resAnswerRequests = await fetch(
-		BACKEND_URL + '/db/answer-requests?id=' + user._id,
-		{
-			method: 'GET',
-			headers: myHeaders,
-		}
-	);
+				const data = await res.json();
+				setMyAnswerRequests(data.answerRequests || []);
+			} catch (error) {
+				console.error('Erro ao buscar solicitações:', error);
+			}
+		};
 
-	const myAnswerRequests = (await resAnswerRequests.json()) as {
-		answerRequests: AnswerRequestSchemaInterface[];
-		total: number;
-	};
+		fetchRequests();
+	}, []);
 
 	return (
 		<>
@@ -57,8 +63,6 @@ export default async function ActiveAssistanceRequests() {
 						<Input
 							type="text"
 							placeholder="Pesquisar solicitações..."
-							// value={searchQuery}
-							// onChange={(e) => setSearchQuery(e.target.value)}
 							className="flex-grow"
 						/>
 						<Button>
@@ -82,7 +86,7 @@ export default async function ActiveAssistanceRequests() {
 						<CardContent>
 							<div className="h-[400px]">
 								<ActiveAssistanceRequestsMap
-									requests={myAnswerRequests.answerRequests}
+									requests={myAnswerRequests}
 								/>
 							</div>
 						</CardContent>
@@ -100,54 +104,42 @@ export default async function ActiveAssistanceRequests() {
 						<CardContent>
 							<ScrollArea className="h-[400px]">
 								<div className="space-y-4">
-									{myAnswerRequests.answerRequests.map(
-										(request) => (
-											<Card key={request._id as string}>
-												<CardHeader>
-													<CardTitle>
-														{request.title}
-													</CardTitle>
-													{request.createdAt !==
-														undefined && (
-														<CardDescription>
-															Criado em:{' '}
-															{format(
-																request.createdAt,
-																'dd/MM/yyyy HH:mm'
-															)}
-														</CardDescription>
-													)}
-												</CardHeader>
-												<CardContent>
-													<p>{request.message}</p>
-													<div className="flex items-center mt-2 space-x-4">
-														<Badge variant="secondary">
-															<MapPin className="h-4 w-4 mr-1" />
-															{
-																request.requestRadius
-															}
-															m raio
-														</Badge>
-														{/* <Badge variant="outline">
-															<Users className="h-4 w-4 mr-1" />
-															{
-																request.respondents
-															}{' '}
-															respondentes
-														</Badge> */}
-													</div>
-												</CardContent>
-												<CardFooter>
-													<Button
-														variant="outline"
-														className="w-full"
-													>
-														Ver Detalhes
-													</Button>
-												</CardFooter>
-											</Card>
-										)
-									)}
+									{myAnswerRequests.map((request) => (
+										<Card key={request._id as string}>
+											<CardHeader>
+												<CardTitle>
+													{request.title}
+												</CardTitle>
+												{request.createdAt && (
+													<CardDescription>
+														Criado em:{' '}
+														{format(
+															request.createdAt,
+															'dd/MM/yyyy HH:mm'
+														)}
+													</CardDescription>
+												)}
+											</CardHeader>
+											<CardContent>
+												<p>{request.message}</p>
+												<div className="flex items-center mt-2 space-x-4">
+													<Badge variant="secondary">
+														<MapPin className="h-4 w-4 mr-1" />
+														{request.requestRadius}m
+														raio
+													</Badge>
+												</div>
+											</CardContent>
+											<CardFooter>
+												<Button
+													variant="outline"
+													className="w-full"
+												>
+													Ver Detalhes
+												</Button>
+											</CardFooter>
+										</Card>
+									))}
 								</div>
 							</ScrollArea>
 						</CardContent>
