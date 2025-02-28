@@ -58,7 +58,13 @@ export default async function MyProfile() {
 		redirect('/no-permission?redirect_to=/my-profile');
 	}
 
-	const myHeaders = await headers();
+	const headersList = headers();
+	const myHeaders = new Headers();
+
+	// Copy headers you need
+	for (const [key, value] of (await headersList).entries()) {
+		myHeaders.append(key, value);
+	}
 
 	const res = await fetch(BACKEND_URL + '/db/users/' + user._id, {
 		method: 'GET',
