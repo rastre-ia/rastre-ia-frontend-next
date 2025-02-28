@@ -12,7 +12,7 @@ interface MongooseCache {
 	conn: Mongoose | null;
 	promise: Promise<Mongoose> | null;
 }
-
+//@ts-ignore
 declare global {
 	var mongoose: MongooseCache; // This is necessary to avoid re-declaring the global variable.
 }
