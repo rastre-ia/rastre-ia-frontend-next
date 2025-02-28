@@ -118,7 +118,7 @@ export default async function HelpWanted() {
 										// @ts-ignore
 										<HelpWantedRequest
 											userId={user._id}
-											request={request}
+											request={request} //teste
 											answered={checkIfAnswered(
 												request._id as string,
 												myAnswers.answers
