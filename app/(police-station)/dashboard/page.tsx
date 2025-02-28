@@ -109,7 +109,7 @@ export default async function PoliceDashboard() {
 						className="space-y-4"
 					>
 						<Suspense fallback={<div>Carregando...</div>}>
-							{/* @ts-expect-error Async Server Component */}
+							{/* @ts-ignore */}
 							<ActiveAssistanceRequests />
 						</Suspense>
 					</TabsContent>
