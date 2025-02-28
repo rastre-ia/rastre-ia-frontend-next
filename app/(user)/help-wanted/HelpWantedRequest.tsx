@@ -37,12 +37,12 @@ interface HelpWantedRequestProps {
 	answered: boolean;
 }
 
-const HelpWantedRequest: FunctionComponent<HelpWantedRequestProps> = async ({
+const HelpWantedRequest = async ({
 	request,
 	myHeaders,
 	userId,
 	answered,
-}) => {
+}: HelpWantedRequestProps) => {
 	if (!request._id) {
 		return null;
 	}

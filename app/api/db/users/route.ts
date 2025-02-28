@@ -6,7 +6,8 @@ import argon2 from '@node-rs/argon2';
 import { cepLookup } from '@/app/_helpers/brasil-api';
 import { auth } from '@/auth';
 
-export const GET = auth(async function GET(req) {
+export async function GET(req: NextRequest) {
+	const token = await getToken({ req, secret: process.env.JWT_SECRET });
 	const lat = req.nextUrl.searchParams.get('lat');
 	const lon = req.nextUrl.searchParams.get('lon');
 	const radius = req.nextUrl.searchParams.get('radius');
@@ -20,7 +21,7 @@ export const GET = auth(async function GET(req) {
 		total: 0,
 	};
 
-	if (req.auth) {
+	if (token) {
 		try {
 			let query = Users.find();
 
@@ -55,7 +56,7 @@ export const GET = auth(async function GET(req) {
 	queryResult.total = usersCount;
 
 	return NextResponse.json(queryResult);
-});
+}
 
 export async function POST(req: NextRequest) {
 	const { name, email, cpf, cep, password } = await req.json();

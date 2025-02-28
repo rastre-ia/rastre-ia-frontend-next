@@ -115,6 +115,7 @@ export default async function HelpWanted() {
 							<div className="space-y-4">
 								{myAnswerRequests.answerRequests.map(
 									(request) => (
+										// @ts-ignore
 										<HelpWantedRequest
 											userId={user._id}
 											request={request}

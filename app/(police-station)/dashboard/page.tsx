@@ -22,6 +22,7 @@ import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchStolenItems from './SearchStolenItems';
 import { auth, signOut } from '@/auth';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
+import { Suspense } from 'react';
 
 export default async function PoliceDashboard() {
 	const session = await auth();
@@ -107,7 +108,10 @@ export default async function PoliceDashboard() {
 						value="active-assistance-requests"
 						className="space-y-4"
 					>
-						<ActiveAssistanceRequests />
+						<Suspense fallback={<div>Carregando...</div>}>
+							{/* @ts-expect-error Async Server Component */}
+							<ActiveAssistanceRequests />
+						</Suspense>
 					</TabsContent>
 					<TabsContent value="search-reports" className="space-y-4">
 						<SearchReports />

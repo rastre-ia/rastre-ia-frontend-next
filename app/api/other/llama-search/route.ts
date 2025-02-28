@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/auth';  
-import { getLlamaSearch } from '@/app/lib/embeddings-api';  
+import { NextResponse, NextRequest } from 'next/server';
+import { auth } from '@/auth';
+import { getLlamaSearch } from '@/app/lib/embeddings-api';
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
+export async function POST(req: NextRequest) {
+	const session = await auth();
+	if (session) {
 		const { query } = await req.json();
 
 		if (!query) {
@@ -15,12 +16,10 @@ export const POST = auth(async function POST(req) {
 
 		try {
 			const searchResults = await getLlamaSearch(query);
-            console.log(searchResults);
+			console.log(searchResults);
 			return NextResponse.json({
 				results: searchResults,
-
 			});
-
 		} catch (error) {
 			console.error('Error during Llama search:', error);
 			return NextResponse.json(
@@ -28,7 +27,6 @@ export const POST = auth(async function POST(req) {
 				{ status: 500 }
 			);
 		}
-
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

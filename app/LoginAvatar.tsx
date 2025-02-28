@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
 import RolesEnum from './lib/schemas/helpers/RolesEnum';
 interface LoginAvatarProps {}
-
+// @ts-ignore
 const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
 	const session = await auth();
 

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import Reports, {
 	ReportAssistanceNeededEnum,
 	ReportSchemaInterface,
@@ -9,41 +9,37 @@ import generateUserActivity from '@/app/lib/generate-user-activity';
 import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
 import dbConnect from '@/app/lib/mongodb';
 import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
-import { getTextEmbeddings, getVectorSearchResults } from '@/app/lib/embeddings-api';
+import {
+	getTextEmbeddings,
+	getVectorSearchResults,
+} from '@/app/lib/embeddings-api';
 
+export async function POST(req: NextRequest) {
+	const session = await auth();
+	if (session) {
+		const { searchQuery, collection, numCandidates, limit } =
+			await req.json();
 
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
-		const {
-            searchQuery,
-			collection,
-			numCandidates,
-			limit
-		} = await req.json();
-
-		if(!searchQuery || !collection)
+		if (!searchQuery || !collection)
 			return NextResponse.json(
 				{ message: 'Bad request' },
 				{ status: 400 }
 			);
 
-        try {
-
+		try {
 			const embeddingsData = await getTextEmbeddings(searchQuery);
 
 			const results = await getVectorSearchResults(
 				embeddingsData,
 				collection,
-				numCandidates, 
-				limit  
+				numCandidates,
+				limit
 			);
 
 			return NextResponse.json({
 				results: results,
 			});
-
-            
-        } catch (error) {
+		} catch (error) {
 			console.error('Error fetching status:', error);
 			return NextResponse.json(
 				{ message: 'Error fetching status', error },
@@ -51,7 +47,6 @@ export const POST = auth(async function POST(req) {
 				{ status: 500 }
 			);
 		}
-        
 	}
 	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

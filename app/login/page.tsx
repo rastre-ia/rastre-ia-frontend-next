@@ -15,6 +15,7 @@ import Link from 'next/link';
 import CitizenLogin from './CitizenLogin';
 import PoliceLogin from './PoliceLogin';
 import { Button } from '@/components/ui/button';
+import { Suspense } from 'react';
 
 export default function Login() {
 	return (
@@ -47,10 +48,14 @@ export default function Login() {
 								</TabsTrigger>
 							</TabsList>
 							<TabsContent value="citizen">
-								<CitizenLogin />
+								<Suspense fallback={<div>Carregando...</div>}>
+									<CitizenLogin />
+								</Suspense>
 							</TabsContent>
 							<TabsContent value="police">
-								<PoliceLogin />
+								<Suspense fallback={<div>Carregando...</div>}>
+									<PoliceLogin />
+								</Suspense>
 							</TabsContent>
 						</Tabs>
 					</CardContent>
