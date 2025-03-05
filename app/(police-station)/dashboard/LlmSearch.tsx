@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import BACKEND_URL from "@/app/_helpers/backend-path";
+import BACKEND_URL from '@/app/_helpers/backend-path';
 
 interface LlmSearchProps {}
 
@@ -83,7 +83,11 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 								placeholder="Digite sua consulta"
 							/>
 							<Button type="submit" disabled={loading}>
-								{loading ? 'Buscando...' : <Search className="h-4 w-4" />}
+								{loading ? (
+									'Buscando...'
+								) : (
+									<Search className="h-4 w-4" />
+								)}
 							</Button>
 						</div>
 					</form>
@@ -94,18 +98,25 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 				{error && (
 					<div className="text-red-600 font-semibold">{error}</div>
 				)}
-				{ response? (
+				{response ? (
 					<Card className=" hover:shadow-xl transition-all duration-300">
 						<CardHeader>
 							<CardTitle>Resultado</CardTitle>
 						</CardHeader>
 						<CardContent>
-						<p dangerouslySetInnerHTML={{ __html: response.replace(/\n/g, '<br>') }} />						</CardContent>
+							<p
+								dangerouslySetInnerHTML={{
+									__html: response.replace(/\n/g, '<br>'),
+								}}
+							/>{' '}
+						</CardContent>
 						<CardFooter>
-							<Badge className="bg-green-500 text-white">IA</Badge>
+							<Badge className="bg-green-500 text-white">
+								IA
+							</Badge>
 						</CardFooter>
 					</Card>
-				): null}
+				) : null}
 			</ScrollArea>
 		</>
 	);
