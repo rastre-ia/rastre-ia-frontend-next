@@ -213,7 +213,7 @@ const RequestAssistDialog: FunctionComponent<RequestAssistDialogProps> = ({
 				top_p: 0.4,
 			});
 
-			setAssistanceMessage(resp.message.content);
+			setAssistanceMessage(resp.message);
 
 			toast({
 				title: 'Sucesso',
