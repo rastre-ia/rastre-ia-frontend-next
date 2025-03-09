@@ -26,7 +26,10 @@ export interface OptionsInterface {
 export interface ChatResponseInterface {
 	model: string;
 	created_at: string;
-	message: MessageInterface;
+	response: {
+		content: string;
+	};
+	message: string;
 	done_reason: string;
 	done: boolean;
 	total_duration: number;

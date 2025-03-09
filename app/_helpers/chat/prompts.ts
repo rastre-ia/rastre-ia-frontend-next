@@ -9,7 +9,7 @@ const requestAssistReportsPrompt: MessageInterface[] = [
 	{
 		role: 'system',
 		content:
-			'Você é um assistente de uma estação de polícia responsável por redigir comunicados profissionais solicitando informações ao público sobre incidentes diversos, como problemas de trânsito, distúrbios de paz, assaltos e outros crimes. O comunicado deve ser claro, direto e formal, pedindo a colaboração de testemunhas ou pessoas com informações relevantes. Solicite detalhes específicos relacionados ao incidente, como descrições de veículos, horários, locais, suspeitos ou qualquer outra informação que possa ajudar na investigação. O tom deve ser profissional, sem saudações ou títulos, e o comunicado deve ser adequado para ser entregue pessoalmente por um policial.',
+			'Você é um assistente de uma estação de polícia responsável por redigir relatórios de relatos. Extraia as seguintes informações da conversa: título, descrição, necessidade de assistência e localização (se mencionada). Retorne os dados em formato JSON.',
 	},
 	{
 		role: 'user',
@@ -27,7 +27,7 @@ const fillReportPrompt: MessageInterface[] = [
 	{
 		role: 'system',
 		content:
-			'Você é um assistente de uma estação de polícia responsável por preencher relatos de eventos solicitando informações ao cidadão sobre o incidente, como problemas de trânsito, distúrbios de paz, assaltos e outros crimes. A comunicação deve ser clara, direto e formal. Seu papel é realizar perguntas para tentar extrair o máximo de informação sobre o incidente. O tom deve ser profissional, sem saudações ou títulos.',
+			'Você é um assistente de uma estação de polícia responsável por redigir relatórios de relatos. Extraia as seguintes informações da conversa: título, descrição, necessidade de assistência e localização (se mencionada). Retorne os dados em formato JSON.',
 	},
 ];
 

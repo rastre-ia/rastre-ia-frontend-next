@@ -34,15 +34,15 @@ export interface ReportSchemaInterface {
 
 	userId: Schema.Types.ObjectId | string;
 	title: string;
-	location: PointSchemaInterface;
+	location?: PointSchemaInterface;
 	description: string;
-	images: string[];
+	images?: string[];
 	status: ReportStatusEnum;
 	assistanceNeeded: ReportAssistanceNeededEnum;
 	type: ReportTypeEnum;
 	submissionMethod: ReportSubmissionMethodEnum;
 	chatHistory?: ChatSchemaInterface[];
-	embeddings: number[];
+	embeddings?: number[];
 	createdAt?: Date;
 	updatedAt?: Date;
 }

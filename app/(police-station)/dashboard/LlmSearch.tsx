@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import BACKEND_URL from '@/app/_helpers/backend-path';
+import ReactMarkdown from 'react-markdown';
 
 interface LlmSearchProps {}
 
@@ -103,13 +104,11 @@ const LlmSearch: FunctionComponent<LlmSearchProps> = () => {
 						<CardHeader>
 							<CardTitle>Resultado</CardTitle>
 						</CardHeader>
+
 						<CardContent>
-							<p
-								dangerouslySetInnerHTML={{
-									__html: response.replace(/\n/g, '<br>'),
-								}}
-							/>{' '}
+							<ReactMarkdown>{response}</ReactMarkdown>
 						</CardContent>
+
 						<CardFooter>
 							<Badge className="bg-green-500 text-white">
 								IA

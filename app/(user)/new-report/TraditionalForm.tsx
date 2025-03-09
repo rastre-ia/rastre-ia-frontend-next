@@ -131,8 +131,9 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 				chatHistory: messages,
 				embeddings: [],
 			};
-
+			console.log('reportBody:', reportBody);
 			const res = await createNewReport(reportBody);
+
 			if (res.status === 200) {
 				console.log('Report created successfully');
 				toast({
