@@ -12,6 +12,19 @@ import {
 import { EmbeddedImageSchemaInterface } from '@/app/lib/schemas/helpers/EmbeddedImageSchema';
 import dbConnect from '@/app/lib/mongodb';
 
+export async function OPTIONS() {
+	const res = new NextResponse(null, { status: 204 });
+
+	res.headers.set('Access-Control-Allow-Origin', '*');
+	res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+	res.headers.set(
+		'Access-Control-Allow-Headers',
+		'Content-Type, Authorization'
+	);
+
+	return res;
+}
+
 export async function POST(req: NextRequest) {
 	const session = await auth();
 	if (!session) {
@@ -102,7 +115,19 @@ export async function POST(req: NextRequest) {
 
 		await mongoSession.endSession();
 
-		return NextResponse.json({ message: 'Report created successfully' });
+		const res = NextResponse.json({
+			message: 'Report created successfully',
+		});
+
+		// Adicionando os cabeçalhos CORS
+		res.headers.set('Access-Control-Allow-Origin', '*');
+		res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+		res.headers.set(
+			'Access-Control-Allow-Headers',
+			'Content-Type, Authorization'
+		);
+
+		return res;
 	} catch (error) {
 		console.error('Error creating report:', error);
 		return NextResponse.json(
