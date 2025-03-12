@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
 			message: 'Report created successfully',
 		});
 
-		// Adicionando os cabeçalhos CORS
+		// Adicionando os cabeçalhos CORSwd
 		res.headers.set('Access-Control-Allow-Origin', '*');
 		res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 		res.headers.set(
