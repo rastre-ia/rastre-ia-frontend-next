@@ -9,7 +9,6 @@ import {
 	getImageEmbeddings,
 	getTextEmbeddings,
 } from '@/app/lib/embeddings-api';
-import { EmbeddedImageSchemaInterface } from '@/app/lib/schemas/helpers/EmbeddedImageSchema';
 import dbConnect from '@/app/lib/mongodb';
 
 export async function OPTIONS() {
@@ -38,6 +37,18 @@ export async function POST(req: NextRequest) {
 		}
 
 		console.log('Validando dados da requisição...');
+		console.log('Validando dados da requisição...');
+		let requestData;
+		try {
+			requestData = await req.json();
+		} catch (error) {
+			console.error('Erro ao fazer parse do JSON:', error);
+			return NextResponse.json(
+				{ message: 'Formato de JSON inválido' },
+				{ status: 400 }
+			);
+		}
+
 		const {
 			userId,
 			object,
@@ -47,8 +58,7 @@ export async function POST(req: NextRequest) {
 			eventDate,
 			eventDescription,
 			suspectCharacteristics,
-		} = (await req.json()) as StolenItemsSchemaInterface;
-
+		} = requestData as StolenItemsSchemaInterface;
 		if (
 			!object ||
 			!objectDescription ||
