@@ -1,7 +1,5 @@
 import dbConnect from '@/app/lib/mongodb';
-import StolenItems, {
-	StolenItemsStatusEnum,
-} from '@/app/lib/schemas/StolenItems';
+import StolenItems from '@/app/lib/schemas/StolenItems';
 import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 

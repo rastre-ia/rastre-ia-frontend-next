@@ -37,9 +37,15 @@ export async function getStolenItemsStatus(
 			return [];
 		}
 
+		const contentType = resp.headers.get('content-type');
+		if (!contentType || !contentType.includes('application/json')) {
+			console.error('Received non-JSON response:', await resp.text());
+			return [];
+		}
+
 		const parsedResp = await resp.json();
 
-		return parsedResp.statusArray;
+		return parsedResp.statusArray || [];
 	} catch (error) {
 		console.error('Error getting stolen items:', error);
 	}
