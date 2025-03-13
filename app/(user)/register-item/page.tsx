@@ -81,39 +81,6 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 	};
 
 	// Função para buscar o endereço com base na latitude e longitude
-	const fetchAddress = async (lat: number, lng: number) => {
-		try {
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-			);
-			const data = await response.json();
-
-			const addressComponents = [
-				data.address.road, // Nome da rua
-				data.address.neighbourhood, // Bairro
-				data.address.city, // Cidade
-				data.address.state, // Estado
-				data.address.postcode, // CEP
-			];
-
-			// Filtra valores vazios e monta o endereço
-			const filteredAddress = addressComponents
-				.filter(Boolean)
-				.join(', ');
-
-			setAddress(filteredAddress);
-		} catch (error) {
-			console.error('Erro ao buscar endereço:', error);
-			setAddress('Endereço não encontrado');
-		}
-	};
-
-	// Sempre que a posição mudar, atualizamos o endereço
-	useEffect(() => {
-		if (position) {
-			fetchAddress(position.lat, position.lng);
-		}
-	}, [position]);
 
 	return position === null ? null : (
 		<Marker
@@ -123,13 +90,7 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 			eventHandlers={{
 				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
 			}}
-		>
-			<Popup className="leaflet-popup">
-				<p>Latitude: {position.lat}</p>
-				<p>Longitude: {position.lng}</p>
-				<p>Endereço: {address ? address : 'Carregando...'}</p>
-			</Popup>
-		</Marker>
+		></Marker>
 	);
 }
 
