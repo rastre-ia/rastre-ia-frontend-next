@@ -1,7 +1,7 @@
 import StolenItems, {
 	StolenItemsSchemaInterface,
 } from '@/app/lib/schemas/StolenItems';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import generateUserActivity from '@/app/lib/generate-user-activity';
 import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
@@ -9,12 +9,46 @@ import {
 	getImageEmbeddings,
 	getTextEmbeddings,
 } from '@/app/lib/embeddings-api';
-import { EmbeddedImageSchemaInterface } from '@/app/lib/schemas/helpers/EmbeddedImageSchema';
+import dbConnect from '@/app/lib/mongodb';
 
-// Route to create a new stolen item report
-// Uses a transaction to ensure that the user activity is created
-export const POST = auth(async function POST(req) {
-	if (req.auth) {
+export async function OPTIONS() {
+	const res = new NextResponse(null, { status: 204 });
+
+	res.headers.set('Access-Control-Allow-Origin', '*');
+	res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+	res.headers.set(
+		'Access-Control-Allow-Headers',
+		'Content-Type, Authorization'
+	);
+
+	return res;
+}
+
+export async function POST(req: NextRequest) {
+	try {
+		console.log('Verificando autenticação...');
+		const session = await auth();
+		if (!session) {
+			console.log('Usuário não autenticado.');
+			return NextResponse.json(
+				{ message: 'Not authenticated' },
+				{ status: 401 }
+			);
+		}
+
+		console.log('Validando dados da requisição...');
+		console.log('Validando dados da requisição...');
+		let requestData;
+		try {
+			requestData = await req.json();
+		} catch (error) {
+			console.error('Erro ao fazer parse do JSON:', error);
+			return NextResponse.json(
+				{ message: 'Formato de JSON inválido' },
+				{ status: 400 }
+			);
+		}
+
 		const {
 			userId,
 			object,
@@ -24,87 +58,103 @@ export const POST = auth(async function POST(req) {
 			eventDate,
 			eventDescription,
 			suspectCharacteristics,
-		} = (await req.json()) as StolenItemsSchemaInterface;
+		} = requestData as StolenItemsSchemaInterface;
+		if (
+			!object ||
+			!objectDescription ||
+			!images ||
+			!location ||
+			!eventDate
+		) {
+			console.log('Dados inválidos ou incompletos.');
+			return NextResponse.json(
+				{ message: 'Dados inválidos ou incompletos' },
+				{ status: 400 }
+			);
+		}
 
-		if ((userId as string) !== req.auth.user._id)
+		if (userId !== session.user._id) {
+			console.log('Usuário não autorizado.');
 			return NextResponse.json(
 				{ message: 'Unauthorized to create report' },
 				{ status: 401 }
 			);
-
-		let textEmbeddings: number[] = [];
-		let imageEmbeddings: EmbeddedImageSchemaInterface[] = [];
-
-		try {
-			const textForEmbeddings = `Data: ${eventDate} Tipo do objeto: ${object} Descrição do objeto: ${objectDescription} Descrição do evento: ${eventDescription} Descrição do suspeito: ${suspectCharacteristics}`;
-
-			textEmbeddings = await getTextEmbeddings(textForEmbeddings);
-		} catch (error) {
-			console.error('Error creating text embeddings:', error);
-			return NextResponse.json(
-				{ message: 'Error creating text embeddings', error },
-
-				{ status: 500 }
-			);
 		}
 
-		try {
-			for (const image of images) {
-				const embeddings = await getImageEmbeddings(image.imageURL);
-				imageEmbeddings.push({ imageURL: image.imageURL, embeddings });
-			}
-		} catch (error) {
-			console.error('Error creating image embeddings:', error);
-			return NextResponse.json(
-				{ message: 'Error creating image embeddings', error },
+		console.log('Criando embeddings de texto...');
+		const textForEmbeddings = `Data: ${eventDate} Tipo do objeto: ${object} Descrição do objeto: ${objectDescription} Descrição do evento: ${eventDescription} Descrição do suspeito: ${suspectCharacteristics}`;
+		const textEmbeddings = await getTextEmbeddings(textForEmbeddings);
+		console.log('Embeddings de texto criados:', textEmbeddings);
 
-				{ status: 500 }
-			);
-		}
+		console.log('Criando embeddings de imagem...');
+		const imageEmbeddings = await Promise.all(
+			images.map(async (image) => ({
+				imageURL: image.imageURL,
+				embeddings: await getImageEmbeddings(image.imageURL),
+			}))
+		);
+		console.log('Embeddings de imagem criados:', imageEmbeddings);
 
-		try {
-			const session = await StolenItems.startSession();
+		console.log('Conectando ao MongoDB...');
+		await dbConnect();
 
-			const stolenItemRegistration =
-				await StolenItems.create<StolenItemsSchemaInterface>(
-					[
-						{
-							userId,
-							object,
-							objectDescription,
-							images: imageEmbeddings,
-							location,
-							eventDate,
-							eventDescription,
-							suspectCharacteristics,
-							embeddings: textEmbeddings,
-						},
-					],
-					{ session: session }
-				);
+		console.log('Iniciando sessão do MongoDB...');
+		const mongoSession = await StolenItems.startSession();
+		mongoSession.startTransaction();
 
-			await generateUserActivity(
+		console.log('Criando registro de item roubado...');
+		const stolenItemRegistration = await StolenItems.create(
+			[
 				{
 					userId,
-					activityType: ActivityTypeEnum.REGISTER_STOLEN_ITEM,
-					stolenItemId: stolenItemRegistration[0]._id,
+					object,
+					objectDescription,
+					images: imageEmbeddings,
+					location,
+					eventDate,
+					eventDescription,
+					suspectCharacteristics,
+					embeddings: textEmbeddings,
 				},
-				session
-			);
+			],
+			{ session: mongoSession }
+		);
+		console.log('Registro de item roubado criado:', stolenItemRegistration);
 
-			session.endSession();
+		console.log('Gerando atividade do usuário...');
+		await generateUserActivity(
+			{
+				userId,
+				activityType: ActivityTypeEnum.REGISTER_STOLEN_ITEM,
+				stolenItemId: stolenItemRegistration[0]._id,
+			},
+			mongoSession
+		);
+		console.log('Atividade do usuário gerada com sucesso.');
 
-			return NextResponse.json({
-				message: 'Report created successfully',
-			});
-		} catch (error) {
-			console.error('Error creating report:', error);
-			return NextResponse.json(
-				{ message: 'Error creating report', error },
+		console.log('Finalizando sessão do MongoDB...');
+		await mongoSession.commitTransaction();
+		mongoSession.endSession();
 
-				{ status: 500 }
-			);
-		}
+		console.log('Retornando resposta...');
+		const res = NextResponse.json({
+			message: 'Report created successfully',
+		});
+		res.headers.set('Access-Control-Allow-Origin', '*');
+		res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+		res.headers.set(
+			'Access-Control-Allow-Headers',
+			'Content-Type, Authorization'
+		);
+		return res;
+	} catch (error: unknown) {
+		console.error('Erro ao processar requisição:', error);
+		return NextResponse.json(
+			{
+				message: 'Internal server error',
+				error: error instanceof Error ? error.message : 'Unknown error',
+			},
+			{ status: 500 }
+		);
 	}
-	return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-});
+}

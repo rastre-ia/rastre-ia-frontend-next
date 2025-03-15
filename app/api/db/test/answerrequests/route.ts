@@ -1,7 +1,7 @@
 import dbConnect from '@/app/lib/mongodb';
-import { NextResponse } from 'next/server';
 import AnswerRequests from '@/app/lib/schemas/AnswerRequests';
 import PoliceStations from '@/app/lib/schemas/PoliceStations';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
 	await dbConnect();
@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
 	const policeStation = await PoliceStations.findById(policeStationId).catch(
 		(error) => {
+			console.error('Error finding police station:', error);
 			return NextResponse.json(
 				{ message: 'Police Station not found' },
 				{ status: 404 }

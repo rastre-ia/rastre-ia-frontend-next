@@ -119,6 +119,7 @@ export default function SignUp() {
 				variant: 'destructive',
 			});
 			setIsSubmitting(false);
+			console.error(error);
 		}
 	};
 

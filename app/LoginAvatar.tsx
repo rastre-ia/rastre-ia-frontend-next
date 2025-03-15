@@ -1,11 +1,11 @@
-import { FunctionComponent } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { FunctionComponent } from 'react';
 import RolesEnum from './lib/schemas/helpers/RolesEnum';
 interface LoginAvatarProps {}
 
-const LoginAvatar: FunctionComponent<LoginAvatarProps> = async () => {
+const LoginAvatar: FunctionComponent<LoginAvatarProps> = async ({}) => {
 	const session = await auth();
 
 	if (!session) {

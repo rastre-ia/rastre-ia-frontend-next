@@ -86,10 +86,8 @@ export async function getVectorSearchResults(
 	return parsedResp.results;
 }
 
-export async function getLlamaSearch(
-	query: string
-): Promise<any[]> {
-	const resp = await fetch(EMBEDDINGS_URL + '/llama-search', {
+export async function getLlamaSearch(query: string): Promise<any[]> {
+	const resp = await fetch(EMBEDDINGS_URL + '/ai-search', {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',

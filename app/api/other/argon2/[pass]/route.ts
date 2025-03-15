@@ -6,9 +6,9 @@ import { NextResponse } from 'next/server';
 // 123123 = $argon2id$v=19$m=19456,t=2,p=1$7NI8ePerwEHir1wSE4s+oA$91JLCEHp3p4XemfmSZT4YQIuuIRtwmol0hzOa1+CgJc
 export async function GET(
 	request: Request,
-	{ params }: { params: { pass: string } }
+	{ params }: { params: Promise<{ pass: string }> }
 ) {
-	const hashed = await argon2.hash(params.pass);
+	const hashed = await argon2.hash((await params).pass);
 
 	return NextResponse.json({ hashed });
 }

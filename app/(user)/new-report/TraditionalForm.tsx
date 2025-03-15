@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Upload, Camera } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Camera, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { TabsContent } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
 	Select,
 	SelectContent,
@@ -18,7 +18,16 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { TabsContent } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import L, { LatLng, latLng } from 'leaflet';
+import { CldUploadWidget } from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
+import { FunctionComponent } from 'react';
+import { RotatingLines } from 'react-loader-spinner';
+import { createNewReport } from '../../_helpers/db/reports';
+import { getUserObjectIdById } from '../../_helpers/db/users';
+import { validReportTypesTranslated } from '../../_helpers/report-type-translator';
 import {
 	ReportAssistanceNeededEnum,
 	ReportSchemaInterface,
@@ -26,15 +35,6 @@ import {
 	ReportSubmissionMethodEnum,
 	ReportTypeEnum,
 } from '../../lib/schemas/Reports';
-import { validReportTypesTranslated } from '../../_helpers/report-type-translator';
-import { getUserObjectIdById } from '../../_helpers/db/users';
-import { createNewReport } from '../../_helpers/db/reports';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { FunctionComponent } from 'react';
-import L, { LatLng, latLng } from 'leaflet';
-import { CldUploadWidget } from 'next-cloudinary';
-import { RotatingLines } from 'react-loader-spinner';
 
 function LocationPicker({
 	onLocationChange,
@@ -49,6 +49,8 @@ function LocationPicker({
 			onLocationChange(e.latlng);
 		},
 	});
+
+	console.log(map);
 
 	return <Marker position={position} icon={customIcon} />;
 }
@@ -68,7 +70,6 @@ interface TraditionalFormProps {
 const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 	userId,
 }) => {
-	const [messages, setMessages] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [reportData, setReportData] = useState({
 		title: '',
@@ -128,11 +129,12 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 				assistanceNeeded: reportData.assistanceNeeded,
 				type: reportData.type,
 				submissionMethod: reportData.submissionMethod,
-				chatHistory: messages,
+				chatHistory: [],
 				embeddings: [],
 			};
-
+			console.log('reportBody:', reportBody);
 			const res = await createNewReport(reportBody);
+
 			if (res.status === 200) {
 				console.log('Report created successfully');
 				toast({
@@ -244,9 +246,9 @@ const TraditionalForm: FunctionComponent<TraditionalFormProps> = ({
 					</Label>
 					<CldUploadWidget
 						uploadPreset="ml_default"
-						onSuccess={(result, { widget }) => {
+						onSuccess={(result) => {
 							setImageUrl(
-								// @ts-ignore
+								// @ts-expect-error - result.info is not null
 								result.info?.secure_url
 							);
 						}}

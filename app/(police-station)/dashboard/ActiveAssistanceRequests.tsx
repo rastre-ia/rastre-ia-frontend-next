@@ -28,13 +28,18 @@ export default async function ActiveAssistanceRequests() {
 		redirect('/no-permission?redirect_to=/my-profile');
 	}
 
-	const myHeaders = await headers();
+	const headersList = headers();
+	const authHeader = (await headersList).get('authorization');
+	const cookieHeader = (await headersList).get('cookie');
 
 	const resAnswerRequests = await fetch(
 		BACKEND_URL + '/db/answer-requests?id=' + user._id,
 		{
 			method: 'GET',
-			headers: myHeaders,
+			headers: {
+				authorization: authHeader || '',
+				cookie: cookieHeader || '',
+			},
 		}
 	);
 

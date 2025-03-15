@@ -1,7 +1,7 @@
 import dbConnect from '@/app/lib/mongodb';
-import { NextResponse } from 'next/server';
-import argon2 from '@node-rs/argon2';
 import PoliceStations from '@/app/lib/schemas/PoliceStations';
+import argon2 from '@node-rs/argon2';
+import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
 	const { password, email } = await req.json();
@@ -11,8 +11,6 @@ export async function POST(req: Request) {
 	}
 
 	await dbConnect();
-
-	const hashedPassword = await argon2.hash(password);
 
 	const policeStation = await PoliceStations.findOne({
 		email: email,

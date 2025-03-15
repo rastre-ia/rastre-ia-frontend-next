@@ -38,6 +38,10 @@ export async function getReports(
 			'Content-Type': 'application/json',
 		},
 	});
+	if (!resp.ok) {
+		console.error('Error: ', resp.statusText);
+	}
+
 	const parsedResp = await resp.json();
 	return parsedResp;
 }

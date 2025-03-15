@@ -1,27 +1,27 @@
 import 'leaflet/dist/leaflet.css';
 import {
-	Search,
 	BarChart3,
 	FileText,
-	LogOut,
-	Megaphone,
 	Locate,
+	LogOut,
 	PackageSearch,
+	Search,
 } from 'lucide-react';
 import Link from 'next/link';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import Overview from './Overview';
-import LlmSearch from './LlmSearch';
 import AnimatedLogo from '@/components/AnimatedLogo';
+import LlmSearch from './LlmSearch';
+import Overview from './Overview';
 
-import { Button } from '@/components/ui/button';
-import SearchReports from './SearchReports';
-import ActiveAssistanceRequests from './ActiveAssistanceRequests';
-import SearchStolenItems from './SearchStolenItems';
 import { auth, signOut } from '@/auth';
+import { Button } from '@/components/ui/button';
+import { Suspense } from 'react';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
+import ActiveAssistanceRequests from './ActiveAssistanceRequests';
+import SearchReports from './SearchReports';
+import SearchStolenItems from './SearchStolenItems';
 
 export default async function PoliceDashboard() {
 	const session = await auth();
@@ -107,7 +107,9 @@ export default async function PoliceDashboard() {
 						value="active-assistance-requests"
 						className="space-y-4"
 					>
-						<ActiveAssistanceRequests />
+						<Suspense fallback={<div>Carregando...</div>}>
+							<ActiveAssistanceRequests />
+						</Suspense>
 					</TabsContent>
 					<TabsContent value="search-reports" className="space-y-4">
 						<SearchReports />

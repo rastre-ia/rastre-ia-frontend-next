@@ -1,29 +1,22 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
-import {
-	MapContainer,
-	TileLayer,
-	Marker,
-	useMapEvents,
-	Popup,
-} from 'react-leaflet';
 import { motion } from 'framer-motion';
-import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
-	Upload,
 	ArrowLeft,
-	Camera,
-	MapPin,
-	FileText,
-	User,
 	Calendar,
+	Camera,
+	FileText,
+	MapPin,
+	Upload,
+	User,
 } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
+import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
 	Card,
 	CardContent,
@@ -31,17 +24,18 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AnimatedLogo from '@/components/AnimatedLogo';
+import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 
-import { CldUploadWidget } from 'next-cloudinary';
-import { useSession } from 'next-auth/react';
-import { redirect, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useSession } from 'next-auth/react';
+import { CldUploadWidget } from 'next-cloudinary';
+import { redirect, useRouter } from 'next/navigation';
+import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
 import { StolenItemsSchemaInterface } from '../../lib/schemas/StolenItems';
 import { EmbeddedImageSchemaInterface } from '../../lib/schemas/helpers/EmbeddedImageSchema';
-import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
 
 interface LatLng {
 	lat: number;
@@ -61,8 +55,6 @@ const customIcon = new L.Icon({
 });
 
 function LocationMarker({ position, setPosition }: LocationMarkerProps) {
-	const [address, setAddress] = useState<string | null>(null);
-
 	const map = useMapEvents({
 		locationfound(e) {
 			// Quando a localização for encontrada, define a posição do marcador
@@ -81,39 +73,6 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 	};
 
 	// Função para buscar o endereço com base na latitude e longitude
-	const fetchAddress = async (lat: number, lng: number) => {
-		try {
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-			);
-			const data = await response.json();
-
-			const addressComponents = [
-				data.address.road, // Nome da rua
-				data.address.neighbourhood, // Bairro
-				data.address.city, // Cidade
-				data.address.state, // Estado
-				data.address.postcode, // CEP
-			];
-
-			// Filtra valores vazios e monta o endereço
-			const filteredAddress = addressComponents
-				.filter(Boolean)
-				.join(', ');
-
-			setAddress(filteredAddress);
-		} catch (error) {
-			console.error('Erro ao buscar endereço:', error);
-			setAddress('Endereço não encontrado');
-		}
-	};
-
-	// Sempre que a posição mudar, atualizamos o endereço
-	useEffect(() => {
-		if (position) {
-			fetchAddress(position.lat, position.lng);
-		}
-	}, [position]);
 
 	return position === null ? null : (
 		<Marker
@@ -123,13 +82,7 @@ function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 			eventHandlers={{
 				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
 			}}
-		>
-			<Popup  className="leaflet-popup">
-				<p>Latitude: {position.lat}</p>
-				<p>Longitude: {position.lng}</p>
-				<p>Endereço: {address ? address : 'Carregando...'}</p>
-			</Popup>
-		</Marker>
+		></Marker>
 	);
 }
 
@@ -273,11 +226,11 @@ export default function RegisterItem() {
 							</Label>
 							<CldUploadWidget
 								uploadPreset="ml_default"
-								onSuccess={(result, { widget }) => {
-									// @ts-ignore
+								onSuccess={(result) => {
+									//@ts-expect-error - result.info is not null
 									setImageUrl(result.info?.secure_url);
 								}}
-								onQueuesEnd={(result, { widget }) => {
+								onQueuesEnd={(_, { widget }) => {
 									widget.close();
 								}}
 							>
@@ -333,12 +286,8 @@ export default function RegisterItem() {
 											width: '100%',
 										}}
 									>
-										<TileLayer
-											url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-											attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-										/>
+										<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 										<LocationMarker
-											
 											position={position}
 											setPosition={setPosition}
 										/>

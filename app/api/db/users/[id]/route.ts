@@ -1,17 +1,16 @@
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
 	request: NextRequest,
-	context: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
-	return auth(async () => {
+	return auth(async (req) => {
 		const params = await context.params;
 
-		// @ts-ignore
-		if (request.auth) {
+		if (req.auth) {
 			await dbConnect();
 
 			try {
@@ -30,5 +29,5 @@ export async function GET(
 			{ message: 'Not authenticated' },
 			{ status: 401 }
 		);
-	})(request, context) as any;
+	})(request, (await context.params) as any);
 }
