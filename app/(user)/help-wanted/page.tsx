@@ -1,7 +1,5 @@
 'use server';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
@@ -10,24 +8,24 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
+	CardFooter,
 	CardHeader,
 	CardTitle,
-	CardFooter,
 } from '@/components/ui/card';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import AnimatedLogo from '@/components/AnimatedLogo';
-import HelpWantedRequest from './HelpWantedRequest';
-import { auth } from '@/auth';
-import getXpStats from '@/app/_helpers/experience-calculator';
-import { redirect } from 'next/navigation';
 import BACKEND_URL from '@/app/_helpers/backend-path';
-import { headers } from 'next/headers';
-import { UsersSchema } from '@/app/lib/schemas/Users';
+import getXpStats from '@/app/_helpers/experience-calculator';
 import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
 import { AnswersSchemaInterface } from '@/app/lib/schemas/Answers';
+import { UsersSchema } from '@/app/lib/schemas/Users';
+import { auth } from '@/auth';
+import AnimatedLogo from '@/components/AnimatedLogo';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import HelpWantedRequest from './HelpWantedRequest';
 
 const expertise = ['Testemunha', 'Conhecimento Local'];
 
@@ -115,7 +113,6 @@ export default async function HelpWanted() {
 							<div className="space-y-4">
 								{myAnswerRequests.answerRequests.map(
 									(request) => (
-										// @ts-ignore
 										<HelpWantedRequest
 											userId={user._id}
 											request={request} //teste

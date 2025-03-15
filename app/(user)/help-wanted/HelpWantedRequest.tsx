@@ -1,34 +1,32 @@
 'use server';
 
-import { FunctionComponent } from 'react';
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-	DialogClose,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import answerRequestPriorityTranslator from '@/app/_helpers/answer-request-priority-translator';
+import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
+import { createNewAnswer } from '@/app/_helpers/db/answer';
+import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
+import { AnswerRequestPriorityEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardFooter,
 } from '@/components/ui/card';
-import { MessageSquare, MapPin, Star, ThumbsUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { AnswerRequestSchemaInterface } from '@/app/lib/schemas/AnswerRequests';
-import { AnswerRequestPriorityEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
-import answerRequestPriorityTranslator from '@/app/_helpers/answer-request-priority-translator';
-import { createNewAnswer } from '@/app/_helpers/db/answer';
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { MapPin, MessageSquare, Star, ThumbsUp } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
 
 interface HelpWantedRequestProps {
 	request: AnswerRequestSchemaInterface;
@@ -127,7 +125,7 @@ const HelpWantedRequest = async ({
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>
-									Responder à "{request.title}""
+									Responder à &quot;{request.title}&quot;
 								</DialogTitle>
 								<DialogDescription>
 									Suas informações são cruciais para esta

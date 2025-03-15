@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Shield } from 'lucide-react';
-import { redirect, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { redirect, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-export default function PoliceLogin({}: {}) {
+export default function PoliceLogin() {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);

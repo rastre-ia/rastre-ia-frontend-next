@@ -1,11 +1,11 @@
 import dbConnect from '@/app/lib/mongodb';
-import { NextResponse } from 'next/server';
-import UserActivities, {
-	ActivityTypeEnum,
-} from '@/app/lib/schemas/UserActivities';
 import AnswerRequests from '@/app/lib/schemas/AnswerRequests';
 import Reports from '@/app/lib/schemas/Reports';
 import StolenItems from '@/app/lib/schemas/StolenItems';
+import UserActivities, {
+	ActivityTypeEnum,
+} from '@/app/lib/schemas/UserActivities';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
 	await dbConnect();
@@ -61,6 +61,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ newUserActivities, success: true });
 	} catch (error) {
+		console.error('Error creating User Activity:', error);
 		return NextResponse.json(
 			{ message: 'Error creating Police Station' },
 			{ status: 500 }

@@ -1,5 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-import RolesEnum from './helpers/RolesEnum';
 
 export interface AnswersSchemaInterface {
 	_id?: string;

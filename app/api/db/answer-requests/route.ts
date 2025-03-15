@@ -1,10 +1,10 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { auth } from '@/auth';
+import dbConnect from '@/app/lib/mongodb';
 import AnswerRequests, {
 	AnswerRequestSchemaInterface,
 } from '@/app/lib/schemas/AnswerRequests';
-import dbConnect from '@/app/lib/mongodb';
 import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
+import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
 	const session = await auth();
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
 	try {
 		await dbConnect();
 
-		let response: {
+		const response: {
 			answerRequests: AnswerRequestSchemaInterface[];
 			total: number;
 		} = {

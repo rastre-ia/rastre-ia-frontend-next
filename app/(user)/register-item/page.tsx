@@ -1,29 +1,22 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
-import {
-	MapContainer,
-	TileLayer,
-	Marker,
-	useMapEvents,
-	Popup,
-} from 'react-leaflet';
 import { motion } from 'framer-motion';
-import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
-	Upload,
 	ArrowLeft,
-	Camera,
-	MapPin,
-	FileText,
-	User,
 	Calendar,
+	Camera,
+	FileText,
+	MapPin,
+	Upload,
+	User,
 } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
+import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
 	Card,
 	CardContent,
@@ -31,17 +24,18 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AnimatedLogo from '@/components/AnimatedLogo';
+import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 
-import { CldUploadWidget } from 'next-cloudinary';
-import { useSession } from 'next-auth/react';
-import { redirect, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useSession } from 'next-auth/react';
+import { CldUploadWidget } from 'next-cloudinary';
+import { redirect, useRouter } from 'next/navigation';
+import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
 import { StolenItemsSchemaInterface } from '../../lib/schemas/StolenItems';
 import { EmbeddedImageSchemaInterface } from '../../lib/schemas/helpers/EmbeddedImageSchema';
-import { registerNewStolenItem } from '../../_helpers/db/stolen-items';
 
 interface LatLng {
 	lat: number;
@@ -61,8 +55,6 @@ const customIcon = new L.Icon({
 });
 
 function LocationMarker({ position, setPosition }: LocationMarkerProps) {
-	const [address, setAddress] = useState<string | null>(null);
-
 	const map = useMapEvents({
 		locationfound(e) {
 			// Quando a localização for encontrada, define a posição do marcador
@@ -234,11 +226,11 @@ export default function RegisterItem() {
 							</Label>
 							<CldUploadWidget
 								uploadPreset="ml_default"
-								onSuccess={(result, { widget }) => {
-									// @ts-ignore
+								onSuccess={(result) => {
+									//@ts-expect-error - result.info is not null
 									setImageUrl(result.info?.secure_url);
 								}}
-								onQueuesEnd={(result, { widget }) => {
+								onQueuesEnd={(_, { widget }) => {
 									widget.close();
 								}}
 							>

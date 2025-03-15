@@ -1,7 +1,6 @@
 import { auth } from '@/auth';
-import Link from 'next/link';
-import RolesEnum from '../lib/schemas/helpers/RolesEnum';
 import { redirect } from 'next/navigation';
+import RolesEnum from '../lib/schemas/helpers/RolesEnum';
 
 export default async function UserLayout({
 	children,

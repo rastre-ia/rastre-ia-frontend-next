@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
-import { ArrowLeft, MessageSquare, FileText } from 'lucide-react';
-import Link from 'next/link';
 import 'leaflet/dist/leaflet.css';
+import { ArrowLeft, FileText, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 
+import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -12,13 +12,12 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AnimatedLogo from '@/components/AnimatedLogo';
 
 import { redirect } from 'next/navigation';
 
-import TraditionalForm from './TraditionalForm';
-import AiChat from './AiChat';
 import { auth } from '@/auth';
+import AiChat from './AiChat';
+import TraditionalForm from './TraditionalForm';
 
 export default async function ReportPage() {
 	const session = await auth();

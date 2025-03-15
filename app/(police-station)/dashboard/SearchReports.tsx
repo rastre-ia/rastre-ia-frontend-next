@@ -1,30 +1,39 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
-	Search,
-	Filter,
 	AlertTriangle,
 	Car,
-	Volume2,
-	Siren,
-	Package2,
-	HelpCircle,
-	ChevronRight,
 	ChevronLeft,
+	ChevronRight,
+	HelpCircle,
+	Package2,
+	Search,
+	Siren,
+	Volume2,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+import { getReports } from '@/app/_helpers/db/reports';
+import reportStatusTranslator from '@/app/_helpers/report-status-translator';
+import {
+	ReportAssistanceNeededEnum,
+	ReportSchemaInterface,
+	ReportStatusEnum,
+	ReportTypeEnum,
+} from '@/app/lib/schemas/Reports';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
 	Card,
 	CardContent,
 	CardDescription,
+	CardFooter,
 	CardHeader,
 	CardTitle,
-	CardFooter,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Select,
 	SelectContent,
@@ -32,28 +41,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Pagination } from '@/components/ui/pagination';
-import {
-	ReportAssistanceNeededEnum,
-	ReportSchemaInterface,
-	ReportStatusEnum,
-	ReportTypeEnum,
-} from '@/app/lib/schemas/Reports';
-import { getReports } from '@/app/_helpers/db/reports';
 import { format } from 'date-fns';
-import reportStatusTranslator from '@/app/_helpers/report-status-translator';
 
+import reportTypeTranslator from '@/app/_helpers/report-type-translator';
+import { AnswerRequestEventTypeEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
+import RequestAssistDialog from '@/components/RequestAssistDialog';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import reportTypeTranslator from '@/app/_helpers/report-type-translator';
-import RequestAssistDialog from '@/components/RequestAssistDialog';
-import { AnswerRequestEventTypeEnum } from '@/app/lib/schemas/helpers/AnswerRequestsEnums';
 
 const iconesTipoRelato = {
 	[ReportTypeEnum.STRANGE_ACTIVITY]: AlertTriangle,
@@ -91,7 +89,7 @@ export default function BuscarRelatos() {
 	const [statusFilter, setStatusFilter] = useState<ReportStatusEnum | null>(
 		null
 	);
-	const [typeFilter, setTypeFilter] = useState<ReportTypeEnum | null>(null);
+	const [typeFilter] = useState<ReportTypeEnum | null>(null);
 
 	const [busca, setBusca] = useState('');
 	const [carregando, setCarregando] = useState(false);

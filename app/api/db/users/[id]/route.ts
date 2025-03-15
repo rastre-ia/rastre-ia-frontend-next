@@ -1,16 +1,15 @@
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
 	request: NextRequest,
 	context: { params: Promise<{ id: string }> }
 ) {
-	return auth(async (req, ctx) => {
+	return auth(async (req) => {
 		const params = await context.params;
 
-		// @ts-ignore
 		if (req.auth) {
 			await dbConnect();
 

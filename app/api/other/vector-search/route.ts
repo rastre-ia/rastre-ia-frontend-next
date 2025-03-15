@@ -1,18 +1,9 @@
-import { NextResponse, NextRequest } from 'next/server';
-import Reports, {
-	ReportAssistanceNeededEnum,
-	ReportSchemaInterface,
-	ReportStatusEnum,
-} from '@/app/lib/schemas/Reports';
-import { auth } from '@/auth';
-import generateUserActivity from '@/app/lib/generate-user-activity';
-import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
-import dbConnect from '@/app/lib/mongodb';
-import RolesEnum from '@/app/lib/schemas/helpers/RolesEnum';
 import {
 	getTextEmbeddings,
 	getVectorSearchResults,
 } from '@/app/lib/embeddings-api';
+import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
 	const session = await auth();

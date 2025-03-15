@@ -1,7 +1,7 @@
 import dbConnect from '@/app/lib/mongodb';
-import { NextResponse } from 'next/server';
-import argon2 from '@node-rs/argon2';
 import PoliceStations from '@/app/lib/schemas/PoliceStations';
+import argon2 from '@node-rs/argon2';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
 	await dbConnect();
@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ newPoliceStation, success: true });
 	} catch (error) {
+		console.error('Error creating Police Station:', error);
 		return NextResponse.json(
 			{ message: 'Error creating Police Station' },
 			{ status: 500 }

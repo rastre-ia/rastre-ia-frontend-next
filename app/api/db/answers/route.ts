@@ -1,12 +1,12 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { auth } from '@/auth';
+import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
 import dbConnect from '@/app/lib/mongodb';
-import Answers, { AnswersSchemaInterface } from '@/app/lib/schemas/Answers';
-import Users from '@/app/lib/schemas/Users';
 import AnswerRequests, {
 	AnswerRequestSchemaInterface,
 } from '@/app/lib/schemas/AnswerRequests';
-import calculateAnswerExperience from '@/app/_helpers/calculate-answer-experience';
+import Answers, { AnswersSchemaInterface } from '@/app/lib/schemas/Answers';
+import Users from '@/app/lib/schemas/Users';
+import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 async function increaseXP(userId: string, requestId: string) {
 	const requestBeingAnswered =
@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
 				answers.answerRequestId as string
 			);
 		} catch (error) {
+			console.error('Error increasing XP:', error);
+
 			return NextResponse.json(
 				{ message: 'Invalid answerRequestId' },
 				{ status: 400 }

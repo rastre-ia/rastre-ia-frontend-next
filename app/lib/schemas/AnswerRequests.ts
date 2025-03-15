@@ -1,10 +1,10 @@
-import mongoose, { Schema, model, Document } from 'mongoose'; // Explicitly import `Document` for type safety
-import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
+import mongoose, { Schema } from 'mongoose'; // Explicitly import `Document` for type safety
 import {
 	AnswerRequestEventTypeEnum,
 	AnswerRequestPriorityEnum,
 	AnswerRequestStatusEnum,
 } from './helpers/AnswerRequestsEnums';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 
 export interface AnswerRequestSchemaInterface {
 	_id?: Schema.Types.ObjectId | string;

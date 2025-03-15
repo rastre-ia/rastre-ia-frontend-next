@@ -1,10 +1,9 @@
+import { cepLookup } from '@/app/_helpers/brasil-api';
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 import argon2 from '@node-rs/argon2';
-import { cepLookup } from '@/app/_helpers/brasil-api';
-import { auth } from '@/auth';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
 	const token = await getToken({ req, secret: process.env.JWT_SECRET });
@@ -14,7 +13,7 @@ export async function GET(req: NextRequest) {
 	await dbConnect();
 
 	const queryResult: {
-		users: any[];
+		users: unknown[];
 		total: number;
 	} = {
 		users: [],
@@ -107,6 +106,7 @@ export async function POST(req: NextRequest) {
 
 		return NextResponse.json({ newUser, success: true });
 	} catch (error) {
+		console.error('Error creating user:', error);
 		return NextResponse.json(
 			{ message: 'Error creating user' },
 			{ status: 500 }

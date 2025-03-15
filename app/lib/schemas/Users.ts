@@ -11,7 +11,7 @@ export interface UsersSchema {
 	role: RolesEnum;
 
 	cep: string;
-	location: any;
+	location: unknown;
 
 	experience: number;
 

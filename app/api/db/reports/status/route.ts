@@ -1,8 +1,5 @@
 import dbConnect from '@/app/lib/mongodb';
-import Reports, {
-	ReportSchemaInterface,
-	ReportStatusEnum,
-} from '@/app/lib/schemas/Reports';
+import Reports from '@/app/lib/schemas/Reports';
 import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 

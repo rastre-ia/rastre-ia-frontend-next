@@ -1,20 +1,22 @@
 'use client';
 
-import { FunctionComponent, useState } from 'react';
-import { Send, Upload } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
+import { chat } from '@/app/_helpers/chat/chat';
+import { MessageInterface } from '@/app/_helpers/types/ChatTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import 'leaflet/dist/leaflet.css';
+import { Send, Upload } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-import { MessageInterface } from '@/app/_helpers/types/ChatTypes';
+import { FunctionComponent, useState } from 'react';
 import { Comment, RotatingLines } from 'react-loader-spinner';
-import { chat } from '@/app/_helpers/chat/chat';
-import { getPromptByType, PromptTypeEnum } from '@/app/_helpers/chat/prompts';
-import 'leaflet/dist/leaflet.css';
 
-import ReactMarkdown from 'react-markdown';
+import { createNewReport } from '@/app/_helpers/db/reports';
+import {
+	ChatSchemaInterface,
+	MessageTypeEnum,
+} from '@/app/lib/schemas/helpers/ChatSchema';
 import {
 	ReportAssistanceNeededEnum,
 	ReportSchemaInterface,
@@ -23,15 +25,10 @@ import {
 	ReportTypeEnum,
 } from '@/app/lib/schemas/Reports';
 import { toast } from '@/hooks/use-toast';
-import { createNewReport } from '@/app/_helpers/db/reports';
-import { useRouter } from 'next/navigation';
-import {
-	ChatSchemaInterface,
-	MessageTypeEnum,
-} from '@/app/lib/schemas/helpers/ChatSchema';
-import { getUserObjectIdById } from '@/app/_helpers/db/users';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L, { LatLng, latLng } from 'leaflet';
+import { useRouter } from 'next/navigation';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import ReactMarkdown from 'react-markdown';
 
 const defaultAssistantMessage: MessageInterface = {
 	role: 'assistant',
@@ -61,6 +58,8 @@ function LocationPicker({
 		},
 	});
 
+	console.log(map);
+
 	return <Marker position={position} icon={customIcon} />;
 }
 
@@ -81,9 +80,7 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 	const [input, setInput] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [isMapOpen, setIsMapOpen] = useState(false);
-	const [userLocation, setUserLocation] = useState<LatLng>(
-		latLng(-24.724443, -53.740623)
-	);
+	const [userLocation] = useState<LatLng>(latLng(-24.724443, -53.740623));
 
 	const router = useRouter();
 

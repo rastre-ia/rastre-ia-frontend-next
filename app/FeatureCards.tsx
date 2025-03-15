@@ -1,7 +1,7 @@
 'use client';
 
-import React, { FunctionComponent, useEffect, useRef } from 'react';
 import { motion, useAnimation, useInView } from 'framer-motion';
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 
 import {
 	Card,
@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/card';
 
 import {
-	Shield,
-	Search,
-	FileText,
-	MessageSquare,
-	HelpCircle,
 	Award,
+	FileText,
+	HelpCircle,
+	MessageSquare,
+	Search,
+	Shield,
 } from 'lucide-react';
 
 interface FeatureCardProps {
@@ -39,7 +39,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 		if (isInView) {
 			mainControls.start('visible');
 		}
-	}, [isInView]);
+	}, [isInView, mainControls]);
 
 	return (
 		<motion.div
@@ -69,7 +69,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 
 interface FeatureCardsProps {}
 
-const FeatureCards: FunctionComponent<FeatureCardsProps> = () => {
+const FeatureCards: FunctionComponent<FeatureCardsProps> = ({}) => {
 	return (
 		<>
 			<FeatureCard

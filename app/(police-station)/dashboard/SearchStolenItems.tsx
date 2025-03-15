@@ -1,19 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-	Search,
-	Filter,
-	ChevronDown,
-	ChevronUp,
-	MapPin,
-	ChevronLeft,
-	ChevronRight,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
 	Card,
 	CardContent,
@@ -22,6 +14,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
 	Select,
 	SelectContent,
@@ -29,10 +23,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Pagination } from '@/components/ui/pagination';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface StolenItem {
 	id: number;
@@ -46,8 +36,7 @@ interface StolenItem {
 
 // Função simulada para buscar itens roubados
 const fetchStolenItems = async (
-	page: number,
-	filter: string
+	page: number
 ): Promise<{ items: StolenItem[]; totalPages: number }> => {
 	await new Promise((resolve) => setTimeout(resolve, 500));
 	return {
@@ -84,10 +73,7 @@ export default function SearchStolenItems() {
 
 	const loadItems = async () => {
 		setIsLoading(true);
-		const { items, totalPages } = await fetchStolenItems(
-			currentPage,
-			filter
-		);
+		const { items, totalPages } = await fetchStolenItems(currentPage);
 		setItems(items);
 		setTotalPages(totalPages);
 		setIsLoading(false);
