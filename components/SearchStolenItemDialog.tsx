@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L, { LatLng } from 'leaflet';
 import { useEffect, useState } from 'react';
-import 'leaflet/dist/leaflet.css'; // Importe o CSS do Leaflet
+import 'leaflet/dist/leaflet.css';
 import BACKEND_URL from '@/app/_helpers/backend-path';
 import { set } from 'mongoose';
 

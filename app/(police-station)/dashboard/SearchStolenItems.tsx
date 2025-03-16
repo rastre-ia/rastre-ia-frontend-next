@@ -101,7 +101,6 @@ export default function SearchStolenItems() {
 
 			const addressUpdates: Record<CoordinateKey, AddressState> = {};
 
-			// Primeiro marcamos todas como carregando
 			response.stolenItems.forEach((item) => {
 				const coords = item.location?.coordinates;
 				if (coords && coords.length >= 2) {
@@ -112,7 +111,6 @@ export default function SearchStolenItems() {
 			});
 			setAddresses((prev) => ({ ...prev, ...addressUpdates }));
 
-			// Processamento com retry
 			await Promise.all(
 				response.stolenItems.map(async (item) => {
 					const coords = item.location?.coordinates;
@@ -166,7 +164,7 @@ export default function SearchStolenItems() {
 	};
 
 	const handleFilterChange = (value: string) => {
-		if (value === 'todos') {
+		if (value === 'all') {
 			setFilter(null);
 		} else {
 			setFilter(value as StolenItemsStatusEnum);

@@ -7,6 +7,7 @@ import {
 	Megaphone,
 	Locate,
 	PackageSearch,
+	MapPinned,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import SearchReports from './SearchReports';
 import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchStolenItems from './SearchStolenItems';
+import PanoramaStolenItem from './PanoramaStolenItem';
 import { auth, signOut } from '@/auth';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
 import { Suspense } from 'react';
@@ -94,6 +96,10 @@ export default async function PoliceDashboard() {
 							<PackageSearch className="h-4 w-4 mr-2" />
 							Buscar itens roubados
 						</TabsTrigger>
+						<TabsTrigger value="panorama-stolen-items">
+							<MapPinned className="h-4 w-4 mr-2" />
+							Panorama
+						</TabsTrigger>
 					</TabsList>
 
 					<TabsContent value="overview" className="space-y-4">
@@ -121,6 +127,12 @@ export default async function PoliceDashboard() {
 						className="space-y-4"
 					>
 						<SearchStolenItems />
+					</TabsContent>
+					<TabsContent
+						value="panorama-stolen-items"
+						className="space-y-4"
+					>
+						<PanoramaStolenItem />
 					</TabsContent>
 				</Tabs>
 			</div>
