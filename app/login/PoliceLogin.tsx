@@ -3,10 +3,10 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Shield } from 'lucide-react';
+import { Eye, EyeOff, Loader, Shield } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 export default function PoliceLogin() {
 	const [email, setEmail] = useState<string>('');
@@ -15,6 +15,7 @@ export default function PoliceLogin() {
 	const searchParams = useSearchParams();
 	const searchParamError = searchParams.get('error');
 	const searchParamRedirectTo = searchParams.get('redirect_to');
+	let [isPending, startTransition] = useTransition();
 
 	const [error, setError] = useState<string>(
 		searchParamError
@@ -23,19 +24,38 @@ export default function PoliceLogin() {
 	);
 
 	const credentialsAction = async () => {
-		const loginResult = await signIn('police_credentials', {
-			password: password,
-			email: email,
-			redirect: false,
-		});
+		startTransition(async () => {
+			const loginResult = await signIn('police_credentials', {
+				password: password,
+				email: email,
+				redirect: false,
+			});
 
-		if (loginResult?.error) {
-			setError('Credenciais inválidas. Por favor, tente novamente.');
-		} else {
-			redirect(
-				searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
-			); // Navigate to the new post page
-		}
+			if (loginResult?.error) {
+				console.error('Error logging in:', loginResult);
+
+				switch (loginResult.code) {
+					case 'CredentialsSignin':
+						setError(
+							'Credenciais inválidas. Por favor, tente novamente.'
+						);
+						break;
+					case 'EmailVerification':
+						setError(
+							'Email não verificado. Por favor, verifique seu email.'
+						);
+						break;
+
+					default:
+						setError('Erro ao entrar. Por favor, tente novamente.');
+						break;
+				}
+			} else if (loginResult?.ok) {
+				redirect(
+					searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
+				); // Navigate to the new post page
+			}
+		});
 	};
 
 	return (
@@ -88,9 +108,18 @@ export default function PoliceLogin() {
 					</div>
 				</div>
 			</div>
-			<Button type="submit" className="w-full mt-6">
-				<Shield className="mr-2 h-4 w-4" />
-				Entrar como Policial
+			<Button type="submit" className="w-full mt-6" disabled={isPending}>
+				{isPending ? (
+					<>
+						<Loader className="mr-2 h-4 w-4" />
+						Entrando...
+					</>
+				) : (
+					<>
+						<Shield className="mr-2 h-4 w-4" />
+						Entrar como Policial
+					</>
+				)}
 			</Button>
 		</form>
 	);

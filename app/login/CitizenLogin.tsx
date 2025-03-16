@@ -4,10 +4,10 @@ import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, User } from 'lucide-react';
+import { Eye, EyeOff, Loader, User } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 export default function CitizenLogin() {
 	const [cpf, setCpf] = useState<string>('');
@@ -16,6 +16,7 @@ export default function CitizenLogin() {
 	const searchParams = useSearchParams();
 	const searchParamError = searchParams.get('error');
 	const searchParamRedirectTo = searchParams.get('redirect_to');
+	let [isPending, startTransition] = useTransition();
 
 	const [error, setError] = useState<string>(
 		searchParamError
@@ -34,19 +35,38 @@ export default function CitizenLogin() {
 		// Remove all non-numeric characters
 		const cleanedCpf = cpf.replace(/\D/g, '');
 
-		const loginResult = await signIn('cpf_credentials', {
-			password: password,
-			cpf: cleanedCpf,
-			redirect: false,
-		});
+		startTransition(async () => {
+			const loginResult = await signIn('cpf_credentials', {
+				password: password,
+				cpf: cleanedCpf,
+				redirect: false,
+			});
 
-		if (loginResult?.error) {
-			setError('Credenciais inválidas. Por favor, tente novamente.');
-		} else {
-			redirect(
-				searchParamRedirectTo ? searchParamRedirectTo : '/my-profile'
-			); // Navigate to the new post page
-		}
+			if (loginResult?.error) {
+				console.error('Error logging in:', loginResult);
+
+				switch (loginResult.code) {
+					case 'CredentialsSignin':
+						setError(
+							'Credenciais inválidas. Por favor, tente novamente.'
+						);
+						break;
+					case 'EmailVerification':
+						setError(
+							'Email não verificado. Por favor, verifique seu email.'
+						);
+						break;
+
+					default:
+						setError('Erro ao entrar. Por favor, tente novamente.');
+						break;
+				}
+			} else if (loginResult?.ok) {
+				redirect(
+					searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
+				); // Navigate to the new post page
+			}
+		});
 	};
 
 	const handleCpfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,19 +125,18 @@ export default function CitizenLogin() {
 					</div>
 				</div>
 			</div>
-			<Button
-				type="submit"
-				className="w-full mt-6"
-				// disabled={isSubmitting}
-			>
-				{/* {isSubmitting ? (
-					<>Carregando...</>
-				) : ( */}
-				<>
-					<User className="mr-2 h-4 w-4" />
-					Entrar como Cidadão
-				</>
-				{/* )} */}
+			<Button type="submit" className="w-full mt-6" disabled={isPending}>
+				{isPending ? (
+					<>
+						<Loader className="mr-2 h-4 w-4" />
+						Entrando...
+					</>
+				) : (
+					<>
+						<User className="mr-2 h-4 w-4" />
+						Entrar como Cidadão
+					</>
+				)}
 			</Button>
 		</form>
 	);
