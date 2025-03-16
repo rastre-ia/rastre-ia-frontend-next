@@ -33,64 +33,131 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Pagination } from '@/components/ui/pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getStolenItems } from '@/app/_helpers/db/stolen-items';
+import {
+	StolenItemsStatusEnum,
+	StolenItemsSchemaInterface,
+} from '@/app/lib/schemas/StolenItems';
 
-interface StolenItem {
-	id: number;
-	name: string;
-	description: string;
-	status: 'Ativo' | 'Recuperado' | 'Fechado';
-	location: string;
-	date: string;
-	image: string;
+import SearchStolenItemDialog from '@/components/SearchStolenItemDialog';
+
+interface Address {
+	city?: string;
+	state?: string;
+	error?: boolean;
 }
+type AddressState = {
+	address?: Address;
+	loading: boolean;
+	error?: boolean;
+};
+type CoordinateKey = `${number},${number}`;
 
-// Função simulada para buscar itens roubados
-const fetchStolenItems = async (
-	page: number,
-	filter: string
-): Promise<{ items: StolenItem[]; totalPages: number }> => {
-	await new Promise((resolve) => setTimeout(resolve, 500));
-	return {
-		items: Array(12)
-			.fill(null)
-			.map((_, i) => ({
-				id: i + 1 + (page - 1) * 10,
-				name: `Item ${i + 1 + (page - 1) * 10}`,
-				description: `Descrição do Item ${i + 1 + (page - 1) * 10}`,
-				status: ['Ativo', 'Recuperado', 'Fechado'][
-					Math.floor(Math.random() * 3)
-				] as StolenItem['status'],
-				location: `Cidade ${Math.floor(Math.random() * 10) + 1}`,
-				date: new Date(
-					Date.now() - Math.floor(Math.random() * 10000000000)
-				).toLocaleDateString('pt-BR'),
-				image: `/placeholder.svg?height=100&width=100`,
-			})),
-		totalPages: 10,
-	};
+const fetchAddress = async (
+	latitude: number,
+	longitude: number
+): Promise<Address> => {
+	try {
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+		const response = await fetch(
+			`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`
+		);
+		const data = await response.json();
+
+		return {
+			city: data.address.city,
+			state: data.address.state,
+		};
+	} catch (error) {
+		return {};
+	}
 };
 
 export default function SearchStolenItems() {
-	const [items, setItems] = useState<StolenItem[]>([]);
+	const [items, setItems] = useState<StolenItemsSchemaInterface[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
-	const [filter, setFilter] = useState('all');
+	const [filter, setFilter] = useState<StolenItemsStatusEnum | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-
+	const [perPage] = useState(12);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [selectedItem, setSelectedItem] =
+		useState<StolenItemsSchemaInterface | null>(null);
+	const [addresses, setAddresses] = useState<
+		Record<CoordinateKey, AddressState>
+	>({});
 	useEffect(() => {
 		loadItems();
 	}, [currentPage, filter]);
 
 	const loadItems = async () => {
 		setIsLoading(true);
-		const { items, totalPages } = await fetchStolenItems(
-			currentPage,
-			filter
-		);
-		setItems(items);
-		setTotalPages(totalPages);
-		setIsLoading(false);
+
+		try {
+			const response = await getStolenItems(perPage, currentPage, filter);
+			setItems(response.stolenItems);
+			setTotalPages(response.pageCount);
+
+			const addressUpdates: Record<CoordinateKey, AddressState> = {};
+
+			// Primeiro marcamos todas como carregando
+			response.stolenItems.forEach((item) => {
+				const coords = item.location?.coordinates;
+				if (coords && coords.length >= 2) {
+					const [longitude, latitude] = coords;
+					const key: CoordinateKey = `${latitude},${longitude}`;
+					addressUpdates[key] = { loading: true };
+				}
+			});
+			setAddresses((prev) => ({ ...prev, ...addressUpdates }));
+
+			// Processamento com retry
+			await Promise.all(
+				response.stolenItems.map(async (item) => {
+					const coords = item.location?.coordinates;
+					if (!coords || coords.length < 2) return;
+
+					const [longitude, latitude] = coords;
+					const key: CoordinateKey = `${latitude},${longitude}`;
+					let finalAddress: Address = {};
+
+					for (let attempt = 1; attempt <= 3; attempt++) {
+						try {
+							await new Promise((resolve) =>
+								setTimeout(resolve, 1000 * attempt)
+							);
+							const address = await fetchAddress(
+								latitude,
+								longitude
+							);
+							finalAddress = address;
+							break;
+						} catch (error) {
+							if (attempt === 3) {
+								console.error(
+									`Falha após 3 tentativas para ${key}`
+								);
+								finalAddress = { error: true };
+							}
+						}
+					}
+
+					setAddresses((prev) => ({
+						...prev,
+						[key]: {
+							address: finalAddress,
+							loading: false,
+							error: finalAddress.error,
+						},
+					}));
+				})
+			);
+		} catch (error) {
+			console.error('Erro ao carregar itens:', error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleSearch = () => {
@@ -99,8 +166,21 @@ export default function SearchStolenItems() {
 	};
 
 	const handleFilterChange = (value: string) => {
-		setFilter(value);
+		if (value === 'todos') {
+			setFilter(null);
+		} else {
+			setFilter(value as StolenItemsStatusEnum);
+		}
 		setCurrentPage(1);
+	};
+	const openDialog = (item: StolenItemsSchemaInterface) => {
+		setSelectedItem(item);
+		setIsDialogOpen(true);
+	};
+
+	const closeDialog = () => {
+		setIsDialogOpen(false);
+		setSelectedItem(null);
 	};
 
 	return (
@@ -135,7 +215,7 @@ export default function SearchStolenItems() {
 							</Button>
 						</div>
 						<Select
-							value={filter}
+							value={filter?.toString() || 'todos'}
 							onValueChange={handleFilterChange}
 						>
 							<SelectTrigger>
@@ -163,26 +243,38 @@ export default function SearchStolenItems() {
 				className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
 			>
 				{items.map((item) => (
-					<Card key={item.id}>
+					<Card key={item._id?.toString()}>
 						<CardHeader>
-							<CardTitle>{item.name}</CardTitle>
+							<CardTitle>{item.object}</CardTitle>
 							<CardDescription>
-								Reportado em {item.date}
+								Reportado em{' '}
+								{item.createdAt
+									? new Date(
+											item.createdAt
+									  ).toLocaleDateString()
+									: ''}
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<img
-								src={item.image}
-								alt={item.name}
+								src={
+									item.images?.[0]?.imageURL ||
+									'https://www.whatnot.co.za/wp-content/uploads/2020/05/block-out-lining-white-1.jpg'
+								}
 								className="w-full h-32 object-cover mb-4 rounded-md"
 							/>
-							<p>{item.description}</p>
+							<p>{item.objectDescription}</p>
 							<div className="flex items-center mt-2 space-x-2">
 								<Badge
 									variant={
-										item.status === 'Ativo'
+										item.status ===
+										StolenItemsStatusEnum.PENDING
 											? 'default'
-											: item.status === 'Recuperado'
+											: item.status ===
+											  StolenItemsStatusEnum.SOLVED_NOT_RECUPERATED
+											? 'destructive'
+											: item.status ===
+											  StolenItemsStatusEnum.SOLVED_RECUPERATED
 											? 'secondary'
 											: 'outline'
 									}
@@ -191,12 +283,44 @@ export default function SearchStolenItems() {
 								</Badge>
 								<Badge variant="outline">
 									<MapPin className="h-4 w-4 mr-1" />
-									{item.location}
+									{item.location?.coordinates
+										? (() => {
+												const key =
+													`${item.location.coordinates[1]},${item.location.coordinates[0]}` as CoordinateKey;
+												const addressState =
+													addresses[key];
+
+												if (!addressState)
+													return 'Carregando...';
+
+												return addressState.loading ? (
+													<span className="animate-pulse">
+														Buscando localização...
+													</span>
+												) : addressState.error ? (
+													'Localização não disponível'
+												) : (
+													<>
+														{addressState.address
+															?.city ||
+															'Cidade não identificada'}
+														,
+														{addressState.address
+															?.state ||
+															'Estado não identificado'}
+													</>
+												);
+										  })()
+										: 'Sem coordenadas'}
 								</Badge>
 							</div>
 						</CardContent>
 						<CardFooter>
-							<Button variant="outline" className="w-full">
+							<Button
+								variant="outline"
+								className="w-full"
+								onClick={() => openDialog(item)}
+							>
 								Ver Detalhes
 							</Button>
 						</CardFooter>
@@ -231,6 +355,14 @@ export default function SearchStolenItems() {
 					<ChevronRight className="h-4 w-4 ml-2" />
 				</Button>
 			</Pagination>
+
+			{isDialogOpen && selectedItem && (
+				<SearchStolenItemDialog
+					isOpen={isDialogOpen}
+					onClose={closeDialog}
+					item={selectedItem}
+				/>
+			)}
 		</>
 	);
 }
