@@ -11,6 +11,7 @@ import L, { LatLng } from 'leaflet';
 import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css'; // Importe o CSS do Leaflet
 import BACKEND_URL from '@/app/_helpers/backend-path';
+import { set } from 'mongoose';
 
 const customIcon = new L.Icon({
 	iconUrl:
@@ -68,6 +69,44 @@ function CenterMap({ location }: { location: LatLng }) {
 	return null;
 }
 
+const cosineSimilarity = (vec1: number[], vec2: number[]) => {
+	const dotProduct = vec1.reduce((acc, val, i) => acc + val * vec2[i], 0);
+	const magnitudeVec1 = Math.sqrt(
+		vec1.reduce((acc, val) => acc + val * val, 0)
+	);
+	const magnitudeVec2 = Math.sqrt(
+		vec2.reduce((acc, val) => acc + val * val, 0)
+	);
+
+	return dotProduct / (magnitudeVec1 * magnitudeVec2);
+};
+
+const getTopSimilarItems = (
+	embedding: number[],
+	results: any[],
+	isTextSearch: boolean
+) => {
+	const itemsWithSimilarity = results.map((result) => {
+		let similarity = 0;
+		if (isTextSearch && result.text_embedding) {
+			similarity = cosineSimilarity(embedding, result.text_embedding);
+		} else if (!isTextSearch && result.img_embedding) {
+			similarity = cosineSimilarity(embedding, result.img_embedding);
+		}
+
+		if (isTextSearch && !result.text_embedding) {
+			similarity = 0;
+		} else if (!isTextSearch && !result.img_embedding) {
+			similarity = 0;
+		}
+
+		return { ...result, similarity };
+	});
+	return itemsWithSimilarity
+		.sort((a, b) => b.similarity - a.similarity)
+		.slice(0, 3);
+};
+
 export default function SearchStolenItemDialog({
 	isOpen,
 	onClose,
@@ -76,12 +115,17 @@ export default function SearchStolenItemDialog({
 	const [address, setAddress] = useState<Address | null>(null);
 	const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
-	const [imageEmbeddings, setImageEmbeddings] = useState<number[] | null>(
-		null
-	);
+	const [isTextSearch, setIsTextSearch] = useState(false);
+	const [produtImageEmbeddings, setprodutImageEmbeddings] = useState<
+		number[] | null
+	>(null);
+	const [productTextEmbeddings, setproductTextEmbeddings] = useState<
+		number[] | null
+	>(null);
 	const [title, setTitle] = useState<string>('');
 
-	const [searchResults, setSearchResults] = useState<any[]>([]);
+	const [searchResults, setSearchResults] = useState<string[]>([]);
+	const [topResults, setTopResults] = useState<any[]>([]);
 
 	const isDefaultImage =
 		item.images?.[0]?.imageURL ===
@@ -120,17 +164,45 @@ export default function SearchStolenItemDialog({
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					search_term: 'gatinho',
+					search_term: title,
 				}),
 			});
 
 			const data = await res.json();
 			console.log('Resposta da API:', data);
-			setSearchResults(data.results);
+			if (data.results) {
+				setSearchResults(data.results);
+				if (isTextSearch) {
+					const topItems = getTopSimilarItems(
+						productTextEmbeddings || [],
+						data.results,
+						true
+					);
+					setTopResults(topItems);
+				} else {
+					const topItems = getTopSimilarItems(
+						produtImageEmbeddings || [],
+						data.results,
+						false
+					);
+					setTopResults(topItems);
+				}
+			} else {
+				setTopResults([]);
+				setSearchResults([]);
+			}
 		} catch (error) {
-			console.error('Erro ao buscar resultados:', error);
+			console.error('Erro na busca:', error);
 		}
 	};
+	useEffect(() => {
+		if (item.images?.[0]?.embeddings) {
+			setprodutImageEmbeddings(item.images[0].embeddings);
+		}
+		if (item.embeddings) {
+			setproductTextEmbeddings(item.embeddings);
+		}
+	}, [item]);
 
 	return (
 		<>
@@ -194,28 +266,46 @@ export default function SearchStolenItemDialog({
 								alt={item.object}
 								className="w-full h-64 object-cover rounded-md mb-4"
 							/>
-							{!isDefaultImage && item.images?.[0]?.imageURL && (
+							<div className="flex justify-between items-center w-full">
+								{!isDefaultImage &&
+									item.images?.[0]?.imageURL && (
+										<Button
+											onClick={() => {
+												setTitle(item.object);
+												setImageUrl(
+													item.images[0].imageURL
+												);
+												setprodutImageEmbeddings(
+													item.images[0].embeddings
+												);
+
+												setIsImageDialogOpen(true);
+												handleSearch();
+											}}
+										>
+											Busca Cruzada por Imagem
+										</Button>
+									)}
 								<Button
-									variant="default"
 									onClick={() => {
-										setTitle(item.object); // Atualiza o título quando o botão é clicado
-										setImageUrl(item.images[0].imageURL);
-										setImageEmbeddings(
-											item.images[0].embeddings
+										setTitle(item.object);
+										setproductTextEmbeddings(
+											item.embeddings
 										);
+
 										setIsImageDialogOpen(true);
-										handleSearch(); // Faz o fetch da API quando o botão é clicado
+										handleSearch();
 									}}
+									className="ml-auto"
 								>
-									Busca Cruzada
+									Busca Cruzada por Texto
 								</Button>
-							)}
+							</div>
 						</div>
 					</div>
 				</DialogContent>
 			</Dialog>
 
-			{/* Dialog para exibir a imagem */}
 			<Dialog
 				open={isImageDialogOpen}
 				onOpenChange={() => setIsImageDialogOpen(false)}
@@ -223,21 +313,50 @@ export default function SearchStolenItemDialog({
 				<DialogContent className="p-6">
 					<DialogHeader>
 						<DialogTitle className="text-xl font-semibold">
-							Busca Cruzada por Imagem
+							Busca Cruzada na Web
 						</DialogTitle>
 					</DialogHeader>
-					{imageUrl ? (
-						<>
-							<img
-								src={imageUrl}
-								alt="Imagem do item"
-								className="w-full object-contain"
-							/>
-						</>
-					) : (
-						<p>Carregando imagem...</p>
-					)}
-					<h2>{imageEmbeddings?.length}</h2>
+
+					<div className="mt-4">
+						{topResults.length > 0 ? (
+							<div>
+								<h3 className="text-lg font-medium">
+									Resultados Mais Semelhantes:
+								</h3>
+								<ul className="space-y-4 mt-4">
+									{topResults.map((result, index) => (
+										<li
+											key={index}
+											className="border-b py-2"
+										>
+											<div className="flex justify-between items-center">
+												<p className="font-semibold">
+													{result.title}
+												</p>
+												<span className="text-sm text-gray-500">
+													Score:{' '}
+													{result.similarity.toFixed(
+														3
+													)}
+												</span>
+											</div>
+											<p>{result.location}</p>
+											<a
+												href={result.product_url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-blue-600"
+											>
+												Ver Item
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						) : (
+							<p>Carregando resultados...</p>
+						)}
+					</div>
 				</DialogContent>
 			</Dialog>
 		</>

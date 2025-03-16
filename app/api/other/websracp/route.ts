@@ -1,7 +1,10 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import { getWebscrap } from '@/app/lib/embeddings-api';
-import { getImageEmbeddings } from '@/app/lib/embeddings-api';
+import {
+	getImageEmbeddings,
+	getTextEmbeddings,
+} from '@/app/lib/embeddings-api';
 
 export async function POST(req: NextRequest) {
 	const session = await auth();
@@ -30,9 +33,13 @@ export async function POST(req: NextRequest) {
 						const img_embedding = await getImageEmbeddings(
 							result.img_url
 						);
+						const text_embedding = await getTextEmbeddings(
+							result.title
+						);
 						return {
 							...result,
 							img_embedding,
+							text_embedding,
 						};
 					} catch (error) {
 						console.error(
@@ -42,6 +49,7 @@ export async function POST(req: NextRequest) {
 						return {
 							...result,
 							img_embedding: null,
+							text_embedding: null,
 						};
 					}
 				})
