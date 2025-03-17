@@ -64,7 +64,7 @@ export default function CitizenLogin() {
 			} else if (loginResult?.ok) {
 				redirect(
 					searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
-				); // Navigate to the new post page
+				);
 			}
 		});
 	};

@@ -1,8 +1,8 @@
-import BACKEND_URL from '../backend-path';
 import {
 	StolenItemsSchemaInterface,
 	StolenItemsStatusEnum,
 } from '@/app/lib/schemas/StolenItems';
+import BACKEND_URL from '../backend-path';
 
 export async function registerNewStolenItem(
 	stolenItem: StolenItemsSchemaInterface
@@ -33,6 +33,9 @@ export async function getStolenItemsStatus(
 				headers: headers,
 			}
 		);
+
+		console.log('getStolenItemsStatus', resp);
+
 		if (!resp.ok) {
 			return [];
 		}

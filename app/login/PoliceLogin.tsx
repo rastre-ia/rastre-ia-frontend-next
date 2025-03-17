@@ -53,7 +53,7 @@ export default function PoliceLogin() {
 			} else if (loginResult?.ok) {
 				redirect(
 					searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
-				); // Navigate to the new post page
+				);
 			}
 		});
 	};
