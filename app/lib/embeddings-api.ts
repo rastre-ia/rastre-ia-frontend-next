@@ -127,10 +127,6 @@ export async function getWebscrap(search_term: string): Promise<any[]> {
 
 	const parsedResp = await resp.json();
 
-	if (!resp.ok) {
-		throw new Error(parsedResp.message || 'Failed to fetch results');
-	}
-
 	if (!parsedResp.results) {
 		console.error('Invalid API response:', parsedResp);
 		throw new Error('Invalid API response: Missing results field');

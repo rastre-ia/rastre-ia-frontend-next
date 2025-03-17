@@ -116,10 +116,10 @@ export default function SearchStolenItemDialog({
 	const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const [isTextSearch, setIsTextSearch] = useState(false);
-	const [produtImageEmbeddings, setprodutImageEmbeddings] = useState<
+	const [productImageEmbeddings, setProductImageEmbeddings] = useState<
 		number[] | null
 	>(null);
-	const [productTextEmbeddings, setproductTextEmbeddings] = useState<
+	const [productTextEmbeddings, setProductTextEmbeddings] = useState<
 		number[] | null
 	>(null);
 	const [title, setTitle] = useState<string>('');
@@ -157,6 +157,8 @@ export default function SearchStolenItemDialog({
 				Connection: 'keep-alive',
 				'Content-Type': 'application/json',
 			};
+			const formattedSearchTerm = title.replace(/ /g, '%20');
+
 			const res = await fetch(BACKEND_URL + '/other/websracp', {
 				method: 'POST',
 				headers: {
@@ -164,7 +166,7 @@ export default function SearchStolenItemDialog({
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					search_term: title,
+					search_term: 'bike calo',
 				}),
 			});
 
@@ -179,9 +181,9 @@ export default function SearchStolenItemDialog({
 						true
 					);
 					setTopResults(topItems);
-				} else {
+				} else if (!isTextSearch) {
 					const topItems = getTopSimilarItems(
-						produtImageEmbeddings || [],
+						productImageEmbeddings || [],
 						data.results,
 						false
 					);
@@ -197,10 +199,10 @@ export default function SearchStolenItemDialog({
 	};
 	useEffect(() => {
 		if (item.images?.[0]?.embeddings) {
-			setprodutImageEmbeddings(item.images[0].embeddings);
+			setProductImageEmbeddings(item.images[0].embeddings);
 		}
 		if (item.embeddings) {
-			setproductTextEmbeddings(item.embeddings);
+			setProductTextEmbeddings(item.embeddings);
 		}
 	}, [item]);
 
@@ -272,13 +274,11 @@ export default function SearchStolenItemDialog({
 										<Button
 											onClick={() => {
 												setTitle(item.object);
-												setImageUrl(
-													item.images[0].imageURL
-												);
-												setprodutImageEmbeddings(
+
+												setProductImageEmbeddings(
 													item.images[0].embeddings
 												);
-
+												setIsTextSearch(false);
 												setIsImageDialogOpen(true);
 												handleSearch();
 											}}
@@ -289,10 +289,10 @@ export default function SearchStolenItemDialog({
 								<Button
 									onClick={() => {
 										setTitle(item.object);
-										setproductTextEmbeddings(
+										setProductTextEmbeddings(
 											item.embeddings
 										);
-
+										setIsTextSearch(true);
 										setIsImageDialogOpen(true);
 										handleSearch();
 									}}

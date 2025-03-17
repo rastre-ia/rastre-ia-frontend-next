@@ -43,7 +43,7 @@ const requestAssistReportsPrompt: MessageInterface[] = [
 	{
 		role: 'system',
 		content:
-			'Você é um assistente que ajuda usuários a preencher relatórios. Seu objetivo é gerar um título e uma descrição com base nas informações fornecidas. SEMPRE retorne um JSON com os campos "title", "description", "type" e "assistanceNeeded"  dentro de um bloco ```json. Não mostre o JSON ao usuário. Continue a conversa normalmente. Valores válidos para "type": "strange_activity", "traffic", "peace_disturbance", "physical_assault", "robbery" ou "other". Valores válidos para "assistanceNeeded": "require_assistance" ou "dont_require_assist".',
+			'Você é um assistente que ajuda usuários a preencher relatórios. Seu objetivo é gerar um título e uma descrição com base nas informações fornecidas. Sempre retorne um JSON com os campos "title", "description", "type" e "assistanceNeeded" dentro de um bloco ```json, mas não mostre o JSON diretamente ao usuário. Continue a conversa normalmente.\n\nValores válidos para "type": "strange_activity", "traffic", "peace_disturbance", "physical_assault", "robbery" ou "other".\nValores válidos para "assistanceNeeded": "require_assistance" ou "dont_require_assist".\n\nSe o usuário digitar "encerrar", "finalizar", "concluir" ou algo semelhante, gere e exiba o JSON formatado como resposta final.',
 	},
 ];
 
@@ -96,7 +96,7 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 		submissionMethod: ReportSubmissionMethodEnum;
 	}>({
 		title: '',
-		location: { type: 'Point', coordinates: [0, 0] }, // Inicializa com coordenadas padrão
+		location: { type: 'Point', coordinates: [0, 0] },
 		description: '',
 		assistanceNeeded: ReportAssistanceNeededEnum.DONT_REQUIRE_ASSIST,
 		type: ReportTypeEnum.STRANGE_ACTIVITY,
@@ -147,6 +147,7 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 			});
 
 			const jsonData = extractJSONFromContent(resp.response.content);
+			console.log('JSON Extraído:', jsonData);
 			if (jsonData) {
 				setReportData((prev) => ({
 					...prev,
@@ -206,12 +207,11 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 	};
 
 	const handleLocationChange = (latlng: LatLng) => {
-		// Atualiza o estado reportData com as novas coordenadas
 		setReportData((prev) => ({
 			...prev,
 			location: {
 				type: 'Point',
-				coordinates: [latlng.lng, latlng.lat], // longitude primeiro, depois latitude
+				coordinates: [latlng.lng, latlng.lat],
 			},
 		}));
 	};
@@ -221,7 +221,7 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 			reportData.location.coordinates[0] === 0 &&
 			reportData.location.coordinates[1] === 0
 		) {
-			setIsMapOpen(true); // Abre o popup do mapa se a localização não foi selecionada
+			setIsMapOpen(true);
 			return;
 		}
 
@@ -248,7 +248,6 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 				embeddings: [],
 			};
 
-			console.log('reportBody:', reportBody);
 			const res = await createNewReport(reportBody);
 			if (res.status === 200) {
 				console.log('Report created successfully');
@@ -303,12 +302,11 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 						backgroundColor="black"
 					/>
 				)}
-				{messages.length >= 3 && (
-					<Button disabled={isLoading} onClick={handleSubmitReport}>
-						<Upload className="h-4 w-4 mr-2" />
-						Encerrar chat e enviar relato.
-					</Button>
-				)}
+
+				<Button disabled={isLoading} onClick={handleSubmitReport}>
+					<Upload className="h-4 w-4 mr-2" />
+					Encerrar chat e enviar relato.
+				</Button>
 			</ScrollArea>
 			<form onSubmit={handleSubmit} className="flex gap-2">
 				<Input
@@ -342,16 +340,18 @@ const AiChat: FunctionComponent<AiChatProps> = () => {
 							Selecione a localização
 						</h2>
 						<div className="h-[300px] mb-4">
-							<MapContainer
-								center={userLocation}
-								zoom={13}
-								style={{ height: '100%', width: '100%' }}
-							>
-								<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-								<LocationPicker
-									onLocationChange={handleLocationChange}
-								/>
-							</MapContainer>
+							{typeof window !== 'undefined' && (
+								<MapContainer
+									center={userLocation}
+									zoom={13}
+									style={{ height: '100%', width: '100%' }}
+								>
+									<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+									<LocationPicker
+										onLocationChange={handleLocationChange}
+									/>
+								</MapContainer>
+							)}
 						</div>
 						<div className="flex justify-end gap-2">
 							<Button

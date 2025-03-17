@@ -28,8 +28,6 @@ export async function POST(req: NextRequest) {
 	// 	);
 	// }
 
-	console.log('Chat Message sent: ', messages);
-
 	try {
 		const resp = await fetch(EMBEDDINGS_URL + '/chat', {
 			method: 'POST',
