@@ -158,3 +158,47 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
+
+export async function GET(req: NextRequest) {
+	try {
+		console.log('Verificando autenticação...');
+		const session = await auth();
+		if (!session) {
+			console.log('Usuário não autenticado.');
+			return NextResponse.json(
+				{ message: 'Not authenticated' },
+				{ status: 401 }
+			);
+		}
+
+		console.log('Conectando ao MongoDB...');
+		await dbConnect();
+
+		console.log('Obtendo parâmetros da URL...');
+		const { searchParams } = new URL(req.url);
+		const perPage = parseInt(searchParams.get('per_page') || '12', 10);
+		const page = parseInt(searchParams.get('page') || '0', 10);
+		const status = searchParams.get('status'); // Se precisar filtrar por status
+
+		console.log('Buscando itens roubados...');
+		const stolenItemsQuery: any = {};
+		if (status) stolenItemsQuery.status = status;
+
+		const stolenItems = await StolenItems.find(stolenItemsQuery)
+			.skip(page * perPage)
+			.limit(perPage)
+			.lean();
+
+		const totalItems = await StolenItems.countDocuments(stolenItemsQuery);
+		const pageCount = Math.ceil(totalItems / perPage);
+
+		console.log('Retornando itens roubados...');
+		return NextResponse.json({ stolenItems, pageCount });
+	} catch (error) {
+		console.error('Erro ao buscar itens roubados:', error);
+		return NextResponse.json(
+			{ message: 'Internal server error' },
+			{ status: 500 }
+		);
+	}
+}

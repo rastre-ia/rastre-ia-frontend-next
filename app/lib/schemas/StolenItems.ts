@@ -62,10 +62,6 @@ StolenItemsSchema.pre('save', function (next) {
 });
 
 const StolenItems =
-	mongoose.models.StolenItems ||
-	mongoose.model<StolenItemsSchemaInterface>(
-		'StolenItems',
-		StolenItemsSchema
-	);
-
+	mongoose.models?.StolenItems ||
+	mongoose.model('StolenItems', StolenItemsSchema);
 export default StolenItems;

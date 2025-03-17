@@ -106,3 +106,31 @@ export async function getLlamaSearch(query: string): Promise<any[]> {
 
 	return parsedResp.response;
 }
+
+export async function getWebscrap(search_term: string): Promise<any[]> {
+	console.log(`Buscando por: ${search_term}`);
+	const headers = {
+		'User-Agent':
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+		'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+		Referer: 'https://www.olx.com.br/',
+		Connection: 'keep-alive',
+		'Content-Type': 'application/json',
+	};
+	const resp = await fetch(EMBEDDINGS_URL + '/webscrap', {
+		method: 'POST',
+		headers: headers,
+		body: JSON.stringify({
+			search_term: search_term,
+		}),
+	});
+
+	const parsedResp = await resp.json();
+
+	if (!parsedResp.results) {
+		console.error('Invalid API response:', parsedResp);
+		throw new Error('Invalid API response: Missing results field');
+	}
+
+	return parsedResp.results;
+}
