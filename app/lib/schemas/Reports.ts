@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 import chatSchema, { ChatSchemaInterface } from './helpers/ChatSchema';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 
 export enum ReportAssistanceNeededEnum {
 	REQUIRE_ASSISTANCE = 'require_assistance',
@@ -20,6 +20,7 @@ export enum ReportTypeEnum {
 	PEACE_DISTURBANCE = 'peace_disturbance',
 	PHYSICAL_ASSAULT = 'physical_assault',
 	ROBBERY = 'robbery',
+	OBJECT_FOUND = 'object_found',
 	OTHER = 'other',
 }
 
