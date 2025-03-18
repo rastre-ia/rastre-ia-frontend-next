@@ -1,15 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
-import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 import embeddedImageSchema, {
 	EmbeddedImageSchemaInterface,
 } from './helpers/EmbeddedImageSchema';
+import pointSchema, { PointSchemaInterface } from './helpers/PointSchema';
 
 export enum StolenItemsStatusEnum {
 	PENDING = 'pending',
 	ON_INVESTIGATION = 'on_investigation',
 	SOLVED_NOT_RECUPERATED = 'solved_not_recuperated',
 	SOLVED_RECUPERATED = 'solved_recuperated',
-	NOT_SOLVED = 'not_solved',
 }
 
 export interface StolenItemsSchemaInterface {
