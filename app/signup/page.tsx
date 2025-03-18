@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, UserPlus } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
 	Card,
 	CardContent,
@@ -16,12 +14,15 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-import { useToast } from '@/hooks/use-toast';
-import AnimatedLogo from '@/components/AnimatedLogo';
-import BACKEND_URL from '../_helpers/backend-path';
 import { formatCPF, isValidCPF } from '@/app/_helpers/cpf-operations';
+import AnimatedLogo from '@/components/AnimatedLogo';
+import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
+import BACKEND_URL from '../_helpers/backend-path';
+import { cepLookup } from '../_helpers/brasil-api';
 
 const formatCEP = (cep: string) => {
 	// Remove all non-numeric characters
@@ -84,7 +85,30 @@ export default function SignUp() {
 				password: password,
 				cep: cleanedCEP,
 				cpf: cleanedCpf,
+				lat: NaN,
+				long: NaN,
 			};
+
+			try {
+				const { latitude, longitude } = await cepLookup(cleanedCEP);
+				body.lat = latitude;
+				body.long = longitude;
+
+				console.log('Coordinates:', latitude, longitude);
+			} catch (error) {
+				toast({
+					title: 'Error',
+					description:
+						'Erro com a checagem do CEP, por favor verifique e tente novamente.',
+					variant: 'destructive',
+				});
+				console.error(error);
+
+				setIsSubmitting(false);
+				return;
+			}
+
+			console.log(body);
 
 			const resp = await fetch(BACKEND_URL + '/db/users', {
 				method: 'POST',
@@ -103,7 +127,7 @@ export default function SignUp() {
 			toast({
 				title: 'Success',
 				description:
-					'Your account has been created. Welcome to RastreIA!',
+					'Sua conta foi criada. Bem vindo ao rastreia RastreIA!',
 			});
 			setIsSubmitting(false);
 			signIn('credentials', {

@@ -1,4 +1,3 @@
-import { cepLookup } from '@/app/_helpers/brasil-api';
 import dbConnect from '@/app/lib/mongodb';
 import Users from '@/app/lib/schemas/Users';
 import argon2 from '@node-rs/argon2';
@@ -58,30 +57,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-	const { name, email, cpf, cep, password } = await req.json();
+	const { name, email, lat, long, cep, cpf, password } = await req.json();
 
-	if (!name || !email || !cpf || !cep || !password) {
+	if (!name || !email || !cpf || !lat || !long || !cep || !password) {
 		return NextResponse.json(
 			{ message: 'Missing fields' },
 			{ status: 400 }
 		);
 	}
 
-	const resp = await cepLookup(cep);
-
-	if (!resp)
-		return NextResponse.json(
-			{ message: 'Error on CEP Lookup' },
-			{ status: 404 }
-		);
-
-	if (resp.type == 'service_error')
-		return NextResponse.json({ message: 'CEP not found' }, { status: 404 });
-
-	const longitude = resp.location.coordinates.longitude;
-	const latitude = resp.location.coordinates.latitude;
-
-	if (!longitude || !latitude)
+	if (!long || !lat)
 		return NextResponse.json(
 			{ message: 'Error getting coordinates' },
 			{ status: 404 }
@@ -99,7 +84,7 @@ export async function POST(req: NextRequest) {
 			cep: cep,
 			location: {
 				type: 'Point',
-				coordinates: [longitude, latitude],
+				coordinates: [long, lat],
 			},
 			passwordHash: hashedPassword,
 		});
