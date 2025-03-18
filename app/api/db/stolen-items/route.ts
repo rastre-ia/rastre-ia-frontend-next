@@ -1,28 +1,15 @@
-import StolenItems, {
-	StolenItemsSchemaInterface,
-} from '@/app/lib/schemas/StolenItems';
-import { NextResponse, NextRequest } from 'next/server';
-import { auth } from '@/auth';
-import generateUserActivity from '@/app/lib/generate-user-activity';
-import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
 import {
 	getImageEmbeddings,
 	getTextEmbeddings,
 } from '@/app/lib/embeddings-api';
+import generateUserActivity from '@/app/lib/generate-user-activity';
 import dbConnect from '@/app/lib/mongodb';
-
-export async function OPTIONS() {
-	const res = new NextResponse(null, { status: 204 });
-
-	res.headers.set('Access-Control-Allow-Origin', '*');
-	res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-	res.headers.set(
-		'Access-Control-Allow-Headers',
-		'Content-Type, Authorization'
-	);
-
-	return res;
-}
+import StolenItems, {
+	StolenItemsSchemaInterface,
+} from '@/app/lib/schemas/StolenItems';
+import { ActivityTypeEnum } from '@/app/lib/schemas/UserActivities';
+import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
 	try {
