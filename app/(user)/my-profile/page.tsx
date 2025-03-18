@@ -1,14 +1,20 @@
-import Link from 'next/link';
 import {
-	Handshake,
+	Award,
 	FileText,
+	Handshake,
+	LogOut,
+	ScanBarcode,
+	Smartphone,
 	TrendingUp,
 	User,
-	Smartphone,
-	LogOut,
-	Award,
+	Vault,
 } from 'lucide-react';
+import Link from 'next/link';
 
+import { auth, signOut } from '@/auth';
+import AnimatedLogo from '@/components/AnimatedLogo';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -18,22 +24,18 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import AnimatedLogo from '@/components/AnimatedLogo';
-import { auth, signOut } from '@/auth';
-import BACKEND_URL from '../../_helpers/backend-path';
-import { headers } from 'next/headers';
-import { UsersSchema } from '../../lib/schemas/Users';
-import { findUserActivitiesByUserId } from '../../_helpers/db/user-activities';
-import { ActivityTypeEnum } from '../../lib/schemas/UserActivities';
-import { format } from 'date-fns';
-import getXpStats from '../../_helpers/experience-calculator';
-import { getStolenItemsStatus } from '../../_helpers/db/stolen-items';
-import { StolenItemsStatusEnum } from '../../lib/schemas/StolenItems';
-import { getReportsStatus } from '../../_helpers/db/reports';
-import { redirect } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { format } from 'date-fns';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import BACKEND_URL from '../../_helpers/backend-path';
+import { getReportsStatus } from '../../_helpers/db/reports';
+import { getStolenItemsStatus } from '../../_helpers/db/stolen-items';
+import { findUserActivitiesByUserId } from '../../_helpers/db/user-activities';
+import getXpStats from '../../_helpers/experience-calculator';
+import { StolenItemsStatusEnum } from '../../lib/schemas/StolenItems';
+import { ActivityTypeEnum } from '../../lib/schemas/UserActivities';
+import { UsersSchema } from '../../lib/schemas/Users';
 
 function getUserActivityTitle(userAct: ActivityTypeEnum) {
 	switch (userAct) {
@@ -207,50 +209,45 @@ export default async function MyProfile() {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Atividades Recentes</CardTitle>
+							<CardTitle>Meu cofre</CardTitle>
+							<CardDescription>
+								Registre itens a sua conta a possibilite a
+								recuperação posterior.
+							</CardDescription>
 						</CardHeader>
-						<CardContent>
-							<ScrollArea className="h-52">
-								<ul className="space-y-4">
-									{userActivities.map((activity, index) => (
-										<li
-											key={index}
-											className="flex items-start space-x-3"
-										>
-											{activity.activityType ===
-												ActivityTypeEnum.ANSWER_REQUEST && (
-												<Handshake className="h-5 w-5 text-green-600" />
-											)}
-											{activity.activityType ===
-												ActivityTypeEnum.CREATE_REPORT && (
-												<FileText className="h-5 w-5 text-blue-600" />
-											)}
-											{activity.activityType ===
-												ActivityTypeEnum.REGISTER_STOLEN_ITEM && (
-												<Smartphone className="h-5 w-5 text-red-600" />
-											)}
-											<div>
-												<p className="text-sm font-medium">
-													{getUserActivityTitle(
-														activity.activityType
-													)}
-												</p>
-												{activity.createdAt !==
-													undefined && (
-													<p className="text-xs text-muted-foreground">
-														{format(
-															activity.createdAt,
-															'dd/MM/yyyy HH:mm'
-														)}
-													</p>
-												)}
-											</div>
-										</li>
-									))}
-								</ul>
-							</ScrollArea>
+						<CardContent className="space-y-4 h-[100%]">
+							<div className="h-[50%] flex justify-center">
+								<div className="flex gap-6">
+									<Button className="h-full flex flex-col items-center justify-center space-y-6 aspect-square">
+										<ScanBarcode
+											style={{
+												scale: 4,
+											}}
+											className="mt-5"
+										/>
+										<span className="text-sm">
+											Adicionar Item
+										</span>
+									</Button>
+									<Button
+										variant="outline"
+										className="h-full flex flex-col items-center justify-center space-y-6 aspect-square"
+									>
+										<Vault
+											style={{
+												scale: 4,
+											}}
+											className="mt-5"
+										/>
+										<span className="text-sm">
+											Ver Meus Itens
+										</span>
+									</Button>
+								</div>
+							</div>
 						</CardContent>
 					</Card>
+
 					<Card>
 						<CardHeader>
 							<CardTitle>Ações Rápidas</CardTitle>
@@ -292,60 +289,111 @@ export default async function MyProfile() {
 							</ul>
 						</CardContent>
 					</Card>
-
-					<Card>
-						<CardHeader>
-							<CardTitle>Seu Impacto</CardTitle>
-							<CardDescription>
-								<div className="flex items-center text-green-600">
-									<TrendingUp className="mr-2 h-4 w-4" />
-									<span className="font-medium">
-										Você realizou{' '}
-										{numberOfActivitiesThisMonth} ações este
-										mês!
-									</span>
-								</div>
-							</CardDescription>
-						</CardHeader>
-						<ScrollArea className="h-52">
-							<CardContent className="h-52 space-y-4">
-								<div className="flex items-center justify-between">
-									<span className="font-medium">
-										Relatos Enviados
-									</span>
-									<Badge variant="secondary">
-										{numberOfReports}
-									</Badge>
-								</div>
-								<hr />
-								<div className="flex items-center justify-between">
-									<span className="font-medium">
-										Registro de itens roubado
-									</span>
-									<Badge variant="secondary">
-										{totalStolenItems}
-									</Badge>
-								</div>
-								<hr />
-								<div className="flex items-center justify-between">
-									<span className="font-medium">
-										Itens Recuperados
-									</span>
-									<Badge variant="secondary">
-										{recoveredItems}
-									</Badge>
-								</div>
-								<hr />
-								<div className="flex items-center justify-between">
-									<span className="font-medium">
-										Investigações Auxiliadas
-									</span>
-									<Badge variant="secondary">
-										{numberOfResponses}
-									</Badge>
-								</div>
-							</CardContent>
-						</ScrollArea>
+					<Card className="overflow-hidden">
+						<div className="flex w-full flex-col sm:flex-row">
+							<div className="w-full">
+								<CardHeader>
+									<CardTitle>Seu Impacto</CardTitle>
+									<CardDescription>
+										<div className="flex items-center text-green-600">
+											<TrendingUp className="mr-2 h-4 w-4" />
+											<span className="font-medium">
+												Você realizou{' '}
+												{numberOfActivitiesThisMonth}{' '}
+												ações este mês!
+											</span>
+										</div>
+									</CardDescription>
+								</CardHeader>
+								<ScrollArea className="h-52">
+									<CardContent className="h-52 space-y-4">
+										<div className="flex items-center justify-between">
+											<span className="font-medium">
+												Relatos Enviados
+											</span>
+											<Badge variant="secondary">
+												{numberOfReports}
+											</Badge>
+										</div>
+										<hr />
+										<div className="flex items-center justify-between">
+											<span className="font-medium">
+												Registro de itens roubado
+											</span>
+											<Badge variant="secondary">
+												{totalStolenItems}
+											</Badge>
+										</div>
+										<hr />
+										<div className="flex items-center justify-between">
+											<span className="font-medium">
+												Itens Recuperados
+											</span>
+											<Badge variant="secondary">
+												{recoveredItems}
+											</Badge>
+										</div>
+										<hr />
+										<div className="flex items-center justify-between">
+											<span className="font-medium">
+												Investigações Auxiliadas
+											</span>
+											<Badge variant="secondary">
+												{numberOfResponses}
+											</Badge>
+										</div>
+									</CardContent>
+								</ScrollArea>
+							</div>
+							<div className="bg-black/5 w-full sm:w-2/3 border-l shadow-inner">
+								<CardHeader>
+									<CardTitle>Atividades Recentes</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<ScrollArea className="max-h-52">
+										<ul className="space-y-4">
+											{userActivities.map(
+												(activity, index) => (
+													<li
+														key={index}
+														className="flex items-start space-x-3"
+													>
+														{activity.activityType ===
+															ActivityTypeEnum.ANSWER_REQUEST && (
+															<Handshake className="h-5 w-5 text-green-600" />
+														)}
+														{activity.activityType ===
+															ActivityTypeEnum.CREATE_REPORT && (
+															<FileText className="h-5 w-5 text-blue-600" />
+														)}
+														{activity.activityType ===
+															ActivityTypeEnum.REGISTER_STOLEN_ITEM && (
+															<Smartphone className="h-5 w-5 text-red-600" />
+														)}
+														<div>
+															<p className="text-sm font-medium">
+																{getUserActivityTitle(
+																	activity.activityType
+																)}
+															</p>
+															{activity.createdAt !==
+																undefined && (
+																<p className="text-xs text-muted-foreground">
+																	{format(
+																		activity.createdAt,
+																		'dd/MM/yyyy HH:mm'
+																	)}
+																</p>
+															)}
+														</div>
+													</li>
+												)
+											)}
+										</ul>
+									</ScrollArea>
+								</CardContent>
+							</div>
+						</div>
 					</Card>
 				</div>
 			</div>
