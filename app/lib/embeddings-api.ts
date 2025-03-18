@@ -1,9 +1,11 @@
 export const EMBEDDINGS_URL = process.env.EMBEDDING_ENDPOINT_URL;
 
 export async function getTextEmbeddings(text: string): Promise<number[]> {
-	console.log('EMBEDDINGS_URL', EMBEDDINGS_URL);
-	const resp = await fetch(EMBEDDINGS_URL + '/text-embeddings', {
+	const url = EMBEDDINGS_URL + '/text-embeddings/';
+	console.log('url', url);
+	const resp = await fetch(url, {
 		method: 'POST',
+		credentials: 'include',
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',

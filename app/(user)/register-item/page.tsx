@@ -12,7 +12,7 @@ import {
 	Upload,
 	User,
 } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
 import AnimatedLogo from '@/components/AnimatedLogo';
@@ -46,6 +46,7 @@ interface LocationMarkerProps {
 	position: LatLng | null;
 	setPosition: (position: LatLng) => void;
 }
+
 const customIcon = new L.Icon({
 	iconUrl:
 		'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -56,33 +57,15 @@ const customIcon = new L.Icon({
 
 function LocationMarker({ position, setPosition }: LocationMarkerProps) {
 	const map = useMapEvents({
-		locationfound(e) {
-			// Quando a localização for encontrada, define a posição do marcador
-			setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
-			map.flyTo(e.latlng, map.getZoom());
+		click(e) {
+			// When the map is clicked, set the position of the marker
+			const { lat, lng } = e.latlng;
+			setPosition({ lat, lng });
 		},
 	});
 
-	useEffect(() => {
-		map.locate({ setView: true, maxZoom: 16 });
-	}, [map]);
-
-	const handleDrag = (event: any) => {
-		const { lat, lng } = event.target.getLatLng();
-		setPosition({ lat, lng });
-	};
-
-	// Função para buscar o endereço com base na latitude e longitude
-
 	return position === null ? null : (
-		<Marker
-			position={position}
-			icon={customIcon}
-			draggable={true}
-			eventHandlers={{
-				dragend: handleDrag, // Quando o marcador for arrastado e o arraste terminar, atualiza a posição
-			}}
-		></Marker>
+		<Marker position={position} icon={customIcon} />
 	);
 }
 
@@ -127,8 +110,6 @@ export default function RegisterItem() {
 			: [];
 
 		try {
-			// const userObjectId = await getUserObjectIdById(userId);
-
 			const stolenItemBody: StolenItemsSchemaInterface = {
 				userId: userId,
 				object: (e.target as HTMLFormElement).object.value,
@@ -284,6 +265,7 @@ export default function RegisterItem() {
 										style={{
 											height: '100%',
 											width: '100%',
+											maxWidth: '500px',
 										}}
 									>
 										<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
