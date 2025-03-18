@@ -1,17 +1,16 @@
+import BACKEND_URL from '@/app/_helpers/backend-path';
+import { StolenItemsSchemaInterface } from '@/app/lib/schemas/StolenItems';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import { StolenItemsSchemaInterface } from '@/app/lib/schemas/StolenItems';
-import { Button } from '@/components/ui/button';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L, { LatLng } from 'leaflet';
-import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import BACKEND_URL from '@/app/_helpers/backend-path';
-import { set } from 'mongoose';
+import { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 
 const customIcon = new L.Icon({
 	iconUrl:
@@ -166,7 +165,7 @@ export default function SearchStolenItemDialog({
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					search_term: 'bike calo',
+					search_term: title,
 				}),
 			});
 
