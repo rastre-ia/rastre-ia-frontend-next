@@ -177,9 +177,9 @@ export default function PanoramaStolenItem() {
 								center={
 									userLocation
 										? [userLocation.lat, userLocation.lng]
-										: [-23.5505, -46.6333]
+										: [-15.7913, -47.8904]
 								}
-								zoom={userLocation ? 13 : 10}
+								zoom={userLocation ? 10 : 4}
 								style={{ height: '100%', width: '100%' }}
 							>
 								<TileLayer
