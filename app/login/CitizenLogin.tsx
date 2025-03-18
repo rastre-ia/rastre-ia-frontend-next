@@ -63,7 +63,9 @@ export default function CitizenLogin() {
 				}
 			} else if (loginResult?.ok) {
 				redirect(
-					searchParamRedirectTo ? searchParamRedirectTo : '/dashboard'
+					searchParamRedirectTo
+						? searchParamRedirectTo
+						: '/my-profile'
 				);
 			}
 		});
