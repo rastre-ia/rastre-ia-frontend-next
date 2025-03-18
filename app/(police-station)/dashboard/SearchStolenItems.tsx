@@ -31,6 +31,7 @@ import {
 } from '@/app/lib/schemas/StolenItems';
 
 import SearchStolenItemDialog from '@/components/SearchStolenItemDialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface Address {
 	city?: string;
@@ -42,6 +43,7 @@ type AddressState = {
 	loading: boolean;
 	error?: boolean;
 };
+
 type CoordinateKey = `${number},${number}`;
 
 const fetchAddress = async (
@@ -60,7 +62,7 @@ const fetchAddress = async (
 			state: data.address.state,
 		};
 	} catch (error) {
-		return {};
+		throw error;
 	}
 };
 
@@ -81,7 +83,7 @@ export default function SearchStolenItems() {
 	useEffect(() => {
 		loadItems();
 	}, [currentPage, filter]);
-
+	const { toast } = useToast();
 	const loadItems = async () => {
 		setIsLoading(true);
 
@@ -124,8 +126,14 @@ export default function SearchStolenItems() {
 							break;
 						} catch (error) {
 							if (attempt === 3) {
+								toast({
+									title: 'Erro',
+									description: `Falha após 3 tentativas para ${key}`,
+									variant: 'destructive',
+								});
+
 								console.error(
-									`Falha após 3 tentativas para ${key}`
+									`Falha após 3 tentativas para ${key}: ${error}`
 								);
 								finalAddress = { error: true };
 							}

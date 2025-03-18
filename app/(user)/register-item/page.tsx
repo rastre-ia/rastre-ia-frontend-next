@@ -13,7 +13,7 @@ import {
 	User,
 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 
 import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,6 @@ interface LatLng {
 
 interface LocationMarkerProps {
 	position: LatLng | null;
-	setPosition: (position: LatLng) => void;
 }
 
 const customIcon = new L.Icon({
@@ -55,22 +54,14 @@ const customIcon = new L.Icon({
 	popupAnchor: [1, -34],
 });
 
-function LocationMarker({ position, setPosition }: LocationMarkerProps) {
-	const map = useMapEvents({
-		click(e) {
-			// When the map is clicked, set the position of the marker
-			const { lat, lng } = e.latlng;
-			setPosition({ lat, lng });
-		},
-	});
-
+function LocationMarker({ position }: LocationMarkerProps) {
 	return position === null ? null : (
 		<Marker position={position} icon={customIcon} />
 	);
 }
 
 export default function RegisterItem() {
-	const [position, setPosition] = useState<LatLng | null>(null);
+	const [position] = useState<LatLng | null>(null);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const { data: session, status } = useSession();
 	const { toast } = useToast();
@@ -269,10 +260,7 @@ export default function RegisterItem() {
 										}}
 									>
 										<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-										<LocationMarker
-											position={position}
-											setPosition={setPosition}
-										/>
+										<LocationMarker position={position} />
 									</MapContainer>
 								</div>
 							</motion.div>

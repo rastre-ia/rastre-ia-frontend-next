@@ -16,7 +16,7 @@ export default function CitizenLogin() {
 	const searchParams = useSearchParams();
 	const searchParamError = searchParams.get('error');
 	const searchParamRedirectTo = searchParams.get('redirect_to');
-	let [isPending, startTransition] = useTransition();
+	const [isPending, startTransition] = useTransition();
 
 	const [error, setError] = useState<string>(
 		searchParamError

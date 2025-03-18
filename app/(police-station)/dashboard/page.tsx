@@ -23,8 +23,6 @@ import ActiveAssistanceRequests from './ActiveAssistanceRequests';
 import SearchReports from './SearchReports';
 import SearchStolenItems from './SearchStolenItems';
 
-export const PUBLIC_URL = process.env.VERCEL_PUBLIC_URL;
-
 export default async function PoliceDashboard() {
 	const session = await auth();
 	const user = session?.user;

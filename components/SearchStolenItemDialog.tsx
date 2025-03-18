@@ -113,7 +113,6 @@ export default function SearchStolenItemDialog({
 }: SearchStolenItemDialogProps) {
 	const [address, setAddress] = useState<Address | null>(null);
 	const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const [isTextSearch, setIsTextSearch] = useState(false);
 	const [productImageEmbeddings, setProductImageEmbeddings] = useState<
 		number[] | null
@@ -122,8 +121,6 @@ export default function SearchStolenItemDialog({
 		number[] | null
 	>(null);
 	const [title, setTitle] = useState<string>('');
-
-	const [searchResults, setSearchResults] = useState<string[]>([]);
 	const [topResults, setTopResults] = useState<any[]>([]);
 
 	const isDefaultImage =
@@ -156,7 +153,6 @@ export default function SearchStolenItemDialog({
 				Connection: 'keep-alive',
 				'Content-Type': 'application/json',
 			};
-			const formattedSearchTerm = title.replace(/ /g, '%20');
 
 			const res = await fetch(BACKEND_URL + '/other/websracp', {
 				method: 'POST',
@@ -172,7 +168,6 @@ export default function SearchStolenItemDialog({
 			const data = await res.json();
 			console.log('Resposta da API:', data);
 			if (data.results) {
-				setSearchResults(data.results);
 				if (isTextSearch) {
 					const topItems = getTopSimilarItems(
 						productTextEmbeddings || [],
@@ -190,7 +185,6 @@ export default function SearchStolenItemDialog({
 				}
 			} else {
 				setTopResults([]);
-				setSearchResults([]);
 			}
 		} catch (error) {
 			console.error('Erro na busca:', error);

@@ -55,7 +55,6 @@ export default function PanoramaStolenItem() {
 	const [stolenItems, setStolenItems] = useState<
 		StolenItemsSchemaInterface[]
 	>([]);
-	const [isLoading, setIsLoading] = useState(false);
 	const [selectedItem, setSelectedItem] =
 		useState<StolenItemsSchemaInterface | null>(null);
 	const [userLocation, setUserLocation] = useState<LatLng>(
@@ -63,7 +62,6 @@ export default function PanoramaStolenItem() {
 	);
 
 	const loadItems = async () => {
-		setIsLoading(true);
 		try {
 			const result = await getStolenItems();
 			let filteredItems = [...result.stolenItems];
@@ -75,8 +73,6 @@ export default function PanoramaStolenItem() {
 			setStolenItems(filteredItems || []);
 		} catch (error) {
 			console.error('Erro ao carregar itens:', error);
-		} finally {
-			setIsLoading(false);
 		}
 	};
 
