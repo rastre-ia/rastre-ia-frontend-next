@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
 	Select,
 	SelectContent,
@@ -9,15 +7,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 import { getStolenItems } from '@/app/_helpers/db/stolen-items';
 import {
-	StolenItemsStatusEnum,
 	StolenItemsSchemaInterface,
+	StolenItemsStatusEnum,
 } from '@/app/lib/schemas/StolenItems';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L, { LatLng, latLng } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import {
 	Card,
 	CardContent,
@@ -25,7 +22,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { set } from 'mongoose';
+import L, { LatLng, latLng } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 
 const statusTranslationMap = {
 	[StolenItemsStatusEnum.PENDING]: 'Pendente',
@@ -33,7 +32,6 @@ const statusTranslationMap = {
 	[StolenItemsStatusEnum.SOLVED_NOT_RECUPERATED]:
 		'Resolvido - Não Recuperado',
 	[StolenItemsStatusEnum.SOLVED_RECUPERATED]: 'Resolvido - Recuperado',
-	[StolenItemsStatusEnum.NOT_SOLVED]: 'Não Resolvido',
 };
 
 const customIcon = new L.Icon({
@@ -163,11 +161,6 @@ export default function PanoramaStolenItem() {
 									}
 								>
 									Resolvido - Recuperado
-								</SelectItem>
-								<SelectItem
-									value={StolenItemsStatusEnum.NOT_SOLVED}
-								>
-									Não Resolvido
 								</SelectItem>
 							</SelectContent>
 						</Select>
