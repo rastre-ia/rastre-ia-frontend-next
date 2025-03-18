@@ -115,71 +115,61 @@ export default function PanoramaStolenItem() {
 				transition={{ duration: 0.5 }}
 			>
 				<Card>
-					<CardHeader>
-						<CardTitle>
-							Pesquisar e Filtrar Itens Roubados
-						</CardTitle>
-						<CardDescription>
-							Use as opções abaixo para encontrar itens
-							específicos
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<Select
-							value={statusFilter || 'all'}
-							onValueChange={(value) => setStatusFilter(value)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Filtrar por status" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">
-									Todos os Itens
-								</SelectItem>
-								<SelectItem
-									value={StolenItemsStatusEnum.PENDING}
-								>
-									Pendente
-								</SelectItem>
-								<SelectItem
-									value={
-										StolenItemsStatusEnum.ON_INVESTIGATION
+					<div className="flex w-full justify-between flex-wrap">
+						<CardHeader className="pb-4">
+							<CardTitle>Mapa de Itens Roubados</CardTitle>
+							<CardDescription>
+								Visualização geográfica dos itens registrados
+							</CardDescription>
+						</CardHeader>
+						<div className="flex align-middle px-6">
+							<div className="my-auto mb-6">
+								<Select
+									value={statusFilter || 'all'}
+									onValueChange={(value) =>
+										setStatusFilter(value)
 									}
 								>
-									Em Investigação
-								</SelectItem>
-								<SelectItem
-									value={
-										StolenItemsStatusEnum.SOLVED_NOT_RECUPERATED
-									}
-								>
-									Resolvido - Não Recuperado
-								</SelectItem>
-								<SelectItem
-									value={
-										StolenItemsStatusEnum.SOLVED_RECUPERATED
-									}
-								>
-									Resolvido - Recuperado
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</CardContent>
-				</Card>
-			</motion.div>
-
-			<motion.div
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-			>
-				<Card>
-					<CardHeader>
-						<CardTitle>Mapa de Itens Roubados</CardTitle>
-						<CardDescription>
-							Visualização geográfica dos itens registrados
-						</CardDescription>
-					</CardHeader>
+									<SelectTrigger>
+										<SelectValue placeholder="Filtrar por status" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="all">
+											Todos os Itens
+										</SelectItem>
+										<SelectItem
+											value={
+												StolenItemsStatusEnum.PENDING
+											}
+										>
+											Pendente
+										</SelectItem>
+										<SelectItem
+											value={
+												StolenItemsStatusEnum.ON_INVESTIGATION
+											}
+										>
+											Em Investigação
+										</SelectItem>
+										<SelectItem
+											value={
+												StolenItemsStatusEnum.SOLVED_NOT_RECUPERATED
+											}
+										>
+											Resolvido - Não Recuperado
+										</SelectItem>
+										<SelectItem
+											value={
+												StolenItemsStatusEnum.SOLVED_RECUPERATED
+											}
+										>
+											Resolvido - Recuperado
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+					</div>
 					<CardContent className="h-[500px]">
 						{stolenItems.length > 0 ? (
 							<MapContainer

@@ -74,7 +74,7 @@ export default async function PoliceDashboard() {
 					</form>
 				</header>
 				<Tabs defaultValue="overview" className="space-y-4">
-					<TabsList>
+					<TabsList className="w-full flex-wrap h-full">
 						<TabsTrigger value="overview">
 							<BarChart3 className="h-4 w-4 mr-2" />
 							Visão geral
