@@ -6,6 +6,7 @@ export const validReportTypesTranslated = [
 	{ value: ReportTypeEnum.PEACE_DISTURBANCE, label: 'Distúrbio de Paz' },
 	{ value: ReportTypeEnum.PHYSICAL_ASSAULT, label: 'Assalto Físico' },
 	{ value: ReportTypeEnum.ROBBERY, label: 'Roubo' },
+	{ value: ReportTypeEnum.OBJECT_FOUND, label: 'Objeto Encontrado' },
 	{ value: ReportTypeEnum.OTHER, label: 'Outro' },
 ];
 
@@ -23,8 +24,10 @@ export default function reportTypeTranslator(
 			return validReportTypesTranslated[3].label;
 		case ReportTypeEnum.ROBBERY:
 			return validReportTypesTranslated[4].label;
+		case ReportTypeEnum.OBJECT_FOUND:
+			return validReportTypesTranslated[5].label;
 		case ReportTypeEnum.OTHER:
 		default:
-			return validReportTypesTranslated[5].label;
+			return validReportTypesTranslated[6].label;
 	}
 }

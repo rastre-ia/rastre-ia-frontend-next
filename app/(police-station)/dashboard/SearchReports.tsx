@@ -7,6 +7,7 @@ import {
 	ChevronRight,
 	HelpCircle,
 	Package2,
+	PackageOpen,
 	Search,
 	Siren,
 	Volume2,
@@ -59,6 +60,7 @@ const iconesTipoRelato = {
 	[ReportTypeEnum.PEACE_DISTURBANCE]: Volume2,
 	[ReportTypeEnum.PHYSICAL_ASSAULT]: Siren,
 	[ReportTypeEnum.ROBBERY]: Package2,
+	[ReportTypeEnum.OBJECT_FOUND]: PackageOpen,
 	[ReportTypeEnum.OTHER]: HelpCircle,
 };
 
@@ -68,6 +70,7 @@ const estilosTipoRelato = {
 	[ReportTypeEnum.PEACE_DISTURBANCE]: 'border-l-4 border-l-purple-500',
 	[ReportTypeEnum.PHYSICAL_ASSAULT]: 'border-l-4 border-l-red-500',
 	[ReportTypeEnum.ROBBERY]: 'border-l-4 border-l-black',
+	[ReportTypeEnum.OBJECT_FOUND]: 'border-l-4 border-l-green-500',
 	[ReportTypeEnum.OTHER]: 'border-l-4 border-l-gray-500',
 };
 
@@ -77,6 +80,7 @@ const coresIconesTipoRelato = {
 	[ReportTypeEnum.PEACE_DISTURBANCE]: 'text-purple-500',
 	[ReportTypeEnum.PHYSICAL_ASSAULT]: 'text-red-500',
 	[ReportTypeEnum.ROBBERY]: 'text-black',
+	[ReportTypeEnum.OBJECT_FOUND]: 'text-green-500',
 	[ReportTypeEnum.OTHER]: 'text-gray-500',
 };
 
