@@ -1,26 +1,27 @@
 'use client';
 
-import { FunctionComponent, useState, useEffect } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import {
-	BarChart,
 	Bar,
-	LineChart,
-	Line,
-	PieChart,
-	Pie,
+	BarChart,
+	CartesianGrid,
 	Cell,
+	Legend,
+	Line,
+	LineChart,
+	Pie,
+	PieChart,
+	ResponsiveContainer,
+	Tooltip,
 	XAxis,
 	YAxis,
-	CartesianGrid,
-	Tooltip,
-	Legend,
-	ResponsiveContainer,
 } from 'recharts';
 
 import 'leaflet/dist/leaflet.css';
 import { BarChart3 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import PanoramaStolenItem from './PanoramaStolenItem';
 
 // Função simulada para obter estatísticas do painel
 const obterEstatisticasDoPainel = async (): Promise<Estatisticas> => {
@@ -202,6 +203,8 @@ const VisaoGeral: FunctionComponent = () => {
 					</CardContent>
 				</Card>
 			</div>
+
+			<PanoramaStolenItem />
 		</>
 	);
 };
