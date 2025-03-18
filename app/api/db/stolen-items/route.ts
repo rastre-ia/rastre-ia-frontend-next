@@ -24,7 +24,6 @@ export async function POST(req: NextRequest) {
 		}
 
 		console.log('Validando dados da requisição...');
-		console.log('Validando dados da requisição...');
 		let requestData;
 		try {
 			requestData = await req.json();
