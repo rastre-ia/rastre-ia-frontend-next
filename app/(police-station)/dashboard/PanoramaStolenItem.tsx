@@ -34,14 +34,6 @@ const statusTranslationMap = {
 	[StolenItemsStatusEnum.SOLVED_RECUPERATED]: 'Resolvido - Recuperado',
 };
 
-const customIcon = new L.Icon({
-	iconUrl:
-		'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-	iconSize: [25, 41],
-	iconAnchor: [12, 41],
-	popupAnchor: [1, -34],
-});
-
 function CenterMap({ location }: { location: LatLng }) {
 	const map = useMap();
 	useEffect(() => {
@@ -50,6 +42,13 @@ function CenterMap({ location }: { location: LatLng }) {
 	return null;
 }
 
+const PUBLIC_URL = process.env.NEXT_PUBLIC_URL || '';
+const iconUrls = {
+	[StolenItemsStatusEnum.PENDING]: `${PUBLIC_URL}/resources/marker-icon-blue.png`,
+	[StolenItemsStatusEnum.ON_INVESTIGATION]: `${PUBLIC_URL}/resources/marker-icon-yellow.png`,
+	[StolenItemsStatusEnum.SOLVED_NOT_RECUPERATED]: `${PUBLIC_URL}/resources/marker-icon-red.png`,
+	[StolenItemsStatusEnum.SOLVED_RECUPERATED]: `${PUBLIC_URL}/resources/marker-icon-green.png`,
+};
 export default function PanoramaStolenItem() {
 	const [statusFilter, setStatusFilter] = useState<string | null>('all');
 
@@ -205,7 +204,21 @@ export default function PanoramaStolenItem() {
 												item.location.coordinates[1],
 												item.location.coordinates[0],
 											]}
-											icon={customIcon}
+											icon={
+												new L.Icon({
+													iconUrl:
+														iconUrls[
+															item.status as StolenItemsStatusEnum
+														] ||
+														iconUrls[
+															StolenItemsStatusEnum
+																.PENDING
+														],
+													iconSize: [25, 41],
+													iconAnchor: [12, 41],
+													popupAnchor: [1, -34],
+												})
+											}
 											eventHandlers={{
 												click: () => {
 													setSelectedItem(item);
