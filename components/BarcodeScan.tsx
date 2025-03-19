@@ -22,11 +22,15 @@ const BarcodeScan: FunctionComponent = () => {
 		qrbox: 300,
 		rememberLastUsedCamera: true,
 		supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-		formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128],
+		formatsToSupport: [
+			Html5QrcodeSupportedFormats.CODE_128,
+			Html5QrcodeSupportedFormats.CODABAR,
+		],
 		useBarCodeDetectorIfSupported: true,
 		showTorchButtonIfSupported: true,
 		videoConstraints: {
 			frameRate: 10,
+			facingMode: 'environment',
 		},
 	};
 	const [scannedValue, setScannedValue] = useState('asdasdfasdf');
