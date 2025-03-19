@@ -1,5 +1,5 @@
 export const EMBEDDINGS_URL = process.env.EMBEDDING_ENDPOINT_URL;
-
+console.log('url:', EMBEDDINGS_URL);
 export async function getTextEmbeddings(text: string): Promise<number[]> {
 	const url = EMBEDDINGS_URL + '/text-embeddings/';
 	console.log('url', url);
@@ -135,4 +135,53 @@ export async function getWebscrap(search_term: string): Promise<any[]> {
 	}
 
 	return parsedResp.results;
+}
+
+export async function getMarkdown(
+	embeddings_url: string,
+	file: File
+): Promise<any> {
+	const formData = new FormData();
+	formData.append('file', file);
+
+	const headers = {
+		Accept: 'application/json',
+	};
+	console.log(embeddings_url);
+	const response = await fetch(embeddings_url + '/markdown', {
+		method: 'POST',
+		headers: headers,
+		body: formData,
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		console.error('Erro na API:', errorText);
+		throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+	}
+
+	return await response.json();
+}
+
+export async function getNFE(chave_acesso: string): Promise<any> {
+	console.log(`Buscando NF-e para a chave de acesso: ${chave_acesso}`);
+
+	const headers = {
+		'Content-Type': 'application/json',
+		Accept: 'application/json',
+	};
+
+	const response = await fetch(EMBEDDINGS_URL + '/nfe', {
+		method: 'POST',
+		headers: headers,
+		body: JSON.stringify({ chave_acesso }),
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		console.error('Erro na API:', errorText);
+		throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+	}
+
+	return await response.json();
 }
