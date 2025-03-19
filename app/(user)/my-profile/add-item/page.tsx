@@ -1,5 +1,6 @@
+'use client';
+
 import BarcodeScan from '@/components/BarcodeScan';
-import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardContent,
@@ -7,14 +8,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Pencil, ScanBarcode } from 'lucide-react';
 import { FunctionComponent } from 'react';
+import ObjectInfo from './ObjectInfo';
 
 interface AddItemProps {}
 
 const AddItem: FunctionComponent<AddItemProps> = () => {
 	return (
-		<Card>
+		<Card className="max-w-4xl mx-auto">
 			<CardHeader>
 				<CardTitle>Adicionar Item</CardTitle>
 				<CardDescription>
@@ -22,15 +23,8 @@ const AddItem: FunctionComponent<AddItemProps> = () => {
 					posterior.
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
-				<Button>
-					<ScanBarcode />
-					Escanear nota fiscal
-				</Button>
-				<Button>
-					<Pencil />
-					Inserir manualmente
-				</Button>
+			<CardContent className="flex flex-col px-0 items-center">
+				<ObjectInfo />
 
 				<BarcodeScan />
 			</CardContent>
