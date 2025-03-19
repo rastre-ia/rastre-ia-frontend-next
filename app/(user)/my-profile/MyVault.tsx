@@ -46,23 +46,20 @@ const MyVault: FunctionComponent<MyVaultProps> = () => {
 						posterior.
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="space-y-4 h-[100%]">
-					<div
-						className={cn(
-							'h-[50%] flex justify-center',
-							showMyItems ? '' : ''
-						)}
-					>
+				<CardContent className="space-y-4">
+					<div className={cn('flex justify-center')}>
 						<div
 							className={cn(
 								'flex',
-								showMyItems ? 'flex-col gap-2' : 'gap-6'
+								showMyItems
+									? 'flex-row sm:flex-col gap-2'
+									: 'flex-row sm:flex-row gap-6'
 							)}
 						>
 							<Link href="/my-profile/add-item">
 								<Button
 									className={cn(
-										'flex items-center justify-center',
+										'flex items-center justify-center w-full sm:w-auto',
 										showMyItems
 											? ''
 											: 'h-full aspect-square flex-col space-y-6'
@@ -87,7 +84,7 @@ const MyVault: FunctionComponent<MyVaultProps> = () => {
 							<Button
 								variant="outline"
 								className={cn(
-									'flex items-center justify-center',
+									'flex items-center justify-center w-full sm:w-auto',
 									showMyItems
 										? ''
 										: 'h-full aspect-square flex-col space-y-6'
@@ -119,12 +116,24 @@ const MyVault: FunctionComponent<MyVaultProps> = () => {
 			</div>
 			<div
 				className={cn(
-					'bg-black/5 shadow-inner border-l transition-all duration-500 ease-in-out overflow-hidden',
-					showMyItems ? 'w-full sm:w-3/5' : 'w-0'
+					'bg-black/5 shadow-inner border-l transition-all duration-500 ease-in-out overflow-hidden w-full sm:w-0',
+					showMyItems
+						? 'max-h-screen sm:max-h-full sm:w-3/5'
+						: 'max-h-0'
 				)}
 			>
 				<div></div>
-				List of my items
+				List of my items List of my items List of my items List of my
+				items List of my items List of my items List of my items List of
+				my items List of my items List of my items List of my items List
+				of my items List of my items List of my items List of my items
+				List of my items List of my items List of my items List of my
+				items List of my items List of my items List of my items List of
+				my items List of my items List of my items List of my items List
+				of my items List of my items List of my items List of my items
+				List of my items List of my items List of my items List of my
+				items List of my items List of my items List of my items List of
+				my items List of my items List of my items
 			</div>
 		</Card>
 	);
