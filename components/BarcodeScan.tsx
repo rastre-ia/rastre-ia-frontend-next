@@ -12,7 +12,11 @@ import { QrCode, ShieldX } from 'lucide-react';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { RotatingLines } from 'react-loader-spinner';
 
-const BarcodeScan: FunctionComponent = () => {
+interface BarcodeScanProps {
+	onScan: (decodedText: string) => void;
+}
+
+const BarcodeScan: FunctionComponent<BarcodeScanProps> = ({ onScan }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState('');
 	const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -33,7 +37,6 @@ const BarcodeScan: FunctionComponent = () => {
 			facingMode: 'environment',
 		},
 	};
-	const [scannedValue, setScannedValue] = useState('asdasdfasdf');
 
 	const handleSubmit = async (decodedText: string) => {
 		setIsLoading(true);
@@ -79,10 +82,10 @@ const BarcodeScan: FunctionComponent = () => {
 				{ facingMode: 'environment' },
 				config,
 				(decodedText) => {
-					setScannedValue(decodedText);
-
 					handleSubmit(decodedText);
 					stopScanner();
+
+					onScan(decodedText);
 					console.log(decodedText);
 				},
 				() => {}
@@ -158,8 +161,6 @@ const BarcodeScan: FunctionComponent = () => {
 					<AlertDescription>{error}</AlertDescription>
 				</Alert>
 			)}
-
-			<div>{scannedValue}</div>
 		</>
 	);
 };

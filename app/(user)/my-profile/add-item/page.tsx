@@ -22,7 +22,7 @@ const AddItem: FunctionComponent<AddItemProps> = () => {
 					posterior.
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="flex flex-col px-0 items-center">
+			<CardContent className="flex flex-col px-0 pb-0 items-center">
 				<ObjectInfo />
 			</CardContent>
 		</Card>
