@@ -27,7 +27,7 @@ const BarcodeScan: FunctionComponent = () => {
 		formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128],
 	};
 
-	const handleSubmit = async (mac: string, password: string) => {
+	const handleSubmit = async () => {
 		setIsLoading(true);
 		setError('');
 
@@ -100,9 +100,9 @@ const BarcodeScan: FunctionComponent = () => {
 		e.preventDefault();
 		const data = new FormData(e.currentTarget);
 
-		const mac = data.get('mac') as string;
-		const password = data.get('password') as string;
-		handleSubmit(mac, password);
+		// const mac = data.get('mac') as string;
+		// const password = data.get('password') as string;
+		handleSubmit();
 		setManualMode(false);
 	};
 	useEffect(() => {
