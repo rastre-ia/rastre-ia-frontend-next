@@ -154,7 +154,7 @@ export default function SearchStolenItemDialog({
 				'Content-Type': 'application/json',
 			};
 
-			const res = await fetch(BACKEND_URL + '/other/websracp', {
+			const res = await fetch(BACKEND_URL + '/other/webscrap', {
 				method: 'POST',
 				headers: {
 					...headers,
