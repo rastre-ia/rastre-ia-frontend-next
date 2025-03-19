@@ -12,8 +12,14 @@ import {
 	Upload,
 	User,
 } from 'lucide-react';
-import { FormEvent, useState } from 'react';
-import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { FormEvent, useEffect, useState } from 'react';
+import {
+	MapContainer,
+	Marker,
+	TileLayer,
+	useMap,
+	useMapEvents,
+} from 'react-leaflet';
 
 import AnimatedLogo from '@/components/AnimatedLogo';
 import { Button } from '@/components/ui/button';
@@ -42,10 +48,6 @@ interface LatLng {
 	lng: number;
 }
 
-interface LocationMarkerProps {
-	position: LatLng | null;
-}
-
 const customIcon = new L.Icon({
 	iconUrl:
 		'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -54,15 +56,47 @@ const customIcon = new L.Icon({
 	popupAnchor: [1, -34],
 });
 
-function LocationMarker({ position }: LocationMarkerProps) {
-	return position === null ? null : (
-		<Marker position={position} icon={customIcon} />
-	);
+function LocationPicker({
+	onLocationChange,
+}: {
+	onLocationChange: (latlng: { lat: number; lng: number }) => void;
+}) {
+	const map = useMap();
+	const [position, setPosition] = useState(map.getCenter());
+
+	useMapEvents({
+		click(e) {
+			setPosition(e.latlng);
+			onLocationChange(e.latlng);
+		},
+	});
+
+	useEffect(() => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					const { latitude, longitude } = position.coords;
+
+					map.setView([latitude, longitude], map.getZoom());
+					setPosition(new L.LatLng(latitude, longitude));
+					onLocationChange({ lat: latitude, lng: longitude });
+				},
+				() => {
+					console.warn(
+						'Geolocation permission denied. Using default location.'
+					);
+				}
+			);
+		}
+	}, [map, onLocationChange]);
+
+	return <Marker position={position} icon={customIcon} />;
 }
 
 export default function RegisterItem() {
-	const [position] = useState<LatLng | null>(null);
+	const [position, setPosition] = useState<LatLng | null>(null);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	const [mapCenter] = useState({ lat: -23.564, lng: -46.652 });
 	const { data: session, status } = useSession();
 	const { toast } = useToast();
 	const userId = session?.user?._id;
@@ -74,7 +108,6 @@ export default function RegisterItem() {
 	if (!userId) {
 		return <div>Loading...</div>;
 	}
-	const center: LatLng = { lat: -23.564, lng: -46.652 };
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -249,18 +282,18 @@ export default function RegisterItem() {
 								</Label>
 								<div className="h-[300px] mt-2 rounded-md overflow-hidden">
 									<MapContainer
-										center={center}
-										zoom={10}
-										minZoom={10}
-										scrollWheelZoom={true}
+										key={`${mapCenter.lat}-${mapCenter.lng}`}
+										center={mapCenter}
+										zoom={15}
 										style={{
 											height: '100%',
 											width: '100%',
-											maxWidth: '500px',
 										}}
 									>
 										<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-										<LocationMarker position={position} />
+										<LocationPicker
+											onLocationChange={setPosition}
+										/>
 									</MapContainer>
 								</div>
 							</motion.div>

@@ -18,7 +18,7 @@ const AddItem: FunctionComponent<AddItemProps> = () => {
 			<CardHeader>
 				<CardTitle>Adicionar Item</CardTitle>
 				<CardDescription>
-					Registre itens a sua conta a possibilite a recuperação
+					Registre itens a sua conta e possibilite a recuperação
 					posterior.
 				</CardDescription>
 			</CardHeader>
