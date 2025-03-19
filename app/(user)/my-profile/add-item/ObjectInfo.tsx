@@ -73,7 +73,7 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 								<Button asChild>
 									<span>
 										<ScanBarcode />
-										Escanear nota fiscal
+										Escanear Nota Fiscal
 									</span>
 								</Button>
 							</DialogTrigger>

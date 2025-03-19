@@ -18,11 +18,16 @@ const BarcodeScan: FunctionComponent = () => {
 	const scannerRef = useRef<Html5Qrcode | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const config: Html5QrcodeScannerConfig = {
-		fps: 14,
-		qrbox: 200,
+		fps: 10,
+		qrbox: 300,
 		rememberLastUsedCamera: true,
 		supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
 		formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128],
+		useBarCodeDetectorIfSupported: true,
+		showTorchButtonIfSupported: true,
+		videoConstraints: {
+			frameRate: 10,
+		},
 	};
 	const [scannedValue, setScannedValue] = useState('asdasdfasdf');
 
