@@ -99,6 +99,7 @@ const BarcodeScan: FunctionComponent = () => {
 	const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const data = new FormData(e.currentTarget);
+		console.log(data);
 
 		// const mac = data.get('mac') as string;
 		// const password = data.get('password') as string;
