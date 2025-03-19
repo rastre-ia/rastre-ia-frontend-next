@@ -1,5 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import {
+	ArrowUpDown,
 	BarChart3,
 	FileText,
 	Locate,
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import RolesEnum from '../../lib/schemas/helpers/RolesEnum';
 import ActiveAssistanceRequests from './ActiveAssistanceRequests';
+import Migrate from './Migrate';
 import SearchReports from './SearchReports';
 import SearchStolenItems from './SearchStolenItems';
 
@@ -93,6 +95,10 @@ export default async function PoliceDashboard() {
 							<PackageSearch className="h-4 w-4 mr-2" />
 							Buscar itens roubados
 						</TabsTrigger>
+						<TabsTrigger value="migrate">
+							<ArrowUpDown className="h-4 w-4 mr-2" />
+							MIgração
+						</TabsTrigger>
 					</TabsList>
 
 					<TabsContent value="overview" className="space-y-4">
@@ -119,6 +125,9 @@ export default async function PoliceDashboard() {
 						className="space-y-4"
 					>
 						<SearchStolenItems />
+					</TabsContent>
+					<TabsContent value="migrate" className="space-y-4">
+						<Migrate />
 					</TabsContent>
 				</Tabs>
 			</div>
