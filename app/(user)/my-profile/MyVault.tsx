@@ -42,7 +42,7 @@ const MyVault: FunctionComponent<MyVaultProps> = () => {
 						</Button>
 					</div>
 					<CardDescription>
-						Registre itens a sua conta a possibilite a recuperação
+						Registre itens a sua conta e possibilite a recuperação
 						posterior.
 					</CardDescription>
 				</CardHeader>
