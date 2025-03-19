@@ -52,7 +52,7 @@ export default async function HelpWanted() {
 
 	const resUsers = await fetch(BACKEND_URL + '/db/users/' + user._id, {
 		method: 'GET',
-		headers: myHeaders,
+		headers: new Headers(myHeaders),
 	});
 	const userData = (await resUsers.json()).user as UsersSchema;
 
@@ -60,7 +60,7 @@ export default async function HelpWanted() {
 		BACKEND_URL + '/db/answer-requests?id=' + user._id,
 		{
 			method: 'GET',
-			headers: myHeaders,
+			headers: new Headers(myHeaders),
 		}
 	);
 	const myAnswerRequests = (await resAnswerRequests.json()) as {
@@ -72,7 +72,7 @@ export default async function HelpWanted() {
 		BACKEND_URL + '/db/answers?id=' + user._id,
 		{
 			method: 'GET',
-			headers: myHeaders,
+			headers: new Headers(myHeaders),
 		}
 	);
 	const myAnswers = (await resMyAnswers.json()) as {
