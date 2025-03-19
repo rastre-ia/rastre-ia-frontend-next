@@ -8,15 +8,13 @@ import {
 	Html5QrcodeSupportedFormats,
 } from 'html5-qrcode';
 import { Html5QrcodeScannerConfig } from 'html5-qrcode/esm/html5-qrcode-scanner';
-import { Check, Pencil, QrCode, ShieldX } from 'lucide-react';
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { QrCode, ShieldX } from 'lucide-react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { RotatingLines } from 'react-loader-spinner';
-import { Input } from './ui/input';
 
 const BarcodeScan: FunctionComponent = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState('');
-	const [manualMode, setManualMode] = useState(false);
 	const scannerRef = useRef<Html5Qrcode | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const config: Html5QrcodeScannerConfig = {
@@ -26,9 +24,13 @@ const BarcodeScan: FunctionComponent = () => {
 		supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
 		formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128],
 	};
+	const [scannedValue, setScannedValue] = useState('asdasdfasdf');
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (decodedText: string) => {
 		setIsLoading(true);
+
+		console.log(decodedText);
+
 		setError('');
 
 		await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -68,9 +70,9 @@ const BarcodeScan: FunctionComponent = () => {
 				{ facingMode: 'environment' },
 				config,
 				(decodedText) => {
-					// const parsedJson = JSON.parse(decodedText);
+					setScannedValue(decodedText);
 
-					// handleSubmit(parsedJson.mac, parsedJson.password);
+					handleSubmit(decodedText);
 					stopScanner();
 					console.log(decodedText);
 				},
@@ -96,16 +98,6 @@ const BarcodeScan: FunctionComponent = () => {
 		}
 	};
 
-	const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const data = new FormData(e.currentTarget);
-		console.log(data);
-
-		// const mac = data.get('mac') as string;
-		// const password = data.get('password') as string;
-		handleSubmit();
-		setManualMode(false);
-	};
 	useEffect(() => {
 		return () => {
 			stopScanner();
@@ -113,78 +105,42 @@ const BarcodeScan: FunctionComponent = () => {
 	}, []);
 
 	return (
-		<div className="flex flex-col items-center justify-center gap-4 p-6 bg-background border text-white rounded-md shadow-lg w-full max-w-md">
-			<h1 className="font-semibold text-2xl">Adicionar Dispositivo</h1>
-			{!manualMode ? (
-				<>
-					<div
-						ref={containerRef}
-						id="qr-scanner"
-						className="w-full rounded-md overflow-hidden shadow-md"
+		<>
+			<div
+				ref={containerRef}
+				id="qr-scanner"
+				className="w-full rounded-md overflow-hidden shadow-md"
+			/>
+
+			{isLoading && (
+				<div className="flex items-center gap-4">
+					Abrindo a câmera...
+					<RotatingLines
+						ariaLabel="loading-spinner"
+						strokeColor="white"
+						width="24"
 					/>
-
-					{isLoading && (
-						<div className="flex items-center gap-4">
-							Abrindo a câmera...
-							<RotatingLines
-								ariaLabel="loading-spinner"
-								strokeColor="white"
-								width="24"
-							/>
-						</div>
-					)}
-
-					{!isLoading && !scannerRef.current && (
-						<p className="text-center text-sm">
-							Para escanear o QR Code, precisamos de acesso à sua
-							câmera.
-						</p>
-					)}
-
-					<div className="flex flex-col gap-3 w-full">
-						{!scannerRef.current && (
-							<Button
-								onClick={startScanner}
-								disabled={isLoading}
-								className="w-full bg-white text-primary"
-							>
-								<QrCode className="mr-2" /> Escanear QR Code
-							</Button>
-						)}
-
-						<Button
-							className="w-full"
-							variant={'secondary'}
-							onClick={() => {
-								setManualMode(true);
-								stopScanner();
-							}}
-							disabled={isLoading}
-						>
-							<Pencil className="mr-2" /> Inserir manualmente
-						</Button>
-					</div>
-				</>
-			) : (
-				<form onSubmit={handleManualSubmit} className="w-full">
-					<div className="flex flex-col gap-3 w-full min-w-full">
-						<Input type="text" placeholder="código nota fiscal" />
-						<Button
-							className="w-full bg-white text-primary"
-							type="submit"
-						>
-							<Check /> Confirmar
-						</Button>
-						<Button
-							className="w-full"
-							variant={'secondary'}
-							onClick={() => setManualMode(false)}
-						>
-							Cancelar
-						</Button>
-					</div>
-				</form>
+				</div>
 			)}
+
+			{!isLoading && !scannerRef.current && (
+				<p className="text-sm">
+					Para escanear o código, precisamos de acesso à sua câmera.
+				</p>
+			)}
+
+			<div className="flex flex-col gap-3 w-full">
+				{!scannerRef.current && (
+					<Button
+						onClick={startScanner}
+						disabled={isLoading}
+						className="w-full"
+						variant={'outline'}
+					>
+						<QrCode className="mr-2" /> Escanear QR Code
+					</Button>
+				)}
+			</div>
 
 			{error && (
 				<Alert variant="destructive" className="w-full">
@@ -193,7 +149,9 @@ const BarcodeScan: FunctionComponent = () => {
 					<AlertDescription>{error}</AlertDescription>
 				</Alert>
 			)}
-		</div>
+
+			<div>{scannedValue}</div>
+		</>
 	);
 };
 

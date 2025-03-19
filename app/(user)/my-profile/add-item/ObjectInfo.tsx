@@ -1,6 +1,15 @@
 'use client';
 
+import BarcodeScan from '@/components/BarcodeScan';
 import { Button } from '@/components/ui/button';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
 import {
 	Form,
 	FormControl,
@@ -38,7 +47,7 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 	}
 
 	return (
-		<div className="bg-black/5 p-2 sm:p-4 lg:p-6 -mx-6 border w-full">
+		<div className="bg-black/5 p-2 sm:px-4 lg:px-6 -mx-6 border w-full space-y-3">
 			<h3 className="text w-full text-center font-semibold text-lg">
 				Dados do objeto
 			</h3>
@@ -47,7 +56,7 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 					defaultValue="scan"
 					className="w-full items-center flex flex-col justify-center"
 				>
-					<TabsList className="mx-auto">
+					<TabsList className="mx-auto mb-4">
 						<TabsTrigger value="scan">
 							Buscar nota fiscal
 						</TabsTrigger>
@@ -57,12 +66,33 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 					</TabsList>
 					<TabsContent
 						value="scan"
-						className="w-full h-full flex gap-2 items-center justify-center"
+						className="w-full h-full flex flex-col sm:flex-row gap-2 items-center justify-center"
 					>
-						<Button>
-							<ScanBarcode />
-							Escanear nota fiscal
-						</Button>
+						<Dialog>
+							<DialogTrigger>
+								<Button asChild>
+									<span>
+										<ScanBarcode />
+										Escanear nota fiscal
+									</span>
+								</Button>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>
+										Escaneando Código de Barras
+									</DialogTitle>
+									<DialogDescription>
+										Aponte a câmera para o código de barras
+										na Nota Fiscal do produto.
+									</DialogDescription>
+								</DialogHeader>
+								<div className="-mx-4">
+									<BarcodeScan />
+								</div>
+							</DialogContent>
+						</Dialog>
+
 						<p>ou</p>
 						<div className="bg-white p-2 border rounded-lg flex flex-col gap-2 w-full">
 							<div className="gap-2 flex w-full">
@@ -73,7 +103,8 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 								<Button>Enviar</Button>
 							</div>
 							<p className="text-muted-foreground text-xs">
-								Conjunto de números próximo ao código de barras.
+								[Chave de Acesso] Encontrada próximo ao código
+								de barras.
 							</p>
 						</div>
 					</TabsContent>
