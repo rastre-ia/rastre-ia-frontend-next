@@ -61,7 +61,7 @@ export default function Migrate() {
 		lat: number;
 		lng: number;
 	} | null>(null);
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 	const userId = session?.user?._id;
 	const { toast } = useToast();
 
