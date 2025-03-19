@@ -95,7 +95,7 @@ const HelpWantedRequest = async ({
 						</Badge>
 					))} */}
 				</div>
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between flex-wrap">
 					<div className="flex items-center">
 						{answered ? (
 							<div className="flex gap-4 align-middle bg-secondary p-2 rounded-md">
@@ -117,9 +117,7 @@ const HelpWantedRequest = async ({
 						<DialogTrigger asChild>
 							<Button variant={answered ? 'outline' : 'default'}>
 								<MessageSquare className="h-4 w-4 mr-2" />
-								{answered
-									? 'Enviar nova resposta'
-									: 'Responder'}
+								{answered ? 'Nova resposta' : 'Responder'}
 							</Button>
 						</DialogTrigger>
 						<DialogContent>
