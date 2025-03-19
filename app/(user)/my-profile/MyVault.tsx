@@ -122,18 +122,7 @@ const MyVault: FunctionComponent<MyVaultProps> = () => {
 						: 'max-h-0'
 				)}
 			>
-				<div></div>
-				List of my items List of my items List of my items List of my
-				items List of my items List of my items List of my items List of
-				my items List of my items List of my items List of my items List
-				of my items List of my items List of my items List of my items
-				List of my items List of my items List of my items List of my
-				items List of my items List of my items List of my items List of
-				my items List of my items List of my items List of my items List
-				of my items List of my items List of my items List of my items
-				List of my items List of my items List of my items List of my
-				items List of my items List of my items List of my items List of
-				my items List of my items List of my items
+				LIST of ITEMS
 			</div>
 		</Card>
 	);

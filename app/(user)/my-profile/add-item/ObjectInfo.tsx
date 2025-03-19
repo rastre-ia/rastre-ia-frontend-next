@@ -215,7 +215,7 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 							<FormField
 								control={withInvoiceForm.control}
 								name="images"
-								render={({ field }) => (
+								render={() => (
 									<FormItem>
 										<FormLabel className="flex items-center gap-2 mb-2">
 											<Camera className="h-4 w-4" />
@@ -371,9 +371,10 @@ const ObjectInfo: FunctionComponent<ObjectInfoProps> = () => {
 											/>
 										</FormControl>
 										<FormDescription>
-											Exemplos: "Arranhão na tampa
-											traseira", "Adesivo personalizado",
-											"Iniciais gravadas"
+											Exemplos: &quot;Arranhão na tampa
+											traseira&quot;, &quot;Adesivo
+											personalizado&quot;, &quot;Iniciais
+											gravadas&quot;
 										</FormDescription>
 										<FormMessage />
 									</FormItem>
