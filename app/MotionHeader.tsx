@@ -11,7 +11,7 @@ interface MotionHeaderProps {}
 
 const MotionHeader: FunctionComponent<MotionHeaderProps> = ({}) => {
 	return (
-		<section className="container mx-auto px-6 py-20 text-center">
+		<section className="container mx-auto px-6 py-6 md:py-10 text-center">
 			<motion.h1
 				className="text-5xl font-bold mb-6"
 				initial={{ opacity: 0, y: -50 }}

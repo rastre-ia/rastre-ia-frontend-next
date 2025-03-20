@@ -1,13 +1,13 @@
-import React from 'react';
 import Link from 'next/link';
+import React from 'react';
 
 import { Button } from '@/components/ui/button';
 
 import AnimatedLogo from '@/components/AnimatedLogo';
-import ProcessFlux from './ProcessFlux';
-import MotionHeader from './MotionHeader';
 import FeatureCards from './FeatureCards';
 import LoginAvatar from './LoginAvatar';
+import MotionHeader from './MotionHeader';
+import ProcessFlux from './ProcessFlux';
 
 const Home: React.FC = () => {
 	return (
@@ -23,10 +23,10 @@ const Home: React.FC = () => {
 				</nav>
 			</header>
 
-			<main className="pt-20">
+			<main className="pt-10">
 				<MotionHeader />
 
-				<section className="container mx-auto px-6 py-20">
+				<section className="container mx-auto px-6 py-6">
 					<h2 className="text-3xl font-bold mb-12 text-center">
 						Como Funciona
 					</h2>
@@ -37,7 +37,7 @@ const Home: React.FC = () => {
 
 				<ProcessFlux />
 
-				<section className="container mx-auto px-6 py-20">
+				<section className="container mx-auto px-6 py-6">
 					<div className="bg-white dark:bg-gray-800 p-12 rounded-lg shadow-lg">
 						<h2 className="text-3xl font-bold mb-6">
 							Junte-se à Luta Contra o Crime

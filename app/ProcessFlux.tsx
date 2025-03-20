@@ -37,7 +37,7 @@ interface ProcessFluxProps {}
 
 const ProcessFlux: FunctionComponent<ProcessFluxProps> = ({}) => {
 	return (
-		<section className="container mx-auto px-6 py-20">
+		<section className="container mx-auto px-6 py-6 md:py-10">
 			<h2 className="text-3xl font-bold mb-12 text-center">
 				Fluxo de processo RastreIA
 			</h2>
